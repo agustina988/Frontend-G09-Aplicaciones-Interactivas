@@ -1,20 +1,56 @@
-import {Link} from 'react-router-dom'
+import { Link, useNavigate } from "react-router-dom";
+import { useApp } from "../context/AppContext";
+import "./Navigation.css";
 
-const Navigation = () => {
+export default function Navigation() {
+    const { usuario, totalCarrito, favoritos } = useApp();
+    const navigate = useNavigate();
+
     return (
-        <>
-         <nav>
-            <ul>
-                <li>
-                    <Link to={'/home'}>Inicio</Link>
-                </li>
-                <li>
-                    <Link to={'/joyeria'}>Joyeria</Link>
-                </li>
-            </ul>
-        </nav>
-        </>
-    )
-}
+        <header className="nav-header">
+            <nav className="nav-inner">
+                <div className="nav-links">
+                    <Link to="/joyeria">Joyería</Link>
+                    <Link to="/relojes">Relojes</Link>
+                    <Link to="/lingotes">Lingotes</Link>
+                    <Link to="/edicion-limitada" className="nav-link-destacado">Edición limitada</Link>
+                </div>
 
-export default Navigation
+                <Link to="/" className="nav-logo">AUREA</Link>
+
+                <div className="nav-actions">
+                    <div className="nav-search">
+                        <input type="text" placeholder="Buscar un producto..." />
+                        <button aria-label="Buscar">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <Link to="/favoritos" className="nav-icon-btn" aria-label="Favoritos">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                        {favoritos.length > 0 && <span className="nav-badge">{favoritos.length}</span>}
+                    </Link>
+
+                    <Link to="/carrito" className="nav-icon-btn" aria-label="Carrito">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                        {totalCarrito > 0 && <span className="nav-badge">{totalCarrito}</span>}
+                    </Link>
+
+                    <Link to={usuario ? "/perfil" : "/login"} className="nav-icon-btn" aria-label="Perfil">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </Link>
+                </div>
+            </nav>
+        </header>
+    );
+}
