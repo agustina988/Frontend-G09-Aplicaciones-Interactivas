@@ -6,7 +6,7 @@
 .home-hero {
     position: relative;
     height: 580px;
-    background: url('/src/assets/home_carrusel.jpg') center/cover no-repeat;
+    background: url('/src/assets/home/home_carrusel.jpg') center/cover no-repeat;
     display: flex;
     align-items: center;
     overflow: hidden;

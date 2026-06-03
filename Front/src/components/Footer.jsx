@@ -5,18 +5,16 @@ export default function Footer() {
     return (
         <footer className="footer">
             <div className="footer-newsletter">
-                <div className="footer-newsletter-box">
-                    <div className="footer-newsletter-inner">
-                        <p className="footer-newsletter-label">EXCLUSIVIDAD</p>
-                        <h2>Se parte de AUREA</h2>
-                        <p className="footer-newsletter-desc">
-                            Sé la primera persona en descubrir las nuevas colecciones, piezas exclusivas y lanzamientos limitados de joyería y lingotes premium.<br />
-                            Recibí beneficios especiales, acceso anticipado y novedades de nuestra marca directamente en tu correo.
-                        </p>
-                        <div className="footer-newsletter-form">
-                            <input type="email" placeholder="Tu dirección de correo electrónico" />
-                            <button>UNIRSE</button>
-                        </div>
+                <div className="footer-newsletter-inner">
+                    <p className="footer-newsletter-label">EXCLUSIVIDAD</p>
+                    <h2>Se parte de AUREA</h2>
+                    <p className="footer-newsletter-desc">
+                        Sé la primera persona en descubrir las nuevas colecciones, piezas exclusivas y lanzamientos limitados de joyería y lingotes premium.<br />
+                        Recibí beneficios especiales, acceso anticipado y novedades de nuestra marca directamente en tu correo.
+                    </p>
+                    <div className="footer-newsletter-form">
+                        <input type="email" placeholder="Tu dirección de correo electrónico" />
+                        <button>UNIRSE</button>
                     </div>
                 </div>
             </div>
