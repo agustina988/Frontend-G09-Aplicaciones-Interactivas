@@ -1,0 +1,264 @@
+.vender-page { font-family: 'Cormorant Garamond', serif; background: #faf9f6; }
+
+.vender-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 5rem;
+}
+
+.vender-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: #8b6914;
+    margin-bottom: 0.4rem;
+}
+
+.vender-header { margin-bottom: 2rem; }
+
+.vender-header h1 {
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: #2a2520;
+    margin-bottom: 0.4rem;
+}
+
+.vender-desc { font-size: 15px; color: #7a7570; line-height: 1.6; }
+
+/* TABS */
+.vender-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid #e8e4dc;
+    margin-bottom: 2.5rem;
+}
+
+.vender-tab {
+    background: none;
+    border: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: #8a8580;
+    padding: 10px 24px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.2s;
+}
+
+.vender-tab.active {
+    color: #8b6914;
+    border-bottom-color: #8b6914;
+    font-weight: 600;
+}
+
+/* MERCADO */
+.vender-mercado-count {
+    font-size: 14px;
+    color: #8a8580;
+    margin-bottom: 1.5rem;
+}
+
+.vender-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.vender-card {
+    border: 1px solid #e8e4dc;
+    background: #fff;
+    transition: box-shadow 0.2s;
+}
+
+.vender-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+
+.vender-card-img {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #f5f2ec;
+}
+
+.vender-card-img img { width: 100%; height: 100%; object-fit: cover; }
+
+.vender-card-cert {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: #2a2520;
+    color: #c9a84c;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    padding: 3px 8px;
+}
+
+.vender-card-info { padding: 1.2rem; }
+
+.vender-card-nombre {
+    font-size: 16px;
+    font-weight: 500;
+    color: #2a2520;
+    margin-bottom: 0.8rem;
+}
+
+.vender-card-vendedor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid #f0ece3;
+}
+
+.vender-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #8b6914;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.vender-card-vendedor p:first-child { font-size: 14px; color: #2a2520; }
+.vender-rating { font-size: 12px; color: #8a8580; }
+
+.vender-card-specs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.vender-card-specs span {
+    font-size: 11px;
+    border: 1px solid #e0dbd2;
+    padding: 2px 8px;
+    color: #5a5550;
+    letter-spacing: 0.05em;
+}
+
+.vender-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.vender-card-precio { font-size: 1.3rem; font-weight: 600; color: #8b6914; }
+
+.vender-card-btn {
+    background: #2a2520;
+    color: #faf9f6;
+    border: none;
+    padding: 8px 16px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.vender-card-btn:hover { background: #8b6914; }
+
+/* FORM */
+.vender-form-section { max-width: 700px; }
+
+.vender-login-aviso {
+    background: #fdf5e4;
+    border: 1px solid #e0cfa0;
+    padding: 1rem 1.5rem;
+    font-size: 15px;
+    color: #8b6914;
+    margin-bottom: 2rem;
+    border-radius: 2px;
+}
+
+.vender-login-aviso a { color: #8b6914; font-weight: 600; }
+
+.vender-form h2 { font-size: 1.8rem; font-weight: 400; color: #2a2520; margin-bottom: 0.4rem; }
+.vender-form-desc { font-size: 14px; color: #7a7570; margin-bottom: 2rem; }
+
+.vender-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.2rem;
+}
+
+.vender-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 1.2rem;
+}
+
+.vender-field label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: #8a8580;
+}
+
+.vender-field input,
+.vender-field select,
+.vender-field textarea {
+    border: none;
+    border-bottom: 1px solid #d0cbc2;
+    background: transparent;
+    padding: 8px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: #2a2520;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.vender-field input:focus,
+.vender-field select:focus,
+.vender-field textarea:focus { border-bottom-color: #8b6914; }
+
+.vender-aviso {
+    display: flex;
+    gap: 10px;
+    background: #f5f2ec;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: flex-start;
+}
+
+.vender-aviso p { font-size: 13px; color: #5a5550; line-height: 1.6; }
+
+.vender-btn {
+    background: #8b6914;
+    color: #fff;
+    border: none;
+    padding: 14px 32px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.vender-btn:hover { background: #6d510f; }
+
+/* ÉXITO */
+.vender-exito {
+    text-align: center;
+    padding: 4rem 0;
+}
+
+.vender-exito-icon {
+    font-size: 3rem;
+    color: #8b6914;
+    margin-bottom: 1rem;
+}
+
+.vender-exito h2 { font-size: 2rem; font-weight: 400; color: #2a2520; margin-bottom: 0.8rem; }
+.vender-exito p { font-size: 15px; color: #7a7570; margin-bottom: 2rem; }
+
+@media (max-width: 768px) {
+    .vender-grid { grid-template-columns: 1fr 1fr; }
+    .vender-form-row { grid-template-columns: 1fr; }
+}

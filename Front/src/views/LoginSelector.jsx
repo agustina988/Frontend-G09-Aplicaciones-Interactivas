@@ -3,16 +3,13 @@ import "./LoginSelector.css";
 
 export default function LoginSelector() {
     const navigate = useNavigate();
-
     return (
         <div className="login-sel-page">
             <div className="login-sel-logo">AUREA</div>
-
             <h1 className="login-sel-title">Acceso Exclusivo</h1>
             <p className="login-sel-sub">Seleccione su portal de entrada a la excelencia.</p>
-
             <div className="login-sel-cards">
-                <button className="login-sel-card" onClick={() => navigate("/login/usuario")}>
+                <button className="login-sel-card" onClick={() => navigate("/login")}>
                     <div className="login-sel-icon">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -22,7 +19,6 @@ export default function LoginSelector() {
                     <p className="login-sel-card-desc">Acceda a sus adquisiciones y piezas deseadas</p>
                     <span className="login-sel-link">ENTRAR AL ATELIER</span>
                 </button>
-
                 <button className="login-sel-card" onClick={() => navigate("/login/admin")}>
                     <div className="login-sel-icon">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -36,7 +32,6 @@ export default function LoginSelector() {
                     <span className="login-sel-link">ACCESO DE GESTIÓN</span>
                 </button>
             </div>
-
             <div className="login-sel-footer">
         <span className="login-sel-cert">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

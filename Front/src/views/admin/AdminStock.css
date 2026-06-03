@@ -1,0 +1,224 @@
+.admin-stock { font-family: 'Cormorant Garamond', serif; background: #faf9f4; min-height: 100vh; }
+
+.admin-stock-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+}
+
+.admin-stock-header { margin-bottom: 1.5rem; }
+
+.admin-stock-header h1 {
+    font-size: 2.5rem;
+    font-weight: 400;
+    color: #2a2520;
+    margin-bottom: 0.3rem;
+}
+
+.admin-stock-header p { font-size: 14px; color: #7a7570; }
+
+/* TABS */
+.admin-stock-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #e0dbd0;
+    margin-bottom: 2rem;
+}
+
+.admin-stock-tab {
+    background: none;
+    border: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: #8a8580;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.2s;
+}
+
+.admin-stock-tab.active {
+    color: #8b6914;
+    border-bottom-color: #8b6914;
+    font-weight: 600;
+}
+
+/* FILTROS */
+.admin-stock-filtros {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.admin-stock-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #e0dbd0;
+    background: #fff;
+    padding: 8px 14px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.admin-stock-search input {
+    border: none;
+    background: transparent;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    color: #2a2520;
+    outline: none;
+    width: 100%;
+}
+
+.admin-stock-select {
+    border: 1px solid #e0dbd0;
+    background: #fff;
+    padding: 9px 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    color: #5a5550;
+    outline: none;
+    cursor: pointer;
+}
+
+/* TABLA */
+.admin-stock-tabla {
+    border: 1px solid #e0dbd0;
+    background: #fff;
+}
+
+.admin-stock-tabla-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 160px 120px;
+    padding: 0.9rem 1.5rem;
+    background: #f5f2ec;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: #8a8580;
+    border-bottom: 1px solid #e0dbd0;
+}
+
+.admin-stock-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 160px 120px;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f0ece3;
+    align-items: center;
+    font-size: 15px;
+    color: #3a3530;
+    transition: background 0.15s;
+}
+
+.admin-stock-row:hover { background: #faf8f4; }
+.admin-stock-row:last-child { border-bottom: none; }
+
+.admin-stock-prod {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-stock-prod img {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    background: #f5f2ec;
+    flex-shrink: 0;
+    border-radius: 2px;
+}
+
+.admin-stock-cat { font-size: 14px; color: #5a5550; }
+
+.admin-stock-precio { font-size: 15px; color: #8b6914; font-weight: 600; }
+
+.admin-stock-qty {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.admin-stock-qty button {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #e0dbd0;
+    background: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5a5550;
+    transition: background 0.2s;
+    font-family: 'Cormorant Garamond', serif;
+}
+
+.admin-stock-qty button:hover { background: #f5f2ec; color: #8b6914; }
+
+.admin-stock-qty span {
+    min-width: 36px;
+    text-align: center;
+    font-size: 15px;
+    border-top: 1px solid #e0dbd0;
+    border-bottom: 1px solid #e0dbd0;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #faf9f4;
+}
+
+.admin-stock-acciones {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.admin-accion-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #8a8580;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+.admin-accion-btn:hover { color: #2a2520; }
+.admin-accion-btn.rojo:hover { color: #c44; }
+
+.admin-stock-empty {
+    text-align: center;
+    padding: 3rem;
+    color: #aaa;
+    font-size: 16px;
+}
+
+.admin-stock-cats-redirect {
+    text-align: center;
+    padding: 4rem 0;
+    color: #7a7570;
+    font-size: 16px;
+}
+
+/* modal compartido */
+.admin-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 2rem;
+}
+.admin-modal {
+    background: #faf9f4; border: 1px solid #e0dbd0;
+    width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto;
+    font-family: 'Cormorant Garamond', serif;
+}
+.admin-modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.5rem 1.8rem; border-bottom: 1px solid #e0dbd0;
+}
+.admin-modal-header h2 { font-size: 1.4rem; font-weight: 400; color: #2a2520; }
+.admin-modal-header button { background: none; border: none; font-size: 18px; cursor: pointer; color: #8a8580; }
+.admin-modal-body { padding: 1.8rem; }

@@ -1,0 +1,150 @@
+.admin-usuarios { font-family: 'Cormorant Garamond', serif; background: #faf9f4; min-height: 100vh; }
+
+.admin-usuarios-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+}
+
+.admin-usuarios-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.admin-usuarios-header h1 {
+    font-size: 2.5rem;
+    font-weight: 400;
+    color: #2a2520;
+    margin-bottom: 0.4rem;
+}
+
+.admin-usuarios-header p {
+    font-size: 14px;
+    color: #7a7570;
+    max-width: 420px;
+    line-height: 1.6;
+}
+
+.admin-usuarios-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.admin-usuarios-stat {
+    border: 1px solid #e0dbd0;
+    background: #fff;
+    padding: 1.5rem;
+}
+
+.admin-usuarios-stat-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: #8a8580;
+    margin-bottom: 0.6rem;
+}
+
+.admin-usuarios-stat-val {
+    font-size: 2rem;
+    color: #2a2520;
+    margin-bottom: 0.3rem;
+}
+.admin-usuarios-stat-val.rojo { color: #c44; }
+
+.admin-usuarios-stat-sub { font-size: 12px; color: #8a8580; }
+
+.admin-usuario-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #2a2520;
+    color: #c9a84c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.admin-rol-badge {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    border: 1px solid #e0dbd0;
+    padding: 3px 10px;
+    color: #8a8580;
+}
+
+.admin-rol-badge.elite {
+    background: #f5f2ec;
+    border-color: #c9a84c;
+    color: #8b6914;
+}
+
+.admin-accion-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #8a8580;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+.admin-accion-btn:hover { color: #2a2520; }
+.admin-accion-btn.rojo:hover { color: #c44; }
+
+.admin-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    font-size: 17px;
+    color: #aaa;
+    border: 1px dashed #e0dbd0;
+    background: #fff;
+    font-family: 'Cormorant Garamond', serif;
+}
+
+.admin-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.admin-modal {
+    background: #faf9f4;
+    border: 1px solid #e0dbd0;
+    width: 100%;
+    max-width: 480px;
+    max-height: 80vh;
+    overflow-y: auto;
+    font-family: 'Cormorant Garamond', serif;
+}
+
+.admin-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.8rem;
+    border-bottom: 1px solid #e0dbd0;
+}
+
+.admin-modal-header h2 { font-size: 1.4rem; font-weight: 400; color: #2a2520; }
+.admin-modal-header button { background: none; border: none; font-size: 18px; cursor: pointer; color: #8a8580; }
+
+.admin-modal-body { padding: 1.8rem; }
+.admin-modal-label { font-size: 9px; letter-spacing: 0.18em; color: #8a8580; margin-bottom: 4px; }
+
+.admin-modal-prod {
+    display: flex; gap: 1rem; align-items: center;
+    padding: 0.8rem 0; border-bottom: 1px solid #f0ece3;
+}

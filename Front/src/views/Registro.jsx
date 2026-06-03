@@ -34,9 +34,8 @@ export default function Registro() {
             miembro: "MEMBER",
             desde: new Date().getFullYear().toString(),
             avatar: null,
-            rol: "usuario",
             pedidos: [],
-        });
+        }, form.password);
         navigate("/perfil");
     };
 
@@ -44,7 +43,7 @@ export default function Registro() {
         <div className="registro-page">
             <div className="registro-image-panel">
                 <img
-                    src="/src/assets/crear_cuenta_usuario.jpg"
+                    src="https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=900&q=80"
                     alt="Joyería artesanal"
                 />
                 <div className="registro-image-caption">

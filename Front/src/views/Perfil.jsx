@@ -14,7 +14,7 @@ export default function Perfil() {
 
     const handleLogout = () => {
         logout();
-        navigate("/");
+        navigate("/login");
     };
 
     return (

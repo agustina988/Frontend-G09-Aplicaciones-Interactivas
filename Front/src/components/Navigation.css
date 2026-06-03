@@ -132,3 +132,11 @@
     justify-content: center;
     font-family: sans-serif;
 }
+
+.nav-icon-logueado {
+    color: #8b6914;
+}
+
+.nav-icon-logueado svg {
+    fill: rgba(139, 105, 20, 0.12);
+}

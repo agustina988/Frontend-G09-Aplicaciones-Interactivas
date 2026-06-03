@@ -5,31 +5,27 @@ import Footer from "../components/Footer";
 import "./Checkout.css";
 
 export default function Checkout() {
-    const { carrito, subtotal, usuario } = useApp();
+    const { carrito, subtotal, total, cupon, descuentoCupon, aplicarCupon, quitarCupon, usuario } = useApp();
     const navigate = useNavigate();
     const [form, setForm] = useState({
-        nombre: usuario?.nombre || "",
-        email: usuario?.email || "",
-        direccion: "",
-        ciudad: "",
-        codigoPostal: "",
-        tarjeta: "",
-        vencimiento: "",
-        cvv: "",
+        nombre: usuario?.nombre || "", email: usuario?.email || "",
+        direccion: "", ciudad: "", codigoPostal: "",
+        tarjeta: "", vencimiento: "", cvv: "",
     });
-
+    const [codigoCupon, setCodigoCupon] = useState("");
+    const [errorCupon, setErrorCupon] = useState("");
+    const [metodoPago, setMetodoPago] = useState("tarjeta"); // tarjeta | transferencia | efectivo
     const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
-    const handleSubmit = () => {
-        navigate("/confirmacion");
+    const descuentoMetodo = metodoPago === "transferencia" ? Math.round(subtotal * 0.05) : 0;
+    const totalFinal = total - descuentoMetodo;
+
+    const handleCupon = () => {
+        if (aplicarCupon(codigoCupon)) { setErrorCupon(""); }
+        else setErrorCupon("Cupón inválido. Probá con AUREA10, AUREA20 o VIP30");
     };
 
-    if (carrito.length === 0) {
-        navigate("/carrito");
-        return null;
-    }
-
-    const primer = carrito[0];
+    if (carrito.length === 0) { navigate("/carrito"); return null; }
 
     return (
         <div className="checkout-page">
@@ -42,7 +38,6 @@ export default function Checkout() {
                     TRANSACCIÓN SEGURA
                 </p>
 
-                {/* PASOS */}
                 <div className="checkout-steps">
                     <span className="checkout-step active">PASO 1<br /><strong>ENVÍO</strong></span>
                     <span className="checkout-step">PASO 2<br /><strong>PAGO</strong></span>
@@ -50,10 +45,8 @@ export default function Checkout() {
                 </div>
 
                 <div className="checkout-layout">
-                    {/* FORMULARIO */}
                     <div className="checkout-form">
                         <h2>Datos de Envío</h2>
-
                         <div className="checkout-row">
                             <div className="checkout-field">
                                 <label>NOMBRE COMPLETO</label>
@@ -64,12 +57,10 @@ export default function Checkout() {
                                 <input type="email" placeholder="julianne@aurea.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
                             </div>
                         </div>
-
                         <div className="checkout-field full">
                             <label>DIRECCIÓN DE ENTREGA</label>
                             <input placeholder="Calle de la Elegancia 123, Suite 405" value={form.direccion} onChange={(e) => set("direccion", e.target.value)} />
                         </div>
-
                         <div className="checkout-row">
                             <div className="checkout-field">
                                 <label>CIUDAD</label>
@@ -81,87 +72,91 @@ export default function Checkout() {
                             </div>
                         </div>
 
-                        <h2 style={{ marginTop: "2.5rem" }}>Método de Pago</h2>
-
-                        <div className="checkout-pago-tipo">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                                <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
-                            </svg>
-                            <span>Tarjeta de Crédito / Débito</span>
-                            <span style={{ marginLeft: "auto", fontSize: "12px", color: "#8a8580" }}>Visa, Mastercard, American Express</span>
-                            <div className="checkout-radio-active" />
+                        <h2 style={{ marginTop: "2rem" }}>Método de Pago</h2>
+                        <div className="checkout-metodos">
+                            {[
+                                { val: "tarjeta", label: "Tarjeta de Crédito / Débito", desc: "Visa, Mastercard, American Express" },
+                                { val: "transferencia", label: "Transferencia Bancaria", desc: "5% de descuento aplicado automáticamente" },
+                                { val: "efectivo", label: "Efectivo / Mercado Pago", desc: "" },
+                            ].map((m) => (
+                                <div key={m.val} className={`checkout-metodo${metodoPago === m.val ? " active" : ""}`} onClick={() => setMetodoPago(m.val)}>
+                                    <div className="checkout-metodo-radio" />
+                                    <div>
+                                        <p>{m.label}</p>
+                                        {m.desc && <p style={{ fontSize: "12px", color: metodoPago === m.val && m.val === "transferencia" ? "#2a7a3a" : "#8a8580" }}>{m.desc}</p>}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
-                        <div className="checkout-field full">
-                            <label>NÚMERO DE TARJETA</label>
-                            <div className="checkout-input-icon">
-                                <input placeholder="0000 0000 0000 0000" value={form.tarjeta} onChange={(e) => set("tarjeta", e.target.value)} maxLength={19} />
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="1.5">
-                                    <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                </svg>
-                            </div>
-                        </div>
+                        {metodoPago === "tarjeta" && (
+                            <>
+                                <div className="checkout-field full" style={{ marginTop: "1rem" }}>
+                                    <label>NÚMERO DE TARJETA</label>
+                                    <input placeholder="0000 0000 0000 0000" value={form.tarjeta} onChange={(e) => set("tarjeta", e.target.value)} maxLength={19} />
+                                </div>
+                                <div className="checkout-row">
+                                    <div className="checkout-field">
+                                        <label>FECHA DE VENCIMIENTO</label>
+                                        <input placeholder="MM / AA" value={form.vencimiento} onChange={(e) => set("vencimiento", e.target.value)} />
+                                    </div>
+                                    <div className="checkout-field">
+                                        <label>CÓDIGO CVV</label>
+                                        <input placeholder="***" type="password" maxLength={4} value={form.cvv} onChange={(e) => set("cvv", e.target.value)} />
+                                    </div>
+                                </div>
+                            </>
+                        )}
 
-                        <div className="checkout-row">
-                            <div className="checkout-field">
-                                <label>FECHA DE VENCIMIENTO</label>
-                                <input placeholder="MM / AA" value={form.vencimiento} onChange={(e) => set("vencimiento", e.target.value)} />
+                        {/* CUPÓN */}
+                        <div className="checkout-cupon">
+                            <p className="checkout-cupon-label">¿TENÉS UN CUPÓN DE DESCUENTO?</p>
+                            <div className="checkout-cupon-row">
+                                {cupon ? (
+                                    <div className="checkout-cupon-aplicado">
+                                        <span>✓ Cupón <strong>{cupon.codigo}</strong> aplicado — {cupon.descuento}% off</span>
+                                        <button onClick={quitarCupon}>✕</button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <input placeholder="Ingresá tu código..." value={codigoCupon} onChange={(e) => setCodigoCupon(e.target.value.toUpperCase())} />
+                                        <button className="checkout-cupon-btn" onClick={handleCupon}>APLICAR</button>
+                                    </>
+                                )}
                             </div>
-                            <div className="checkout-field">
-                                <label>CÓDIGO CVV</label>
-                                <input placeholder="***" type="password" maxLength={4} value={form.cvv} onChange={(e) => set("cvv", e.target.value)} />
-                            </div>
-                        </div>
-
-                        {/* COMPROMISO */}
-                        <div className="checkout-compromiso">
-                            <p className="checkout-compromiso-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.5">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                                Compromiso Ético AUREA
-                            </p>
-                            <p>Cada pieza de nuestra colección AUREA Luxury Guild es el resultado de un proceso de trazabilidad riguroso. Garantizamos que todos nuestros diamantes y metales preciosos han sido obtenidos bajo los estándares más estrictos del Consejo de Joyería Responsable (RJC).</p>
-                            <div className="checkout-sellos">
-                                <span>RJC CERTIFIED</span>
-                                <span>KIMBERLEY PROCESS</span>
-                                <span>TRACEABLE ORIGIN</span>
-                            </div>
+                            {errorCupon && <p className="checkout-cupon-error">{errorCupon}</p>}
                         </div>
                     </div>
 
                     {/* RESUMEN */}
                     <div className="checkout-resumen">
                         <p className="checkout-resumen-title">Resumen del Pedido</p>
-
                         {carrito.map((p) => (
                             <div key={p.id} className="checkout-resumen-item">
                                 <img src={p.imagenes?.[0] || p.imagen} alt={p.nombre} />
-                                <div>
-                                    <p style={{ fontSize: "14px", color: "#8a8580", letterSpacing: "0.1em", fontSize: "11px" }}>{p.subcategoria?.toUpperCase()}</p>
+                                <div style={{ flex: 1 }}>
+                                    <p style={{ fontSize: "11px", color: "#8a8580", letterSpacing: "0.1em" }}>{p.subcategoria?.toUpperCase()}</p>
                                     <p style={{ fontSize: "17px", color: "#2a2520", fontWeight: 500 }}>{p.nombre}</p>
                                     <p style={{ fontSize: "13px", color: "#8a8580" }}>Cantidad: {p.cantidad}</p>
                                 </div>
-                                <p style={{ fontSize: "17px", color: "#8b6914", fontWeight: 600, marginLeft: "auto" }}>
-                                    ${(p.precio * p.cantidad).toLocaleString("es-AR")}
-                                </p>
+                                <p style={{ fontSize: "17px", color: "#8b6914", fontWeight: 600 }}>${(p.precio * p.cantidad).toLocaleString("es-AR")}</p>
                             </div>
                         ))}
 
                         <div className="checkout-resumen-rows">
                             <div className="checkout-resumen-row"><span>Subtotal</span><span>${subtotal.toLocaleString("es-AR")}</span></div>
-                            <div className="checkout-resumen-row"><span>Envío Premium (Asegurado)</span><span style={{ color: "#2a2520" }}>$0</span></div>
-                            <div className="checkout-resumen-row"><span>Impuestos (IVA 21%)</span><span>$0</span></div>
+                            {cupon && <div className="checkout-resumen-row descuento"><span>Cupón {cupon.codigo} ({cupon.descuento}%)</span><span>-${descuentoCupon.toLocaleString("es-AR")}</span></div>}
+                            {descuentoMetodo > 0 && <div className="checkout-resumen-row descuento"><span>Descuento transferencia (5%)</span><span>-${descuentoMetodo.toLocaleString("es-AR")}</span></div>}
+                            <div className="checkout-resumen-row"><span>Envío Premium</span><span style={{ color: "#2a2520" }}>$0</span></div>
+                            <div className="checkout-resumen-row"><span>Impuestos</span><span>$0</span></div>
                         </div>
 
                         <div className="checkout-total">
                             <span>TOTAL</span>
-                            <span>${subtotal.toLocaleString("es-AR")}</span>
+                            <span>${totalFinal.toLocaleString("es-AR")}</span>
                         </div>
 
-                        <button className="checkout-btn" onClick={handleSubmit}>
-                            CONFIRMAR Y PAGAR →
-                        </button>
+                        <button className="checkout-btn" onClick={() => navigate("/confirmacion")}>CONFIRMAR Y PAGAR →</button>
 
                         <p className="checkout-garantia">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2">
@@ -169,26 +164,9 @@ export default function Checkout() {
                             </svg>
                             Garantía AUREA de Autenticidad
                         </p>
-
                         <div className="checkout-iconos">
-                            <div className="checkout-icono">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a8580" strokeWidth="1.5">
-                                    <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="#8a8580"/>
-                                </svg>
-                                <span>ENCRYPTED</span>
-                            </div>
-                            <div className="checkout-icono">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a8580" strokeWidth="1.5">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                </svg>
-                                <span>GIA SECURE</span>
-                            </div>
-                            <div className="checkout-icono">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a8580" strokeWidth="1.5">
-                                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                                </svg>
-                                <span>GIA CERTIFIED</span>
-                            </div>
+                            <div className="checkout-icono"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8580" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>ENCRYPTED</span></div>
+                            <div className="checkout-icono"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8580" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>GIA SECURE</span></div>
                         </div>
                     </div>
                 </div>

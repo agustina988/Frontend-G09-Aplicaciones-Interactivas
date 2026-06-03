@@ -1,0 +1,72 @@
+.admin-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #faf9f4;
+    border-bottom: 1px solid #e0dbd0;
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    height: 64px;
+    gap: 2rem;
+    font-family: 'Cormorant Garamond', serif;
+}
+
+.admin-nav-logo {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: #8b6914;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.admin-nav-links {
+    display: flex;
+    gap: 0.2rem;
+    flex: 1;
+    justify-content: center;
+}
+
+.admin-nav-link {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: #8a8580;
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 2px;
+    transition: color 0.2s, background 0.2s;
+}
+
+.admin-nav-link:hover { color: #2a2520; background: #f0ece3; }
+.admin-nav-link.active { color: #8b6914; font-weight: 600; }
+
+.admin-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.admin-nav-tienda {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: #8b6914;
+    text-decoration: none;
+    border: 1px solid #e0dbd0;
+    padding: 5px 12px;
+    transition: background 0.2s;
+}
+.admin-nav-tienda:hover { background: #f5f2ec; }
+
+.admin-nav-logout {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: #8a8580;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Cormorant Garamond', serif;
+    transition: color 0.2s;
+}
+.admin-nav-logout:hover { color: #c44; }

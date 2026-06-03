@@ -3,8 +3,18 @@ import { useApp } from "../context/AppContext";
 import "./Navigation.css";
 
 export default function Navigation() {
-    const { usuario, totalCarrito, favoritos } = useApp();
+    const { usuario, logout, totalCarrito, favoritos } = useApp();
     const navigate = useNavigate();
+
+    const handlePerfil = () => {
+        if (usuario) {
+            // Si ya está logueado, cerrar sesión y redirigir al login
+            logout();
+            navigate("/login");
+        } else {
+            navigate("/login");
+        }
+    };
 
     return (
         <header className="nav-header">
@@ -43,12 +53,24 @@ export default function Navigation() {
                         {totalCarrito > 0 && <span className="nav-badge">{totalCarrito}</span>}
                     </Link>
 
-                    <Link to={usuario ? "/perfil" : "/login"} className="nav-icon-btn" aria-label="Perfil">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    </Link>
+                    {/* Muñeco: si está logueado va al perfil; si no, al login */}
+                    {usuario ? (
+                        <div className="nav-perfil-wrap">
+                            <Link to="/perfil" className="nav-icon-btn nav-icon-logueado" aria-label="Mi perfil" title={`Hola, ${usuario.nombre}`}>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                            </Link>
+                        </div>
+                    ) : (
+                        <Link to="/login" className="nav-icon-btn" aria-label="Iniciar sesión">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </Link>
+                    )}
                 </div>
             </nav>
         </header>

@@ -27,28 +27,28 @@ export default function Home() {
                 <h2>Explorá nuestras categorías</h2>
                 <div className="home-cats-grid">
                     <Link to="/joyeria" className="home-cat-card home-cat-large">
-                        <img src="/src/assets/home/home_joyeria.jpg" alt="Anillos" />
+                        <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&q=80" alt="Anillos" />
                         <div className="home-cat-overlay">
                             <p className="home-cat-name">Anillos</p>
                             <p className="home-cat-sub">Comprar Colección</p>
                         </div>
                     </Link>
                     <Link to="/lingotes" className="home-cat-card">
-                        <img src="/src/assets/home/home_lingotes.jpg" alt="Lingotes de Oro" />
+                        <img src="https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&q=80" alt="Lingotes de Oro" />
                         <div className="home-cat-overlay">
                             <p className="home-cat-name">Lingotes de Oro</p>
                             <p className="home-cat-sub">Grado de Inversión</p>
                         </div>
                     </Link>
                     <Link to="/joyeria" className="home-cat-card">
-                        <img src="/src/assets/home/home_collares.jpg" alt="Collares" />
+                        <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80" alt="Collares" />
                         <div className="home-cat-overlay">
                             <p className="home-cat-name">Collares</p>
                             <p className="home-cat-sub">Descubrí el Lujo</p>
                         </div>
                     </Link>
                     <Link to="/lingotes" className="home-cat-card">
-                        <img src="/src/assets/home/home_lingotePlata.jpg" alt="Lingotes de Plata" />
+                        <img src="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=600&q=80" alt="Lingotes de Plata" />
                         <div className="home-cat-overlay">
                             <p className="home-cat-name">Lingotes de Plata</p>
                             <p className="home-cat-sub">Preservá tu Riqueza</p>

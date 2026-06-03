@@ -1,18 +1,21 @@
+import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import "./ProductCard.css";
 
 export default function ProductCard({ producto }) {
     const { agregarAlCarrito, toggleFavorito, esFavorito } = useApp();
+    const navigate = useNavigate();
     const fav = esFavorito(producto.id);
+    const imagen = producto.imagenes?.[0] || producto.imagen;
 
     return (
         <div className="product-card">
-            <div className="product-card-img-wrap">
-                <img src={producto.imagen} alt={producto.nombre} loading="lazy" />
+            <div className="product-card-img-wrap" onClick={() => navigate(`/producto/${producto.id}`)} style={{ cursor: "pointer" }}>
+                <img src={imagen} alt={producto.nombre} loading="lazy" />
                 {producto.badge && <span className="product-badge">{producto.badge}</span>}
                 <button
                     className={`product-fav-btn${fav ? " active" : ""}`}
-                    onClick={() => toggleFavorito(producto)}
+                    onClick={(e) => { e.stopPropagation(); toggleFavorito(producto); }}
                     aria-label={fav ? "Quitar de favoritos" : "Agregar a favoritos"}
                 >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8">

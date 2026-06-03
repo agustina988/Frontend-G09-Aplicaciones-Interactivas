@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import "./Login.css";
 
-export default function Login({ rol = "usuario" }) {
+export default function Login() {
     const { login } = useApp();
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
@@ -11,35 +11,29 @@ export default function Login({ rol = "usuario" }) {
     const [showPass, setShowPass] = useState(false);
     const [error, setError] = useState("");
 
-    const esAdmin = rol === "admin";
-
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!email || !password) { setError("Completá todos los campos."); return; }
-        // Mock: cualquier email/pass es válido
-        login({
-            nombre: esAdmin ? "Admin AUREA" : "Alejandro Valderrama",
+        const esAdmin = email === "admin@aurea.com";
+        const resultado = login({
+            nombre: esAdmin ? "Admin AUREA" : email.split("@")[0],
             email,
-            telefono: "+34 600 000 000",
-            direccion: "Calle de Serrano, 45\n28001 Madrid, España",
-            miembro: "ELITE MEMBER",
-            desde: "2024",
+            telefono: "",
+            direccion: "",
+            miembro: esAdmin ? "ADMINISTRADOR" : "MEMBER",
+            desde: new Date().getFullYear().toString(),
             avatar: null,
-            rol,
-            pedidos: [
-                { id: "#1414", producto: "Imperial", precio: 120000, fecha: "12 Oct 2023", estado: "EN CAMINO" }
-            ],
-        });
-        navigate(esAdmin ? "/" : "/perfil");
+            pedidos: [],
+        }, password);
+
+        if (!resultado.ok) { setError(resultado.error); return; }
+        navigate(esAdmin ? "/admin" : "/perfil");
     };
 
     return (
         <div className="login-page">
             <div className="login-image-panel">
-                <img
-                    src="/src/assets/inicio_sesion_usuario.jpg"
-                    alt="Reloj AUREA"
-                />
+                <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=900&q=80" alt="Reloj AUREA" />
                 <div className="login-image-caption">
                     <p className="login-caption-label">ELEGANCIA Y PRECISIÓN</p>
                     <h2>El arte de lo eterno.</h2>
@@ -55,58 +49,35 @@ export default function Login({ rol = "usuario" }) {
                         AUREA
                     </p>
 
-                    <h1>{esAdmin ? "Acceso de Gestión" : "Bienvenido de nuevo"}</h1>
-                    <p className="login-subtitle">
-                        {esAdmin
-                            ? "Accedé al panel de administración."
-                            : "Acceda a su catálogo exclusivo y gestione sus piezas de alta joyería."}
-                    </p>
+                    <h1>Bienvenido de nuevo</h1>
+                    <p className="login-subtitle">Acceda a su catálogo exclusivo y gestione sus piezas de alta joyería.</p>
 
                     <form onSubmit={handleSubmit}>
                         <div className="login-field">
                             <label>EMAIL</label>
-                            <input
-                                type="email"
-                                placeholder="nombre@ejemplo.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
+                            <input type="email" placeholder="nombre@ejemplo.com" value={email} onChange={(e) => { setEmail(e.target.value); setError(""); }} />
                         </div>
-
                         <div className="login-field">
                             <label>CONTRASEÑA</label>
                             <div className="login-pass-wrap">
-                                <input
-                                    type={showPass ? "text" : "password"}
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
+                                <input type={showPass ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); setError(""); }} />
                                 <button type="button" className="login-pass-toggle" onClick={() => setShowPass(!showPass)}>
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                                         {showPass
                                             ? <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></>
-                                            : <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>
-                                        }
+                                            : <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>}
                                     </svg>
                                 </button>
                             </div>
                         </div>
-
                         {error && <p className="login-error">{error}</p>}
-
                         <button type="button" className="login-forgot">Olvidé mi contraseña</button>
-
-                        <button type="submit" className="login-submit">
-                            {esAdmin ? "ACCEDER AL PANEL" : "ACCEDER AL ATELIER"}
-                        </button>
+                        <button type="submit" className="login-submit">ACCEDER AL ATELIER</button>
                     </form>
 
                     <p className="login-register-link">
-                        ¿Es su primera visita?{" "}
-                        <Link to="/registro">Crear cuenta</Link>
+                        ¿Es su primera visita? <Link to="/registro">Crear cuenta</Link>
                     </p>
-
                     <div className="login-footer-bar">
                         <span>EST. 1924</span>
                         <span>GENÈVE • PARIS • MADRID</span>
