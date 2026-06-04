@@ -265,3 +265,248 @@
     .checkout-layout { grid-template-columns: 1fr; }
     .checkout-row { grid-template-columns: 1fr; }
 }
+
+/* MÉTODO DE PAGO SELECTOR */
+.checkout-metodos { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.2rem; }
+
+.checkout-metodo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #e0dbd2;
+    padding: 12px 16px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    font-size: 15px;
+    color: #2a2520;
+}
+
+.checkout-metodo.active { border-color: #8b6914; background: #fdf9f2; }
+
+.checkout-metodo-radio {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+    position: relative;
+}
+
+.checkout-metodo.active .checkout-metodo-radio {
+    border-color: #8b6914;
+}
+
+.checkout-metodo.active .checkout-metodo-radio::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: #8b6914;
+}
+
+/* CUPÓN */
+.checkout-cupon {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e8e4dc;
+}
+
+.checkout-cupon-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: #8a8580;
+    margin-bottom: 0.8rem;
+}
+
+.checkout-cupon-row {
+    display: flex;
+    gap: 0;
+}
+
+.checkout-cupon-row input {
+    flex: 1;
+    border: 1px solid #e0dbd2;
+    border-right: none;
+    padding: 10px 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    outline: none;
+    background: #fff;
+    transition: border-color 0.2s;
+}
+
+.checkout-cupon-row input:focus { border-color: #8b6914; }
+
+.checkout-cupon-btn {
+    background: #2a2520;
+    color: #faf9f6;
+    border: none;
+    padding: 10px 20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.checkout-cupon-btn:hover { background: #8b6914; }
+
+.checkout-cupon-aplicado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+    background: #edf7ed;
+    border: 1px solid #a8d5a2;
+    padding: 10px 16px;
+    font-size: 15px;
+    color: #2a7a3a;
+}
+
+.checkout-cupon-aplicado button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #8a8580;
+    font-size: 16px;
+}
+
+.checkout-cupon-error { font-size: 13px; color: #c44; margin-top: 6px; }
+
+.checkout-resumen-row.descuento span { color: #2a7a3a; }
+
+/* VALIDACIÓN */
+.input-error {
+    border-bottom-color: #c44 !important;
+}
+
+.checkout-field-error {
+    display: block;
+    font-size: 12px;
+    color: #c44;
+    margin-top: 4px;
+    font-family: 'Cormorant Garamond', serif;
+}
+
+.checkout-tipo-tarjeta {
+    margin-left: 10px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: #2a7a3a;
+    background: #edf7ed;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: normal;
+}
+
+/* TIPO TARJETA BADGE */
+.checkout-tipo-tarjeta {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    background: #f5f2ec;
+    color: #8b6914;
+    border: 1px solid #e0dbd0;
+    padding: 2px 8px;
+    margin-left: 8px;
+    font-weight: 600;
+}
+
+/* ERROR FIELDS */
+.input-error {
+    border-bottom-color: #c44 !important;
+}
+
+.checkout-field-error {
+    font-size: 12px;
+    color: #c44;
+    margin-top: 3px;
+    display: block;
+}
+
+/* CUPÓN MEJORADO */
+.checkout-cupon {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid #e8e4dc;
+    background: #fff;
+}
+
+.checkout-cupon-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2a2520;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.05em;
+}
+
+.checkout-cupon-row {
+    display: flex;
+    gap: 0;
+    border: 1px solid #e0dbd2;
+}
+
+.checkout-cupon-row input {
+    flex: 1;
+    border: none;
+    padding: 10px 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    outline: none;
+    background: transparent;
+    color: #2a2520;
+}
+
+.checkout-cupon-btn {
+    background: #8b6914;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: 600;
+}
+
+.checkout-cupon-btn:hover { background: #6d510f; }
+
+.checkout-cupon-aplicado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+    background: #edf7ed;
+    padding: 10px 16px;
+    font-size: 15px;
+    color: #2a7a3a;
+    border: 1px solid #a8d5a2;
+}
+
+.checkout-cupon-aplicado button {
+    background: none; border: none; cursor: pointer; color: #8a8580; font-size: 16px;
+}
+
+.checkout-cupon-error { font-size: 12px; color: #c44; margin-top: 6px; }
+
+.checkout-resumen-row.descuento span { color: #2a7a3a; }
+
+/* STEPS - separador circular */
+.checkout-steps {
+    align-items: center;
+}
+
+.checkout-step-sep {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #e0dbd0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 12px;
+    flex-shrink: 0;
+}

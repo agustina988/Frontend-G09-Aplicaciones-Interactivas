@@ -142,15 +142,15 @@ export default function DetalleProducto() {
                 <div className="detalle-features">
                     <div className="detalle-features-left">
                         <h2>La Esencia de la Elegancia</h2>
-                        <p>Cada detalle del {producto.nombre} fue diseñado para reflejar sofisticación, precisión y carácter. Una pieza atemporal que combina materiales premium, acabados refinados y un estilo pensado para destacar en cualquier momento.</p>
+                        <p>{producto.esencia}</p>
                     </div>
                     <div className="detalle-features-right">
                         {producto.caracteristicas.map((c, i) => (
                             <div key={i} className="detalle-feature-item">
                                 <p className="detalle-feature-title" style={{ color: "#8b6914" }}>
-                                    {["Diseño Atemporal", "Materiales Premium", "Comodidad Superior", "Durabilidad Garantizada"][i] || `Característica ${i + 1}`}
+                                    {c.titulo}
                                 </p>
-                                <p>{c}</p>
+                                <p>{c.texto}</p>
                             </div>
                         ))}
                     </div>

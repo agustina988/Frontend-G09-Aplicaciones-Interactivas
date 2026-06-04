@@ -1,20 +1,45 @@
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
+import { productos } from "../data/productos";
 import "./Navigation.css";
 
 export default function Navigation() {
     const { usuario, logout, totalCarrito, favoritos } = useApp();
     const navigate = useNavigate();
+    const [busqueda, setBusqueda] = useState("");
+    const [resultados, setResultados] = useState([]);
+    const [buscadorAbierto, setBuscadorAbierto] = useState(false);
+    const inputRef = useRef(null);
+    const dropRef = useRef(null);
 
-    const handlePerfil = () => {
-        if (usuario) {
-            // Si ya está logueado, cerrar sesión y redirigir al login
-            logout();
-            navigate("/login");
-        } else {
-            navigate("/login");
-        }
+    const handleBusqueda = (val) => {
+        setBusqueda(val);
+        if (val.trim().length < 2) { setResultados([]); return; }
+        const found = productos.filter((p) =>
+            p.nombre.toLowerCase().includes(val.toLowerCase()) ||
+            p.subcategoria?.toLowerCase().includes(val.toLowerCase())
+        ).slice(0, 6);
+        setResultados(found);
     };
+
+    const irAProducto = (id) => {
+        setBusqueda("");
+        setResultados([]);
+        setBuscadorAbierto(false);
+        navigate(`/producto/${id}`);
+    };
+
+    // Cerrar al hacer click fuera
+    useEffect(() => {
+        const handler = (e) => {
+            if (dropRef.current && !dropRef.current.contains(e.target)) {
+                setResultados([]);
+            }
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
 
     return (
         <header className="nav-header">
@@ -29,13 +54,42 @@ export default function Navigation() {
                 <Link to="/" className="nav-logo">AUREA</Link>
 
                 <div className="nav-actions">
-                    <div className="nav-search">
-                        <input type="text" placeholder="Buscar un producto..." />
-                        <button aria-label="Buscar">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                            </svg>
-                        </button>
+                    {/* BUSCADOR */}
+                    <div className="nav-search-wrap" ref={dropRef}>
+                        <div className="nav-search">
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                placeholder="Buscar un producto..."
+                                value={busqueda}
+                                onChange={(e) => handleBusqueda(e.target.value)}
+                                onFocus={() => setBuscadorAbierto(true)}
+                            />
+                            <button aria-label="Buscar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                                </svg>
+                            </button>
+                        </div>
+                        {resultados.length > 0 && (
+                            <div className="nav-search-dropdown">
+                                {resultados.map((p) => (
+                                    <button key={p.id} className="nav-search-item" onClick={() => irAProducto(p.id)}>
+                                        <img src={p.imagenes?.[0] || p.imagen} alt={p.nombre} />
+                                        <div>
+                                            <p className="nav-search-nombre">{p.nombre}</p>
+                                            <p className="nav-search-cat">{p.subcategoria}</p>
+                                        </div>
+                                        <p className="nav-search-precio">${p.precio.toLocaleString("es-AR")}</p>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                        {busqueda.trim().length >= 2 && resultados.length === 0 && (
+                            <div className="nav-search-dropdown nav-search-empty">
+                                No se encontraron productos para "{busqueda}"
+                            </div>
+                        )}
                     </div>
 
                     <Link to="/favoritos" className="nav-icon-btn" aria-label="Favoritos">
@@ -53,16 +107,13 @@ export default function Navigation() {
                         {totalCarrito > 0 && <span className="nav-badge">{totalCarrito}</span>}
                     </Link>
 
-                    {/* Muñeco: si está logueado va al perfil; si no, al login */}
                     {usuario ? (
-                        <div className="nav-perfil-wrap">
-                            <Link to="/perfil" className="nav-icon-btn nav-icon-logueado" aria-label="Mi perfil" title={`Hola, ${usuario.nombre}`}>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="12" cy="7" r="4"/>
-                                </svg>
-                            </Link>
-                        </div>
+                        <Link to="/perfil" className="nav-icon-btn nav-icon-logueado" aria-label="Mi perfil" title={`Hola, ${usuario.nombre}`}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </Link>
                     ) : (
                         <Link to="/login" className="nav-icon-btn" aria-label="Iniciar sesión">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">

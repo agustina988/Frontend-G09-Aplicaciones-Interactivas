@@ -140,3 +140,153 @@
 .nav-icon-logueado svg {
     fill: rgba(139, 105, 20, 0.12);
 }
+
+/* BUSCADOR CON DROPDOWN */
+.nav-search-wrap {
+    position: relative;
+}
+
+.nav-search-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e0dbd2;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    z-index: 200;
+    min-width: 320px;
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+.nav-search-empty {
+    padding: 1.2rem 1rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    color: #aaa;
+    text-align: center;
+}
+
+.nav-search-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    border-bottom: 1px solid #f5f2ec;
+    transition: background 0.15s;
+}
+
+.nav-search-item:last-child { border-bottom: none; }
+.nav-search-item:hover { background: #faf8f4; }
+
+.nav-search-item img {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    background: #f5f2ec;
+    flex-shrink: 0;
+    border-radius: 2px;
+}
+
+.nav-search-item-info { flex: 1; }
+
+.nav-search-item-nombre {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    color: #2a2520;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.nav-search-item-cat {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    color: #8b6914;
+    letter-spacing: 0.04em;
+}
+
+.nav-icon-logueado { color: #8b6914; }
+.nav-icon-logueado svg { fill: rgba(139,105,20,0.1); }
+
+/* BUSCADOR DROPDOWN */
+.nav-search-wrap {
+    position: relative;
+}
+
+.nav-search-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e8e4dc;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    z-index: 200;
+    min-width: 320px;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.nav-search-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    width: 100%;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #f0ece3;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+    font-family: 'Cormorant Garamond', serif;
+}
+
+.nav-search-item:hover { background: #faf8f4; }
+.nav-search-item:last-child { border-bottom: none; }
+
+.nav-search-item img {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    background: #f5f2ec;
+    flex-shrink: 0;
+}
+
+.nav-search-nombre {
+    font-size: 15px;
+    color: #2a2520;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.nav-search-cat {
+    font-size: 12px;
+    color: #8a8580;
+    letter-spacing: 0.05em;
+}
+
+.nav-search-precio {
+    font-size: 14px;
+    color: #8b6914;
+    font-weight: 600;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.nav-search-empty {
+    padding: 1rem 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    color: #8a8580;
+    font-style: italic;
+}
+
+.nav-icon-logueado { color: #8b6914; }
+.nav-icon-logueado svg { fill: rgba(139,105,20,0.12); }

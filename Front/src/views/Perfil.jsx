@@ -7,37 +7,27 @@ export default function Perfil() {
     const { usuario, logout } = useApp();
     const navigate = useNavigate();
 
-    if (!usuario) {
-        navigate("/login");
-        return null;
-    }
+    if (!usuario) { navigate("/login"); return null; }
 
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
-    };
+    const handleLogout = () => { logout(); navigate("/login"); };
 
     return (
         <div className="perfil-page">
             <div className="perfil-inner">
                 {/* HEADER */}
                 <div className="perfil-header">
-                    <div className="perfil-avatar">
+                    {/* Avatar circular SIN lápiz */}
+                    <div className="perfil-avatar-circle">
                         {usuario.avatar
                             ? <img src={usuario.avatar} alt={usuario.nombre} />
-                            : <span>{usuario.nombre.charAt(0)}</span>
+                            : <span>{usuario.nombre?.charAt(0)?.toUpperCase()}</span>
                         }
-                        <button className="perfil-avatar-edit" aria-label="Editar foto">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                            </svg>
-                        </button>
                     </div>
                     <div className="perfil-header-info">
                         <p className="perfil-label">MI PERFIL</p>
                         <h1>{usuario.nombre}</h1>
                         <div className="perfil-badges">
-                            <span className="perfil-badge-member">{usuario.miembro}</span>
+                            <span className="perfil-badge-member">{usuario.miembro || "MEMBER"}</span>
                             <span className="perfil-badge-since">• DESDE {usuario.desde}</span>
                         </div>
                     </div>
@@ -85,27 +75,37 @@ export default function Perfil() {
 
                         {usuario.pedidos && usuario.pedidos.length > 0 ? (
                             <div className="perfil-pedidos-list">
-                                {usuario.pedidos.map((p) => (
-                                    <div key={p.id} className="perfil-pedido">
+                                {usuario.pedidos.map((p, i) => (
+                                    <div key={i} className="perfil-pedido">
                                         <div className="perfil-pedido-img">
-                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="1.5">
-                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                            </svg>
+                                            {p.productos?.[0]?.imagenes?.[0]
+                                                ? <img src={p.productos[0].imagenes[0]} alt={p.producto} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                                : <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="1.5">
+                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                </svg>
+                                            }
                                         </div>
                                         <div className="perfil-pedido-info">
                                             <div className="perfil-pedido-top">
                                                 <span className="perfil-pedido-id">{p.id}</span>
                                                 <div className="perfil-pedido-fecha-estado">
                                                     <span className="perfil-pedido-fecha">{p.fecha}</span>
-                                                    <span className={`perfil-pedido-estado ${p.estado === "EN CAMINO" ? "en-camino" : ""}`}>
-                            • {p.estado}
-                          </span>
+                                                    <span className={`perfil-pedido-estado${p.estado === "EN CAMINO" ? " en-camino" : ""}`}>• {p.estado}</span>
                                                 </div>
                                             </div>
-                                            <p className="perfil-pedido-nombre">{p.producto}</p>
+                                            {/* Mostrar TODOS los productos del pedido */}
+                                            {p.productos && p.productos.length > 0 ? (
+                                                p.productos.map((prod, j) => (
+                                                    <p key={j} className="perfil-pedido-nombre" style={{ fontSize: "15px", marginBottom: "2px" }}>
+                                                        {prod.nombre} <span style={{ color: "#8a8580", fontSize: "13px" }}>×{prod.cantidad}</span>
+                                                    </p>
+                                                ))
+                                            ) : (
+                                                <p className="perfil-pedido-nombre">{p.producto}</p>
+                                            )}
                                             <div className="perfil-pedido-bottom">
                         <span className="perfil-pedido-precio">
-                          ${p.precio.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+                          ${p.precio?.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
                         </span>
                                                 <button className="perfil-pedido-detalle">Detalles del pedido</button>
                                             </div>
@@ -121,7 +121,6 @@ export default function Perfil() {
                     </div>
                 </div>
             </div>
-
             <Footer />
         </div>
     );

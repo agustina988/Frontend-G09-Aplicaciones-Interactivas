@@ -3,18 +3,22 @@
 }
 
 .footer-newsletter {
-    background: #1a1714;
-    background-image: url('https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1400&q=40');
+    background: #faf9f6;
     background-size: cover;
     background-position: center;
     position: relative;
+    padding: 3rem 10%;  /* ← cambiá 2rem por 10% */
+    display: flex;
+    justify-content: center;
 }
 
-.footer-newsletter::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(20, 16, 12, 0.82);
+.footer-newsletter-box {
+    max-width: 900px;
+    width: 100%;             /* ← AGREGÁ ESTO */
+    margin: 0 auto;
+    background-image: url('../assets/footer.jpg');
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 .footer-newsletter-inner {
@@ -83,13 +87,11 @@
 .footer-newsletter-form button:hover { background: #6d510f; }
 
 .footer-main {
-    background: #111009;
-    padding: 4rem 2rem 2rem;
+    background: #000000;
+    padding: 4rem 6rem 2rem;
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 3rem;
-    max-width: 1200px;
-    margin: 0 auto;
 }
 
 .footer-logo {

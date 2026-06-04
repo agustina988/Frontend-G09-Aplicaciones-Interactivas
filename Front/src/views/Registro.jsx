@@ -19,6 +19,13 @@ export default function Registro() {
         if (!form.email.includes("@")) e.email = "Email inválido";
         if (form.password.length < 6) e.password = "Mínimo 6 caracteres";
         if (form.password !== form.confirmar) e.confirmar = "Las contraseñas no coinciden";
+
+        if (form.telefono) {
+            const tel = form.telefono.replace(/\s|-/g, "");
+            const argRegex = /^(\+54|0054|54)?9?[1-9]\d{9}$/;
+            if (!argRegex.test(tel)) e.telefono = "Formato inválido. Ej: +54 9 11 0000-0000";
+        }
+
         return e;
     };
 
@@ -43,11 +50,11 @@ export default function Registro() {
         <div className="registro-page">
             <div className="registro-image-panel">
                 <img
-                    src="https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=900&q=80"
+                    src="/src/assets/crear_cuenta_usuario.jpg"
                     alt="Joyería artesanal"
                 />
                 <div className="registro-image-caption">
-                    <p className="registro-est">EST. 1924</p>
+                    <p className="registro-est">EST. 1980</p>
                     <h2>La Maestría del<br />Tiempo.</h2>
                     <p>Cada pieza en nuestra colección es un testimonio de décadas de tradición y perfección técnica.</p>
                 </div>
@@ -117,10 +124,11 @@ export default function Registro() {
                             <label>Teléfono (opcional)</label>
                             <input
                                 type="tel"
-                                placeholder="+34 600 000 000"
+                                placeholder="+54 9 11 0000-0000"
                                 value={form.telefono}
                                 onChange={(e) => set("telefono", e.target.value)}
                             />
+                            {errors.telefono && <p className="registro-err">{errors.telefono}</p>}
                         </div>
 
                         <label className="registro-check">

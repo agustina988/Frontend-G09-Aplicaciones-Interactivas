@@ -1,6 +1,6 @@
 .toast-container {
     position: fixed;
-    bottom: 2rem;
+    top: 5rem;
     right: 2rem;
     z-index: 9999;
     display: flex;
@@ -20,12 +20,21 @@
     min-width: 280px;
     max-width: 360px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    animation: toast-in 0.3s ease forwards;
+    animation: toast-in 0.35s ease forwards;
+}
+
+.toast.toast-saliendo {
+    animation: toast-out 0.5s ease forwards;
 }
 
 @keyframes toast-in {
     from { opacity: 0; transform: translateX(40px); }
     to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toast-out {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(40px); }
 }
 
 .toast-carrito {

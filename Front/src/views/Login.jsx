@@ -33,7 +33,7 @@ export default function Login() {
     return (
         <div className="login-page">
             <div className="login-image-panel">
-                <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=900&q=80" alt="Reloj AUREA" />
+                <img src="/src/assets/inicio_sesion_usuario.jpg" alt="Reloj AUREA" />
                 <div className="login-image-caption">
                     <p className="login-caption-label">ELEGANCIA Y PRECISIÓN</p>
                     <h2>El arte de lo eterno.</h2>
@@ -79,8 +79,8 @@ export default function Login() {
                         ¿Es su primera visita? <Link to="/registro">Crear cuenta</Link>
                     </p>
                     <div className="login-footer-bar">
-                        <span>EST. 1924</span>
-                        <span>GENÈVE • PARIS • MADRID</span>
+                        <span>EST. 1980</span>
+                        <span>BUENOS AIRES • ARGENTINA</span>
                     </div>
                 </div>
             </div>

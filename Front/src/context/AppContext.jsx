@@ -28,9 +28,22 @@ export function AppProvider({ children }) {
         { id: 4, nombre: "Piezas de Autor", slug: "autor", desc: "Diseños conceptuales firmados por maestros artesanos.", badge: "ARTISAN SELECT", productos: 34, publicado: true },
     ]);
     const [productosStock, setProductosStock] = useState([
-        { id: 9, nombre: "Reloj Chronos", categoria: "Relojes", precio: 150000, stock: 1, imagen: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=100&q=60" },
-        { id: 4, nombre: "Pulsera Eternidad", categoria: "Joyería", precio: 180000, stock: 3, imagen: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=100&q=60" },
-        { id: 1, nombre: "Anillo Solitario de Esmeralda", categoria: "Joyería", precio: 130000, stock: 9, imagen: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=100&q=60" },
+        { id: 1, nombre: "Aros Aura Pearl", categoria: "Joyería", precio: 90000, stock: 5, imagen: "/src/assets/joyeria/aros aura/foto1.jpg" },
+        { id: 2, nombre: "Aros Alba", categoria: "Joyería", precio: 110000, stock: 5, imagen: "/src/assets/joyeria/aros alba/foto1.jpg" },
+        { id: 3, nombre: "Aros Éter", categoria: "Joyería", precio: 100000, stock: 5, imagen: "/src/assets/joyeria/aros eter/foto1.jpg" },
+        { id: 4, nombre: "Aros Ambar", categoria: "Joyería", precio: 140000, stock: 5, imagen: "/src/assets/joyeria/aro ambar/foto1.jpg" },
+        { id: 5, nombre: "Anillo Eternity", categoria: "Joyería", precio: 80000, stock: 5, imagen: "/src/assets/joyeria/anillo eternity/foto1.jpg" },
+        { id: 6, nombre: "Anillo Vittoria", categoria: "Joyería", precio: 130000, stock: 5, imagen: "/src/assets/joyeria/anillo victoria/foto1.jpg" },
+        { id: 7, nombre: "Collar Heaven", categoria: "Joyería", precio: 170000, stock: 5, imagen: "/src/assets/joyeria/collar heaven/foto1.jpg" },
+        { id: 8, nombre: "Pulsera Firenze", categoria: "Joyería", precio: 180000, stock: 5, imagen: "/src/assets/joyeria/pulsera firenze/foto1.jpg" },
+        { id: 9, nombre: "Pulsera Siena", categoria: "Joyería", precio: 110000, stock: 5, imagen: "/src/assets/joyeria/pulsera siena/foto1.jpg" },
+        { id: 10, nombre: "Reloj Imperial", categoria: "Relojes", precio: 200000, stock: 5, imagen: "/src/assets/relojes/reloj imperial/foto1.jpg" },
+        { id: 11, nombre: "Reloj Chronos", categoria: "Relojes", precio: 150000, stock: 5, imagen: "/src/assets/relojes/reloj chronos/foto1.jpg" },
+        { id: 12, nombre: "Reloj Monaco", categoria: "Relojes", precio: 150000, stock: 5, imagen: "/src/assets/relojes/reloj monaco/foto1.jpg" },
+        { id: 13, nombre: "Reloj Noir", categoria: "Relojes", precio: 180000, stock: 5, imagen: "/src/assets/relojes/reloj noir/foto1.jpg" },
+        { id: 14, nombre: "Reloj Tempus", categoria: "Relojes", precio: 150000, stock: 5, imagen: "/src/assets/relojes/reloj tempus/foto1.jpg" },
+        { id: 15, nombre: "Lingote de Oro Laminado", categoria: "Lingotes", precio: 2300000, stock: 5, imagen: "/src/assets/lingotes/lingote_oro.jpg" },
+        { id: 16, nombre: "Lingote de Plata", categoria: "Lingotes", precio: 1400000, stock: 5, imagen: "/src/assets/lingotes/lingote_plata.jpg" },
     ]);
 
     const addToast = useCallback((msg, tipo = "carrito") => {
@@ -111,14 +124,30 @@ export function AppProvider({ children }) {
             direccion: datosEnvio?.direccion || usuario?.direccion || "",
             ciudad: datosEnvio?.ciudad || "",
         };
+
         setPedidosAdmin((prev) => [pedido, ...prev]);
-        // También actualizar historial del usuario
+
+        // ← AGREGÁ ESTO: restar stock por cada producto comprado
+        setProductosStock((prev) =>
+            prev.map((p) => {
+                const comprado = carrito.find((c) => c.id === p.id);
+                if (comprado) {
+                    return { ...p, stock: Math.max(0, p.stock - comprado.cantidad) };
+                }
+                return p;
+            })
+        );
+
         if (usuario) {
             setUsuario((prev) => ({
                 ...prev,
-                pedidos: [{ id: pedido.id, producto: carrito[0]?.nombre, precio: total, fecha: pedido.fecha, estado: "EN CAMINO" }, ...(prev.pedidos || [])],
+                pedidos: [
+                    { id: pedido.id, producto: carrito[0]?.nombre, precio: total, fecha: pedido.fecha, estado: "EN CAMINO", productos: [...carrito] },
+                    ...(prev.pedidos || [])
+                ],
             }));
         }
+
         vaciarCarrito();
         return pedido;
     };
