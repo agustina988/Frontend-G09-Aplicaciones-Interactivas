@@ -1,16 +1,36 @@
-# React + Vite
+# AUREA — Joyería & Lingotes Premium
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+E-commerce de joyería fina y lingotes de metales preciosos.
 
-Currently, two official plugins are available:
+## Tecnologías
+- React + Vite
+- React Router DOM
+- CSS propio
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Instrucciones para ejecutar
 
-## React Compiler
+1. Instalar dependencias:
+   npm install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+2. Iniciar el servidor de desarrollo:
+   npm run dev
 
-## Expanding the ESLint configuration
+3. Abrir en el navegador:
+   http://localhost:5173
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Credenciales de prueba
+- Admin: admin@aurea.com / admin1234
+- Usuario: cualquier email / cualquier contraseña
+
+## Estructura del proyecto
+src/
+├── assets/        → Imágenes y recursos estáticos
+│   ├── home/      → Imágenes del home
+│   ├── joyeria/   → Imágenes de productos de joyería
+│   ├── relojes/   → Imágenes de relojes
+│   └── lingotes/  → Imágenes de lingotes
+├── components/    → Navigation, Footer, ProductCard, Toast
+├── views/         → Todas las vistas del usuario
+│   └── admin/     → Panel de administración
+├── context/       → AppContext (estado global)
+└── data/          → productos.js (datos mock)

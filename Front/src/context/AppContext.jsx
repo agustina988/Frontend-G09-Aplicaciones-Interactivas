@@ -127,7 +127,7 @@ export function AppProvider({ children }) {
 
         setPedidosAdmin((prev) => [pedido, ...prev]);
 
-        // ← AGREGÁ ESTO: restar stock por cada producto comprado
+        // restar stock por cada producto comprado
         setProductosStock((prev) =>
             prev.map((p) => {
                 const comprado = carrito.find((c) => c.id === p.id);

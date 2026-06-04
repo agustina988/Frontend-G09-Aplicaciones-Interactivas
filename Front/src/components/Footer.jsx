@@ -5,7 +5,7 @@ export default function Footer() {
     return (
         <footer className="footer">
             <div className="footer-newsletter">
-                <div className="footer-newsletter-box">        {/* ← AGREGÁS ESTE */}
+                <div className="footer-newsletter-box">
                     <div className="footer-newsletter-inner">
                         <p className="footer-newsletter-label">EXCLUSIVIDAD</p>
                         <h2>Se parte de AUREA</h2>
@@ -18,7 +18,7 @@ export default function Footer() {
                             <button>UNIRSE</button>
                         </div>
                     </div>
-                </div>                                          {/* ← Y LO CERRÁS ACÁ */}
+                </div>
             </div>
 
             <div className="footer-main">

@@ -16,7 +16,6 @@ export default function Perfil() {
             <div className="perfil-inner">
                 {/* HEADER */}
                 <div className="perfil-header">
-                    {/* Avatar circular SIN lápiz */}
                     <div className="perfil-avatar-circle">
                         {usuario.avatar
                             ? <img src={usuario.avatar} alt={usuario.nombre} />

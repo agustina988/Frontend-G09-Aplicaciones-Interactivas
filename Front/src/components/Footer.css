@@ -7,14 +7,14 @@
     background-size: cover;
     background-position: center;
     position: relative;
-    padding: 3rem 10%;  /* ← cambiá 2rem por 10% */
+    padding: 3rem 10%;
     display: flex;
     justify-content: center;
 }
 
 .footer-newsletter-box {
     max-width: 900px;
-    width: 100%;             /* ← AGREGÁ ESTO */
+    width: 100%;
     margin: 0 auto;
     background-image: url('../assets/footer.jpg');
     border-radius: 6px;
