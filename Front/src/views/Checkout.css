@@ -493,20 +493,4 @@
 
 .checkout-resumen-row.descuento span { color: #2a7a3a; }
 
-/* STEPS - separador circular */
-.checkout-steps {
-    align-items: center;
-}
 
-.checkout-step-sep {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    border: 1px solid #e0dbd0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ccc;
-    font-size: 12px;
-    flex-shrink: 0;
-}

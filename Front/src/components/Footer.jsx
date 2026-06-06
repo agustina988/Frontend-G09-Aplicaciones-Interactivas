@@ -1,7 +1,18 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Footer.css";
 
 export default function Footer() {
+    const [email, setEmail] = useState("");
+    const [suscrito, setSuscrito] = useState(false);
+
+    const handleUnirse = () => {
+        if (!email.includes("@")) return;
+        setSuscrito(true);
+        setEmail("");
+        setTimeout(() => setSuscrito(false), 4000);
+    };
+
     return (
         <footer className="footer">
             <div className="footer-newsletter">
@@ -13,10 +24,21 @@ export default function Footer() {
                             Sé la primera persona en descubrir las nuevas colecciones, piezas exclusivas y lanzamientos limitados de joyería y lingotes premium.<br />
                             Recibí beneficios especiales, acceso anticipado y novedades de nuestra marca directamente en tu correo.
                         </p>
-                        <div className="footer-newsletter-form">
-                            <input type="email" placeholder="Tu dirección de correo electrónico" />
-                            <button>UNIRSE</button>
-                        </div>
+                        {suscrito ? (
+                            <div className="footer-newsletter-exito">
+                                ✓ ¡Gracias! Te uniste a la comunidad AUREA.
+                            </div>
+                        ) : (
+                            <div className="footer-newsletter-form">
+                                <input
+                                    type="email"
+                                    placeholder="Tu dirección de correo electrónico"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                                <button onClick={handleUnirse}>UNIRSE</button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -47,6 +69,12 @@ export default function Footer() {
                     <a href="#">Envíos y Devoluciones</a>
                 </div>
             </div>
+
+            <div className="footer-bottom">
+                <p>© 2026 AUREA. Todos los derechos reservados.</p>
+                <p>Diseñado con exclusividad para coleccionistas y amantes del lujo.</p>
+            </div>
+
         </footer>
     );
 }

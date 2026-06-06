@@ -98,14 +98,6 @@ export default function Checkout() {
                     TRANSACCIÓN SEGURA
                 </p>
 
-                <div className="checkout-steps">
-                    <span className="checkout-step active">PASO 1<br /><strong>ENVÍO</strong></span>
-                    <span className="checkout-step-sep">›</span>
-                    <span className="checkout-step">PASO 2<br /><strong>PAGO</strong></span>
-                    <span className="checkout-step-sep">›</span>
-                    <span className="checkout-step">PASO 3<br /><strong>CONFIRMAR</strong></span>
-                </div>
-
                 <div className="checkout-layout">
                     <div className="checkout-form">
                         {/* ENVÍO */}
