@@ -9,11 +9,13 @@ export default function Productos({ categoria }) {
     const info = categorias[categoria];
     const [subcat, setSubcat] = useState(null);
     const [materiales, setMateriales] = useState([]);
-    const [precioMax, setPrecioMax] = useState(10000);
+
     const [orden, setOrden] = useState("relevancia");
 
     const prodsCat = todosProd.filter((p) => p.categoria === categoria);
     const maxPrecioReal = Math.max(...prodsCat.map((p) => p.precio));
+
+    const [precioMax, setPrecioMax] = useState(maxPrecioReal);
 
     const filtrados = useMemo(() => {
         let lista = prodsCat;
