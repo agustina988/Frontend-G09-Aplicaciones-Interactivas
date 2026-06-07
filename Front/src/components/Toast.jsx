@@ -7,7 +7,15 @@ export default function Toast() {
     return (
         <div className="toast-container">
             {toasts.map((t) => (
-                <div key={t.id} className={`toast toast-${t.tipo}`}>
+                <div
+                    key={t.id}
+                    className={`toast toast-${t.tipo}`}
+                    style={{
+                        animation: t.saliendo
+                            ? "toast-out 0.35s ease forwards"
+                            : "toast-in 0.4s ease forwards"
+                    }}
+                >
           <span className="toast-icon">
             {t.tipo === "carrito" && (
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

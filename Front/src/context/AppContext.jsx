@@ -18,7 +18,6 @@ export function AppProvider({ children }) {
     const [favoritos, setFavoritos] = useState([]);
     const [toasts, setToasts] = useState([]);
     const [cupon, setCupon] = useState(null);
-    // Estado global compartido admin
     const [pedidosAdmin, setPedidosAdmin] = useState([]);
     const [usuariosAdmin, setUsuariosAdmin] = useState([]);
     const [categoriasAdmin, setCategoriasAdmin] = useState([
@@ -48,8 +47,13 @@ export function AppProvider({ children }) {
 
     const addToast = useCallback((msg, tipo = "carrito") => {
         const id = Date.now();
-        setToasts((prev) => [...prev, { id, msg, tipo }]);
-        setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
+        setToasts((prev) => [...prev, { id, msg, tipo, saliendo: false }]);
+        setTimeout(() => {
+            setToasts((prev) => prev.map((t) => t.id === id ? { ...t, saliendo: true } : t));
+        }, 3000);
+        setTimeout(() => {
+            setToasts((prev) => prev.filter((t) => t.id !== id));
+        }, 3400);
     }, []);
 
     // Login único con validación de contraseña para admin
