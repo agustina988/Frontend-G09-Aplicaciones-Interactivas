@@ -1,17 +1,34 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Footer.css";
+import Swal from 'sweetalert2'
 
 export default function Footer() {
+    
     const [email, setEmail] = useState("");
     const [suscrito, setSuscrito] = useState(false);
 
     const handleUnirse = () => {
-        if (!email.includes("@")) return;
-        setSuscrito(true);
-        setEmail("");
-        setTimeout(() => setSuscrito(false), 4000);
-    };
+        const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        if (emailValido) {
+            setSuscrito(true);
+            setEmail("");
+            
+            Swal.fire({
+                title: "¡Gracias!",
+                text: "Te uniste a la comunidad AUREA.",
+                icon: "success"
+            });
+            
+            setTimeout(() => setSuscrito(false), 4000);} 
+            else {
+            Swal.fire({
+                title: "Oops...",
+                text: "Por favor, ingresa un correo electrónico válido.",
+                icon: "error"
+            });
+        }
+};
 
     return (
         <footer className="footer">

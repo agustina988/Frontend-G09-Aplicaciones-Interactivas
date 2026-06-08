@@ -1,8 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { AppProvider, useApp } from "./context/AppContext";
 import ScrollToTop from "./components/ScrollToTop";
 import Navigation from "./components/Navigation";
 import Toast from "./components/Toast";
+import Swal from "sweetalert2";
+import { useState, useEffect } from "react";
 
 import Home from "./views/Home";
 import Productos from "./views/Productos";
@@ -40,6 +42,39 @@ function AdminRoute({ children }) {
     if (!esAdmin) return <Navigate to="/" />;
     return children;
 }
+//Private Route bloquea ciertas rutas si el usuario no esta logueado (Ej. Carrito)
+function PrivateRoute({ children }) {
+    const { usuario } = useApp();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!usuario) {
+            Swal.fire({
+                title: "Acceso Restringido",
+                text: "Necesitas iniciar sesión para ver esta sección.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#D4AF37",
+                cancelButtonColor: "#333333",
+                confirmButtonText: "Ir a Login",
+                cancelButtonText: "Volver atrás",
+                allowOutsideClick: false 
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    navigate("/login"); 
+                } else if (result.isDismissed){
+                    navigate("/"); 
+                }
+            });
+        }
+        
+    }, [usuario, navigate]);
+
+    return children;
+}
+
+
+
 
 function AppRoutes() {
     return (
@@ -63,11 +98,17 @@ function AppRoutes() {
                 <Route path="/edicion-limitada" element={<Layout><Productos categoria="edicion-limitada" /></Layout>} />
                 <Route path="/producto/:id" element={<Layout><DetalleProducto /></Layout>} />
                 <Route path="/vender-lingote" element={<Layout><VenderLingote /></Layout>} />
-                <Route path="/favoritos" element={<Layout><Favoritos /></Layout>} />
-                <Route path="/carrito" element={<Layout><Carrito /></Layout>} />
-                <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
-                <Route path="/confirmacion" element={<Layout><Confirmacion /></Layout>} />
-                <Route path="/perfil" element={<Layout><Perfil /></Layout>} />
+                
+                
+
+
+                {/* Rutas privadas */}
+                <Route path="/carrito" element={<Layout><PrivateRoute><Carrito /></PrivateRoute></Layout>} />
+                <Route path="/perfil" element={<Layout><PrivateRoute><Perfil /></PrivateRoute></Layout>} />
+                <Route path="/favoritos" element={<Layout><PrivateRoute><Favoritos /></PrivateRoute></Layout>} />
+                <Route path="/checkout" element={<Layout><PrivateRoute><Checkout /></PrivateRoute></Layout>} />
+                <Route path="/confirmacion" element={<Layout><PrivateRoute><Confirmacion /></PrivateRoute></Layout>} />
+                
             </Routes>
         </>
     );
