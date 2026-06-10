@@ -1,12 +1,39 @@
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
+import Swal from "sweetalert2";
 import "./ProductCard.css";
 
 export default function ProductCard({ producto }) {
-    const { agregarAlCarrito, toggleFavorito, esFavorito } = useApp();
+    const { agregarAlCarrito, toggleFavorito, esFavorito, usuario } = useApp();
     const navigate = useNavigate();
     const fav = esFavorito(producto.id);
     const imagen = producto.imagenes?.[0] || producto.imagen;
+
+    const handleFavoritoClick = (e) => {
+        e.stopPropagation();
+
+    if (!usuario) {
+            
+            Swal.fire({
+                title: "Acceso Restringido",
+                text: "Necesitas iniciar sesión para guardar tus favoritos.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#D4AF37", // Dorado AUREA
+                cancelButtonColor: "#333333",
+                confirmButtonText: "Ir a Login",
+                cancelButtonText: "Cancelar",
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    navigate("/login");
+                }
+            });
+        } else {
+            
+            toggleFavorito(producto);
+        }
+    };
 
     return (
         <div className="product-card">
@@ -15,7 +42,7 @@ export default function ProductCard({ producto }) {
                 {producto.badge && <span className="product-badge">{producto.badge}</span>}
                 <button
                     className={`product-fav-btn${fav ? " active" : ""}`}
-                    onClick={(e) => { e.stopPropagation(); toggleFavorito(producto); }}
+                    onClick={handleFavoritoClick}
                     aria-label={fav ? "Quitar de favoritos" : "Agregar a favoritos"}
                 >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8">
