@@ -92,12 +92,15 @@ function AppRoutes() {
                 <Route path="/admin/stock" element={<AdminRoute><AdminStock /></AdminRoute>} />
 
                 <Route path="/" element={<Layout><Home /></Layout>} />
-                <Route path="/joyeria" element={<Layout><Productos categoria="joyeria" /></Layout>} />
-                <Route path="/relojes" element={<Layout><Productos categoria="relojes" /></Layout>} />
-                <Route path="/lingotes" element={<Layout><Productos categoria="lingotes" /></Layout>} />
-                <Route path="/edicion-limitada" element={<Layout><Productos categoria="edicion-limitada" /></Layout>} />
                 <Route path="/producto/:id" element={<Layout><DetalleProducto /></Layout>} />
                 <Route path="/vender-lingote" element={<Layout><VenderLingote /></Layout>} />
+
+
+                {/* */}
+                <Route path="/joyeria" element={<Layout><Productos key="joyeria" categoria="joyeria" /></Layout>} />
+                <Route path="/relojes" element={<Layout><Productos key="relojes" categoria="relojes" /></Layout>} />
+                <Route path="/lingotes" element={<Layout><Productos key="lingotes" categoria="lingotes" /></Layout>} />
+                <Route path="/edicion-limitada" element={<Layout><Productos key="edicion" categoria="edicion-limitada" /></Layout>} />
                 
                 
 
