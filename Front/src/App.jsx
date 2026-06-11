@@ -96,7 +96,7 @@ function AppRoutes() {
                 <Route path="/vender-lingote" element={<Layout><VenderLingote /></Layout>} />
 
 
-                {/* */}
+                {/* Rutas de Catálogo Key agregada*/}
                 <Route path="/joyeria" element={<Layout><Productos key="joyeria" categoria="joyeria" /></Layout>} />
                 <Route path="/relojes" element={<Layout><Productos key="relojes" categoria="relojes" /></Layout>} />
                 <Route path="/lingotes" element={<Layout><Productos key="lingotes" categoria="lingotes" /></Layout>} />

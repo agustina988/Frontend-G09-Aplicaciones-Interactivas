@@ -1,13 +1,16 @@
-import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { productos as todosProd, categorias } from "../data/productos";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import "./Productos.css";
 
 export default function Productos({ categoria }) {
+    const location = useLocation();
     const info = categorias[categoria];
-    const [subcat, setSubcat] = useState(null);
+    const subcatInicial = location.state?.subcategoria || null;
+    
+    const [subcat, setSubcat] = useState(subcatInicial);
     const [materiales, setMateriales] = useState([]);
 
     const [orden, setOrden] = useState("relevancia");
@@ -16,6 +19,13 @@ export default function Productos({ categoria }) {
     const maxPrecioReal = Math.max(...prodsCat.map((p) => p.precio));
 
     const [precioMax, setPrecioMax] = useState(maxPrecioReal);
+
+    useEffect(() => {
+        setSubcat(subcatInicial); 
+        setMateriales([]);          
+        setOrden("relevancia");     
+        setPrecioMax(maxPrecioReal); 
+    }, [categoria, maxPrecioReal, subcatInicial]);
 
     const filtrados = useMemo(() => {
         let lista = prodsCat;

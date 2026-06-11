@@ -26,28 +26,28 @@ export default function Home() {
             <section className="home-cats">
                 <h2>Explorá nuestras categorías</h2>
                 <div className="home-cats-grid">
-                    <Link to="/joyeria" className="home-cat-card home-cat-large">
+                    <Link to="/joyeria" state={{ subcategoria: "Anillos" }} className="home-cat-card home-cat-large">
                         <img src="src/assets/home/home_joyeria.jpg" alt="Anillos" />
                         <div className="home-cat-overlay">
                             <p className="home-cat-name">Anillos</p>
                             <p className="home-cat-sub">Comprar Colección</p>
                         </div>
                     </Link>
-                    <Link to="/lingotes" className="home-cat-card">
+                    <Link to="/lingotes" state={{ subcategoria: "Lingotes de Oro" }} className="home-cat-card">
                         <img src="src/assets/home/home_lingotes.jpg" alt="Lingotes de Oro" />
                         <div className="home-cat-overlay">
                             <p className="home-cat-name">Lingotes de Oro</p>
                             <p className="home-cat-sub">Grado de Inversión</p>
                         </div>
                     </Link>
-                    <Link to="/joyeria" className="home-cat-card">
+                    <Link to="/joyeria" state={{ subcategoria: "Collares" }} className="home-cat-card">
                         <img src="src/assets/home/home_collares.jpg" alt="Collares" />
                         <div className="home-cat-overlay">
                             <p className="home-cat-name">Collares</p>
                             <p className="home-cat-sub">Descubrí el Lujo</p>
                         </div>
                     </Link>
-                    <Link to="/lingotes" className="home-cat-card">
+                    <Link to="/lingotes" state={{ subcategoria: "Lingotes de Plata" }} className="home-cat-card">
                         <img src="src/assets/home/home_lingotePlata.jpg" alt="Lingotes de Plata" />
                         <div className="home-cat-overlay">
                             <p className="home-cat-name">Lingotes de Plata</p>
