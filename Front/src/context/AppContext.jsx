@@ -27,8 +27,8 @@ export function AppProvider({ children }) {
         { id: 4, nombre: "Piezas de Autor", slug: "autor", desc: "Diseños conceptuales firmados por maestros artesanos.", badge: "ARTISAN SELECT", productos: 34, publicado: true },
     ]);
     const [productosStock, setProductosStock] = useState([
-        { id: 1, nombre: "Aros Aura Pearl", categoria: "Joyería", precio: 90000, stock: 5, imagen: "/src/assets/joyeria/aros aura/foto1.jpg" },
-        { id: 2, nombre: "Aros Alba", categoria: "Joyería", precio: 110000, stock: 5, imagen: "/src/assets/joyeria/aros alba/foto1.jpg" },
+        { id: 1, nombre: "Aros Aura Pearl", categoria: "Joyería", precio: 90000, stock: 4, imagen: "/src/assets/joyeria/aros aura/foto1.jpg" },
+        { id: 2, nombre: "Aros Alba", categoria: "Joyería", precio: 110000, stock: 0, imagen: "/src/assets/joyeria/aros alba/foto1.jpg" },
         { id: 3, nombre: "Aros Éter", categoria: "Joyería", precio: 100000, stock: 5, imagen: "/src/assets/joyeria/aros eter/foto1.jpg" },
         { id: 4, nombre: "Aros Ambar", categoria: "Joyería", precio: 140000, stock: 5, imagen: "/src/assets/joyeria/aro ambar/foto1.jpg" },
         { id: 5, nombre: "Anillo Eternity", categoria: "Joyería", precio: 80000, stock: 5, imagen: "/src/assets/joyeria/anillo eternity/foto1.jpg" },

@@ -22,7 +22,8 @@ export default function DetalleProducto() {
         );
     }
 
-    const stockActual = producto ? producto.stock : 0;
+    const productoEnStock = productosStock.find((p) => p.id === producto.id);
+    const stockActual = productoEnStock ? productoEnStock.stock : 0;
 
     // Lógica para el mensaje
     let textoStock = "● Disponible";
@@ -31,7 +32,7 @@ export default function DetalleProducto() {
     if (stockActual === 0) {
         textoStock = "● Agotado";
         claseStock = "detalle-disponible agotado"; 
-    } else if (stockActual <= 5) {
+    } else if (stockActual < 5) {
         textoStock = "● Últimas unidades";
         claseStock = "detalle-disponible ultimas"; 
     }
@@ -130,7 +131,7 @@ export default function DetalleProducto() {
                     {/* INFO */}
                     <div className="detalle-info">
                         {producto.badge && <span className="detalle-badge">{producto.badge}</span>}
-                        <div className="{claseStock}"> {textoStock}</div>
+                        <div className={claseStock}> {textoStock}</div>
 
                         <h1>{producto.nombre}</h1>
                         <p className="detalle-subt">{producto.specs.categoria.toUpperCase()} PREMIUM</p>
