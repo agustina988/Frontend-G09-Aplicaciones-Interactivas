@@ -257,6 +257,14 @@
     font-family: 'Cormorant Garamond', serif;
 }
 
+.detalle-disponible.ultimas {
+    color: #e67e22; 
+}
+
+.detalle-disponible.agotado {
+    color: #e74c3c; 
+}
+
 @media (max-width: 900px) {
     .detalle-main { grid-template-columns: 1fr; gap: 2rem; }
     .detalle-features { grid-template-columns: 1fr; }

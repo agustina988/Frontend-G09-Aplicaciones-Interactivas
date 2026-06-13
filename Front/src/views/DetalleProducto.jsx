@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 export default function DetalleProducto() {
     const { id } = useParams();
     const producto = productos.find((p) => p.id === Number(id));
-    const { agregarAlCarrito, toggleFavorito, esFavorito, usuario } = useApp();
+    const { agregarAlCarrito, toggleFavorito, esFavorito, usuario, productosStock } = useApp();
     const navigate = useNavigate();
     const [imgActiva, setImgActiva] = useState(0);
 
@@ -22,6 +22,19 @@ export default function DetalleProducto() {
         );
     }
 
+    const stockActual = producto ? producto.stock : 0;
+
+    // Lógica para el mensaje
+    let textoStock = "● Disponible";
+    let claseStock = "detalle-disponible"; 
+
+    if (stockActual === 0) {
+        textoStock = "● Agotado";
+        claseStock = "detalle-disponible agotado"; 
+    } else if (stockActual <= 5) {
+        textoStock = "● Últimas unidades";
+        claseStock = "detalle-disponible ultimas"; 
+    }
 
 
     const fav = esFavorito(producto.id);
@@ -117,7 +130,7 @@ export default function DetalleProducto() {
                     {/* INFO */}
                     <div className="detalle-info">
                         {producto.badge && <span className="detalle-badge">{producto.badge}</span>}
-                        <div className="detalle-disponible">● Disponible</div>
+                        <div className="{claseStock}"> {textoStock}</div>
 
                         <h1>{producto.nombre}</h1>
                         <p className="detalle-subt">{producto.specs.categoria.toUpperCase()} PREMIUM</p>
