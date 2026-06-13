@@ -4,11 +4,12 @@ import { productos } from "../data/productos";
 import { useApp } from "../context/AppContext";
 import Footer from "../components/Footer";
 import "./DetalleProducto.css";
+import Swal from "sweetalert2";
 
 export default function DetalleProducto() {
     const { id } = useParams();
     const producto = productos.find((p) => p.id === Number(id));
-    const { agregarAlCarrito, toggleFavorito, esFavorito } = useApp();
+    const { agregarAlCarrito, toggleFavorito, esFavorito, usuario } = useApp();
     const navigate = useNavigate();
     const [imgActiva, setImgActiva] = useState(0);
 
@@ -21,6 +22,8 @@ export default function DetalleProducto() {
         );
     }
 
+
+
     const fav = esFavorito(producto.id);
     const categoriaPath = producto.categoria;
     const categoriaLabel = {
@@ -29,6 +32,33 @@ export default function DetalleProducto() {
         lingotes: "Lingotes",
         "edicion-limitada": "Edición Limitada",
     }[categoriaPath];
+
+     const handleFavoritoClick = (e) => {
+            e.stopPropagation();
+    
+        if (!usuario) {
+                
+                Swal.fire({
+                    title: "Acceso Restringido",
+                    text: "Necesitas iniciar sesión para guardar tus favoritos.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#D4AF37", // Dorado AUREA
+                    cancelButtonColor: "#333333",
+                    confirmButtonText: "Ir a Login",
+                    cancelButtonText: "Cancelar",
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        navigate("/login");
+                    }
+                });
+            } else {
+                
+                toggleFavorito(producto);
+            }
+        };
+    
 
     return (
         <div className="detalle-page">
@@ -120,7 +150,7 @@ export default function DetalleProducto() {
                             </button>
                             <button
                                 className={`detalle-btn-fav${fav ? " active" : ""}`}
-                                onClick={() => toggleFavorito(producto)}
+                                onClick={handleFavoritoClick}
                                 aria-label={fav ? "Quitar de favoritos" : "Guardar en favoritos"}
                             >
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8">
