@@ -10,6 +10,7 @@ export default function Registro() {
         nombre: "", email: "", password: "", confirmar: "", telefono: "", newsletter: false,
     });
     const [errors, setErrors] = useState({});
+    const [cargando, setCargando] = useState(false);
 
     const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -29,21 +30,47 @@ export default function Registro() {
         return e;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const e2 = validate();
         if (Object.keys(e2).length) { setErrors(e2); return; }
-        login({
-            nombre: form.nombre,
-            email: form.email,
-            telefono: form.telefono,
-            direccion: "",
-            miembro: "MEMBER",
-            desde: new Date().getFullYear().toString(),
-            avatar: null,
-            pedidos: [],
-        }, form.password);
-        navigate("/perfil");
+
+        setCargando(true);
+        try {
+            const res = await fetch("http://localhost:4002/auth/registro", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: form.email, password: form.password }),
+            });
+
+            if (!res.ok) {
+                const msg = await res.text();
+                setErrors({ email: msg });
+                setCargando(false);
+                return;
+            }
+
+            const data = await res.json();
+            localStorage.setItem("token", data.token);
+
+            login({
+                nombre: form.nombre,
+                email: form.email,
+                telefono: form.telefono,
+                direccion: "",
+                miembro: "MEMBER",
+                desde: new Date().getFullYear().toString(),
+                avatar: null,
+                pedidos: [],
+            }, form.password);
+
+            navigate("/perfil");
+
+        } catch (err) {
+            setErrors({ email: "Error de conexión con el servidor." });
+        } finally {
+            setCargando(false);
+        }
     };
 
     return (
@@ -140,7 +167,9 @@ export default function Registro() {
                             Deseo recibir invitaciones exclusivas y noticias de colecciones especiales.
                         </label>
 
-                        <button type="submit" className="registro-submit">CREAR CUENTA</button>
+                        <button type="submit" className="registro-submit" disabled={cargando}>
+                            {cargando ? "CREANDO CUENTA..." : "CREAR CUENTA"}
+                        </button>
                     </form>
 
                     <p className="registro-login-link">

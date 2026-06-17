@@ -3,6 +3,7 @@ import { AppProvider, useApp } from "./context/AppContext";
 import ScrollToTop from "./components/ScrollToTop";
 import Navigation from "./components/Navigation";
 import Toast from "./components/Toast";
+import BackendStatus from "./components/BackendStatus";
 import Swal from "sweetalert2";
 import { useState, useEffect } from "react";
 
@@ -42,7 +43,7 @@ function AdminRoute({ children }) {
     if (!esAdmin) return <Navigate to="/" />;
     return children;
 }
-//Private Route bloquea ciertas rutas si el usuario no esta logueado (Ej. Carrito)
+
 function PrivateRoute({ children }) {
     const { usuario } = useApp();
     const navigate = useNavigate();
@@ -58,23 +59,19 @@ function PrivateRoute({ children }) {
                 cancelButtonColor: "#333333",
                 confirmButtonText: "Ir a Login",
                 cancelButtonText: "Volver atrás",
-                allowOutsideClick: false 
+                allowOutsideClick: false
             }).then((result) => {
                 if (result.isConfirmed) {
-                    navigate("/login"); 
-                } else if (result.isDismissed){
-                    navigate("/"); 
+                    navigate("/login");
+                } else if (result.isDismissed) {
+                    navigate("/");
                 }
             });
         }
-        
     }, [usuario, navigate]);
 
     return children;
 }
-
-
-
 
 function AppRoutes() {
     return (
@@ -95,23 +92,16 @@ function AppRoutes() {
                 <Route path="/producto/:id" element={<Layout><DetalleProducto /></Layout>} />
                 <Route path="/vender-lingote" element={<Layout><VenderLingote /></Layout>} />
 
-
-                {/* Rutas de Catálogo Key agregada*/}
                 <Route path="/joyeria" element={<Layout><Productos key="joyeria" categoria="joyeria" /></Layout>} />
                 <Route path="/relojes" element={<Layout><Productos key="relojes" categoria="relojes" /></Layout>} />
                 <Route path="/lingotes" element={<Layout><Productos key="lingotes" categoria="lingotes" /></Layout>} />
                 <Route path="/edicion-limitada" element={<Layout><Productos key="edicion" categoria="edicion-limitada" /></Layout>} />
-                
-                
 
-
-                {/* Rutas privadas */}
                 <Route path="/carrito" element={<Layout><PrivateRoute><Carrito /></PrivateRoute></Layout>} />
                 <Route path="/perfil" element={<Layout><PrivateRoute><Perfil /></PrivateRoute></Layout>} />
                 <Route path="/favoritos" element={<Layout><PrivateRoute><Favoritos /></PrivateRoute></Layout>} />
                 <Route path="/checkout" element={<Layout><PrivateRoute><Checkout /></PrivateRoute></Layout>} />
                 <Route path="/confirmacion" element={<Layout><PrivateRoute><Confirmacion /></PrivateRoute></Layout>} />
-                
             </Routes>
         </>
     );
@@ -123,6 +113,7 @@ export default function App() {
             <AppProvider>
                 <AppRoutes />
                 <Toast />
+                <BackendStatus />
             </AppProvider>
         </BrowserRouter>
     );

@@ -11,23 +11,39 @@ export default function Login() {
     const [showPass, setShowPass] = useState(false);
     const [error, setError] = useState("");
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!email || !password) { setError("Completá todos los campos."); return; }
-        const esAdmin = email === "admin@aurea.com";
-        const resultado = login({
-            nombre: esAdmin ? "Admin AUREA" : email.split("@")[0],
-            email,
-            telefono: "",
-            direccion: "",
-            miembro: esAdmin ? "ADMINISTRADOR" : "MEMBER",
-            desde: new Date().getFullYear().toString(),
-            avatar: null,
-            pedidos: [],
-        }, password);
 
-        if (!resultado.ok) { setError(resultado.error); return; }
-        navigate(esAdmin ? "/admin" : "/perfil");
+        try {
+            const res = await fetch("http://localhost:4002/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (!res.ok) { setError("Email o contraseña incorrectos."); return; }
+
+            const data = await res.json();
+            localStorage.setItem("token", data.token);
+
+            const resultado = login({
+                nombre: email.split("@")[0],
+                email,
+                telefono: "",
+                direccion: "",
+                miembro: email === "admin@aurea.com" ? "ADMINISTRADOR" : "MEMBER",
+                desde: new Date().getFullYear().toString(),
+                avatar: null,
+                pedidos: [],
+            }, password);
+
+            if (!resultado.ok) { setError(resultado.error); return; }
+            navigate(email === "admin@aurea.com" ? "/admin" : "/perfil");
+
+        } catch (err) {
+            setError("Error de conexión con el servidor.");
+        }
     };
 
     return (

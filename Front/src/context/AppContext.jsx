@@ -1,8 +1,8 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect } from "react";
+import { productos } from "../data/productos";
 
 const AppContext = createContext();
 
-// Credenciales admin fijas
 const ADMIN_EMAIL = "admin@aurea.com";
 const ADMIN_PASS = "admin1234";
 
@@ -56,7 +56,53 @@ export function AppProvider({ children }) {
         }, 3400);
     }, []);
 
-    // Login único con validación de contraseña para admin
+    // Cargar carrito del backend cuando el usuario se loguea
+    useEffect(() => {
+        const tokenGuardado = localStorage.getItem("token");
+        if (!tokenGuardado || !usuario || usuario.rol === "admin") return;
+
+        fetch("http://localhost:4002/carrito", {
+            headers: { Authorization: `Bearer ${tokenGuardado}` }
+        })
+            .then((res) => { if (!res.ok) throw new Error(); return res.json(); })
+            .then((data) => {
+                if (data.productos && data.productos.length > 0) {
+                    setCarrito(data.productos.map((p) => {
+                        const prodLocal = productos.find((pl) => pl.id === p.idProducto);
+                        return {
+                            id: p.idProducto,
+                            nombre: p.nombre,
+                            precio: p.precio,
+                            cantidad: p.cantidad,
+                            imagenes: prodLocal?.imagenes || [],
+                            subcategoria: prodLocal?.subcategoria || "",
+                        };
+                    }));
+                } else {
+                    setCarrito([]);
+                }
+            })
+            .catch(() => {});
+    }, [usuario]);
+
+    // Sincronizar stock con el backend cuando el usuario está logueado
+    useEffect(() => {
+        const tokenGuardado = localStorage.getItem("token");
+        if (!tokenGuardado) return;
+        fetch("http://localhost:4002/productos", {
+            headers: { Authorization: `Bearer ${tokenGuardado}` }
+        })
+            .then((res) => { if (!res.ok) throw new Error(); return res.json(); })
+            .then((data) => {
+                setProductosStock((prev) => prev.map((p) => {
+                    const backendProd = data.find((b) => b.nombre === p.nombre);
+                    if (backendProd) return { ...p, stock: backendProd.stock };
+                    return p;
+                }));
+            })
+            .catch(() => {});
+    }, [usuario]);
+
     const login = (datos, password) => {
         if (datos.email === ADMIN_EMAIL && password !== ADMIN_PASS) {
             return { ok: false, error: "Contraseña incorrecta para administrador." };
@@ -65,7 +111,6 @@ export function AppProvider({ children }) {
         setToken(jwt);
         const usuarioFinal = { ...datos, rol: jwt.rol };
         setUsuario(usuarioFinal);
-        // Registrar en lista de usuarios admin si no existe
         if (jwt.rol !== "admin") {
             setUsuariosAdmin((prev) => {
                 const existe = prev.find((u) => u.email === datos.email);
@@ -76,26 +121,58 @@ export function AppProvider({ children }) {
         return { ok: true };
     };
 
-    const logout = () => { setToken(null); setUsuario(null); };
+    const logout = () => {
+        setToken(null);
+        setUsuario(null);
+        setCarrito([]);
+        localStorage.removeItem("token");
+    };
+
     const esAdmin = usuario?.rol === "admin";
 
-    // Carrito
-    const agregarAlCarrito = (producto) => {
+    const agregarAlCarrito = async (producto) => {
         setCarrito((prev) => {
             const existe = prev.find((p) => p.id === producto.id);
             if (existe) return prev.map((p) => p.id === producto.id ? { ...p, cantidad: p.cantidad + 1 } : p);
             return [...prev, { ...producto, cantidad: 1 }];
         });
         addToast(`${producto.nombre} agregado al carrito`, "carrito");
+
+        const tokenGuardado = localStorage.getItem("token");
+        if (tokenGuardado && usuario?.rol !== "admin") {
+            try {
+                await fetch("http://localhost:4002/carrito/agregar", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${tokenGuardado}`,
+                    },
+                    body: JSON.stringify({ productoId: producto.id, cantidad: 1 }),
+                });
+            } catch (err) {
+                console.error("Error sincronizando carrito:", err);
+            }
+        }
     };
+
     const quitarDelCarrito = (id) => setCarrito((prev) => prev.filter((p) => p.id !== id));
+
     const cambiarCantidad = (id, cantidad) => {
         if (cantidad < 1) return;
         setCarrito((prev) => prev.map((p) => p.id === id ? { ...p, cantidad } : p));
     };
-    const vaciarCarrito = () => setCarrito([]);
 
-    // Favoritos
+    const vaciarCarrito = () => {
+        setCarrito([]);
+        const tokenGuardado = localStorage.getItem("token");
+        if (tokenGuardado && usuario?.rol !== "admin") {
+            fetch("http://localhost:4002/carrito/vaciar", {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${tokenGuardado}` },
+            }).catch(() => {});
+        }
+    };
+
     const toggleFavorito = (producto) => {
         setFavoritos((prev) => {
             const existe = prev.find((p) => p.id === producto.id);
@@ -106,7 +183,6 @@ export function AppProvider({ children }) {
     };
     const esFavorito = (id) => favoritos.some((p) => p.id === id);
 
-    // Cupones
     const CUPONES = { "AUREA10": 10, "AUREA20": 20, "VIP30": 30 };
     const aplicarCupon = (codigo) => {
         const descuento = CUPONES[codigo.toUpperCase()];
@@ -115,55 +191,80 @@ export function AppProvider({ children }) {
     };
     const quitarCupon = () => setCupon(null);
 
-    // Confirmar compra → agrega pedido al admin
     const confirmarCompra = (datosEnvio) => {
+        const carritoSnapshot = [...carrito];
+        const totalSnapshot = total;
+
         const pedido = {
             id: "#" + Math.floor(1000 + Math.random() * 9000),
             cliente: usuario?.nombre || datosEnvio?.nombre || "Cliente",
             email: usuario?.email || datosEnvio?.email || "",
             fecha: new Date().toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" }),
-            total: total,
+            total: totalSnapshot,
             estado: "PENDIENTE",
-            productos: [...carrito],
+            productos: carritoSnapshot,
             direccion: datosEnvio?.direccion || usuario?.direccion || "",
             ciudad: datosEnvio?.ciudad || "",
         };
 
         setPedidosAdmin((prev) => [pedido, ...prev]);
 
-        // restar stock por cada producto comprado
+        const tokenGuardado = localStorage.getItem("token");
+
+        // Restar stock en el backend
+        carritoSnapshot.forEach((p) => {
+            if (tokenGuardado) {
+                fetch(`http://localhost:4002/productos/${p.id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${tokenGuardado}`,
+                    },
+                    body: JSON.stringify({ stock: Math.max(0, (p.stock || 0) - p.cantidad) }),
+                }).catch(() => {});
+            }
+        });
+
+        // Restar stock local
         setProductosStock((prev) =>
             prev.map((p) => {
-                const comprado = carrito.find((c) => c.id === p.id);
-                if (comprado) {
-                    return { ...p, stock: Math.max(0, p.stock - comprado.cantidad) };
-                }
+                const comprado = carritoSnapshot.find((c) => c.id === p.id);
+                if (comprado) return { ...p, stock: Math.max(0, p.stock - comprado.cantidad) };
                 return p;
             })
         );
 
+        // Guardar pedido en historial del usuario
         if (usuario) {
             setUsuario((prev) => ({
                 ...prev,
                 pedidos: [
-                    { id: pedido.id, producto: carrito[0]?.nombre, precio: total, fecha: pedido.fecha, estado: "EN CAMINO", productos: [...carrito] },
+                    { id: pedido.id, producto: carritoSnapshot[0]?.nombre, precio: totalSnapshot, fecha: pedido.fecha, estado: "EN CAMINO", productos: carritoSnapshot },
                     ...(prev.pedidos || [])
                 ],
             }));
         }
 
-        vaciarCarrito();
+        // Vaciar carrito local inmediatamente
+        setCarrito([]);
+
+        // Vaciar carrito en el backend
+        if (tokenGuardado && usuario?.rol !== "admin") {
+            fetch("http://localhost:4002/carrito/vaciar", {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${tokenGuardado}` },
+            }).catch(() => {});
+        }
+
         return pedido;
     };
 
-    // Categorías admin
     const agregarCategoria = (cat) => {
         setCategoriasAdmin((prev) => [...prev, { ...cat, id: Date.now(), publicado: true, productos: 0 }]);
     };
     const eliminarCategoria = (id) => setCategoriasAdmin((prev) => prev.filter((c) => c.id !== id));
     const editarCategoria = (id, datos) => setCategoriasAdmin((prev) => prev.map((c) => c.id === id ? { ...c, ...datos } : c));
 
-    // Stock
     const editarStock = (id, cantidad) => setProductosStock((prev) => prev.map((p) => p.id === id ? { ...p, stock: Math.max(0, cantidad) } : p));
     const eliminarStock = (id) => setProductosStock((prev) => prev.filter((p) => p.id !== id));
 

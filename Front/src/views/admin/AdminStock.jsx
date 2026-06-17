@@ -18,6 +18,41 @@ export default function AdminStock() {
         return coincideBusq && coincideCat;
     });
 
+    // Actualiza stock local Y en el backend
+    const handleEditarStock = async (id, nuevoStock) => {
+        editarStock(id, nuevoStock); // actualiza estado local inmediatamente
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        try {
+            await fetch(`http://localhost:4002/productos/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ stock: Math.max(0, nuevoStock) }),
+            });
+        } catch (err) {
+            console.error("Error actualizando stock en backend:", err);
+        }
+    };
+
+    // Elimina producto local Y en el backend
+    const handleEliminarStock = async (id) => {
+        eliminarStock(id);
+        setModalEliminar(null);
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        try {
+            await fetch(`http://localhost:4002/productos/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+        } catch (err) {
+            console.error("Error eliminando producto en backend:", err);
+        }
+    };
+
     return (
         <div className="admin-stock">
             <AdminNav />
@@ -77,30 +112,30 @@ export default function AdminStock() {
                                 </div>
                             ) : filtrados.map((p) => (
                                 <div key={p.id} className="admin-stock-row">
-                  <span className="admin-stock-prod">
-                    <img src={p.imagen} alt={p.nombre} />
-                    <span>{p.nombre}</span>
-                  </span>
+                                    <span className="admin-stock-prod">
+                                        <img src={p.imagen} alt={p.nombre} />
+                                        <span>{p.nombre}</span>
+                                    </span>
                                     <span className="admin-stock-cat">{p.categoria}</span>
                                     <span className="admin-stock-precio">${p.precio?.toLocaleString("es-AR")}</span>
                                     <span className="admin-stock-qty">
-                    <button onClick={() => editarStock(p.id, p.stock - 1)}>-</button>
-                    <span>{p.stock}</span>
-                    <button onClick={() => editarStock(p.id, p.stock + 1)}>+</button>
-                  </span>
+                                        <button onClick={() => handleEditarStock(p.id, p.stock - 1)}>-</button>
+                                        <span>{p.stock}</span>
+                                        <button onClick={() => handleEditarStock(p.id, p.stock + 1)}>+</button>
+                                    </span>
                                     <span className="admin-stock-acciones">
-                    <button className="admin-accion-btn" title="Editar producto">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                      </svg>
-                    </button>
-                    <button className="admin-accion-btn rojo" title="Eliminar producto" onClick={() => setModalEliminar(p)}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                        <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
-                      </svg>
-                    </button>
-                  </span>
+                                        <button className="admin-accion-btn" title="Editar producto">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                                            </svg>
+                                        </button>
+                                        <button className="admin-accion-btn rojo" title="Eliminar producto" onClick={() => setModalEliminar(p)}>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                                <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+                                            </svg>
+                                        </button>
+                                    </span>
                                 </div>
                             ))}
                         </div>
@@ -131,7 +166,7 @@ export default function AdminStock() {
                             </p>
                             <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
                                 <button className="admin-btn-primary" style={{ background: "#c44" }}
-                                        onClick={() => { eliminarStock(modalEliminar.id); setModalEliminar(null); }}>
+                                        onClick={() => handleEliminarStock(modalEliminar.id)}>
                                     ELIMINAR
                                 </button>
                                 <button className="admin-btn-primary" style={{ background: "#888" }} onClick={() => setModalEliminar(null)}>
