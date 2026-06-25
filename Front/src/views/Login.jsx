@@ -1,50 +1,34 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../redux/authSlice";
 import "./Login.css";
 
 export default function Login() {
-    const { login } = useApp();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    // redux
+    const { loading, error: reduxError } = useSelector((state) => state.auth);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
-    const [error, setError] = useState("");
+    const [localError, setLocalError] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!email || !password) { setError("Completá todos los campos."); return; }
+        
+        if (!email || !password) { 
+            setLocalError("Completá todos los campos."); 
+            return; 
+        }
 
-        try {
-            const res = await fetch("http://localhost:4002/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (!res.ok) { setError("Email o contraseña incorrectos."); return; }
-
-            const data = await res.json();
-            localStorage.setItem("token", data.token);
-
-            const resultado = login({
-                nombre: email.split("@")[0],
-                email,
-                telefono: "",
-                direccion: "",
-                miembro: email === "admin@aurea.com" ? "ADMINISTRADOR" : "MEMBER",
-                desde: new Date().getFullYear().toString(),
-                avatar: null,
-                pedidos: [],
-            }, password);
-
-            if (!resultado.ok) { setError(resultado.error); return; }
+        const resultAction = await dispatch(loginUser({ email, password })); // con redux aca lo que se hace es encargarse del fetch y guardar el token
+        if (loginUser.fulfilled.match(resultAction)) { // promesa
             navigate(email === "admin@aurea.com" ? "/admin" : "/perfil");
-
-        } catch (err) {
-            setError("Error de conexión con el servidor.");
         }
     };
+
+    const displayError = localError || (reduxError ? "Email o contraseña incorrectos." : "");
 
     return (
         <div className="login-page">
@@ -71,12 +55,22 @@ export default function Login() {
                     <form onSubmit={handleSubmit}>
                         <div className="login-field">
                             <label>EMAIL</label>
-                            <input type="email" placeholder="nombre@ejemplo.com" value={email} onChange={(e) => { setEmail(e.target.value); setError(""); }} />
+                            <input 
+                                type="email" 
+                                placeholder="nombre@ejemplo.com" 
+                                value={email} 
+                                onChange={(e) => { setEmail(e.target.value); setLocalError(""); }} 
+                            />
                         </div>
                         <div className="login-field">
                             <label>CONTRASEÑA</label>
                             <div className="login-pass-wrap">
-                                <input type={showPass ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); setError(""); }} />
+                                <input 
+                                    type={showPass ? "text" : "password"} 
+                                    placeholder="••••••••" 
+                                    value={password} 
+                                    onChange={(e) => { setPassword(e.target.value); setLocalError(""); }} 
+                                />
                                 <button type="button" className="login-pass-toggle" onClick={() => setShowPass(!showPass)}>
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                                         {showPass
@@ -86,9 +80,14 @@ export default function Login() {
                                 </button>
                             </div>
                         </div>
-                        {error && <p className="login-error">{error}</p>}
+                        
+                        {displayError && <p className="login-error">{displayError}</p>}
+                        
                         <button type="button" className="login-forgot">Olvidé mi contraseña</button>
-                        <button type="submit" className="login-submit">ACCEDER AL ATELIER</button>
+                        
+                        <button type="submit" className="login-submit" disabled={loading}>
+                            {loading ? "VERIFICANDO CREDENCIALES..." : "ACCEDER AL ATELIER"}
+                        </button>
                     </form>
 
                     <p className="login-register-link">
