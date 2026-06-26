@@ -1,11 +1,17 @@
+import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useDispatch, useSelector } from "react-redux";
+import { quitarDelCarrito, cambiarCantidad } from "../redux/carritoSlice";
 import Footer from "../components/Footer";
 import "./Carrito.css";
 
 export default function Carrito() {
-    const { carrito, quitarDelCarrito, cambiarCantidad, subtotal } = useApp();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const carrito = useSelector((state) => state.carrito.items);
+    const subtotal = useMemo(() => {
+        return carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
+    }, [carrito]);
 
     return (
         <div className="carrito-page">
@@ -32,15 +38,15 @@ export default function Carrito() {
                                         <p className="carrito-item-cat">{p.subcategoria?.toUpperCase()}</p>
                                         <p className="carrito-item-nombre">{p.nombre}</p>
                                         <div className="carrito-item-qty">
-                                            <button onClick={() => cambiarCantidad(p.id, p.cantidad - 1)}>-</button>
+                                            <button onClick={() => dispatch(cambiarCantidad({ id: p.id, cantidad: p.cantidad - 1 }))}>-</button>
                                             <span>{p.cantidad}</span>
-                                            <button onClick={() => cambiarCantidad(p.id, p.cantidad + 1)}>+</button>
+                                            <button onClick={() => dispatch(cambiarCantidad({ id: p.id, cantidad: p.cantidad + 1 }))}>+</button>
                                         </div>
                                     </div>
                                     <div className="carrito-item-right">
                                         <p className="carrito-item-label">PRECIO UNITARIO</p>
                                         <p className="carrito-item-precio">$ {p.precio.toLocaleString("es-AR")}</p>
-                                        <button className="carrito-item-del" onClick={() => quitarDelCarrito(p.id)} aria-label="Eliminar">
+                                        <button className="carrito-item-del" onClick={() => dispatch(quitarDelCarrito(p.id))} aria-label="Eliminar">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
                                             </svg>
@@ -87,18 +93,18 @@ export default function Carrito() {
                                 CONTINUAR COMPRANDO
                             </button>
                             <div className="carrito-sellos">
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  </svg>
-                  PAGO SEGURO GARANTIZADO
-                </span>
                                 <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2">
-                    <rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-4"/>
-                  </svg>
-                  ENVÍO ASEGURADO A TODO EL PAÍS
-                </span>
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                  </svg>
+                                  PAGO SEGURO GARANTIZADO
+                                </span>
+                                <span>
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2">
+                                    <rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-4"/>
+                                  </svg>
+                                  ENVÍO ASEGURADO A TODO EL PAÍS
+                                </span>
                             </div>
                         </div>
                     </div>
