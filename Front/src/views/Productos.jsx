@@ -1,23 +1,28 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { productos as todosProd, categorias } from "../data/productos";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProductos } from "../redux/productoSlice";
+import { categorias } from "../data/productos"; 
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import "./Productos.css";
 
 export default function Productos({ categoria }) {
     const location = useLocation();
+    const dispatch = useDispatch();
+    const { items: todosProd, loading, error } = useSelector((state) => state.productos); //extraccion del catalogo desde redux
     const info = categorias[categoria];
     const subcatInicial = location.state?.subcategoria || null;
-    
     const [subcat, setSubcat] = useState(subcatInicial);
     const [materiales, setMateriales] = useState([]);
-
     const [orden, setOrden] = useState("relevancia");
 
-    const prodsCat = todosProd.filter((p) => p.categoria === categoria);
-    const maxPrecioReal = Math.max(...prodsCat.map((p) => p.precio));
+    useEffect(() => { //peticion al back para traer los productos
+        dispatch(fetchProductos());
+    }, [dispatch]);
 
+    const prodsCat = todosProd.filter((p) => p.categoria === categoria); //filtro de productos por categoria en redux
+    const maxPrecioReal = prodsCat.length > 0 ? Math.max(...prodsCat.map((p) => p.precio)) : 0;
     const [precioMax, setPrecioMax] = useState(maxPrecioReal);
 
     useEffect(() => {
@@ -35,7 +40,7 @@ export default function Productos({ categoria }) {
         if (orden === "precio-asc") lista = [...lista].sort((a, b) => a.precio - b.precio);
         if (orden === "precio-desc") lista = [...lista].sort((a, b) => b.precio - a.precio);
         return lista;
-    }, [subcat, materiales, precioMax, orden, categoria]);
+    }, [subcat, materiales, precioMax, orden, prodsCat]); 
 
     const toggleMaterial = (mat) => {
         setMateriales((prev) =>
@@ -100,6 +105,7 @@ export default function Productos({ categoria }) {
                                 value={precioMax}
                                 onChange={(e) => setPrecioMax(Number(e.target.value))}
                                 className="sidebar-range"
+                                disabled={loading}
                             />
                             <div className="sidebar-range-labels">
                                 <span>$0</span>
@@ -113,14 +119,14 @@ export default function Productos({ categoria }) {
                         </div>
                     </aside>
 
-                    {/* GRID */}
                     <div className="productos-main">
                         <div className="productos-top-bar">
-                            <p>Productos encontrados: <strong>{filtrados.length}</strong></p>
+                            <p>Productos encontrados: <strong>{loading ? "..." : filtrados.length}</strong></p>
                             <select
                                 value={orden}
                                 onChange={(e) => setOrden(e.target.value)}
                                 className="productos-orden"
+                                disabled={loading}
                             >
                                 <option value="relevancia">ORDENAR POR: RELEVANCIA</option>
                                 <option value="precio-asc">PRECIO: MENOR A MAYOR</option>
@@ -128,16 +134,30 @@ export default function Productos({ categoria }) {
                             </select>
                         </div>
 
-                        {filtrados.length === 0 ? (
+                        {loading && (       // manejo de estados de redux
+                            <div className="productos-empty">
+                                <p>Cargando catálogo desde el servidor...</p>
+                            </div>
+                        )}
+
+                        {!loading && error && (
+                            <div className="productos-empty">
+                                <p style={{ color: "red" }}>Error de conexión: {error}</p>
+                            </div>
+                        )}
+
+                        {!loading && !error && filtrados.length === 0 ? (
                             <div className="productos-empty">
                                 <p>No hay productos con esos filtros.</p>
                             </div>
                         ) : (
-                            <div className="productos-grid">
-                                {filtrados.map((p) => (
-                                    <ProductCard key={p.id} producto={p} />
-                                ))}
-                            </div>
+                            !loading && !error && (
+                                <div className="productos-grid">
+                                    {filtrados.map((p) => (
+                                        <ProductCard key={p.id} producto={p} />
+                                    ))}
+                                </div>
+                            )
                         )}
                     </div>
                 </div>
