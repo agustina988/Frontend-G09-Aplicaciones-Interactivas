@@ -21,12 +21,29 @@ const productoSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProductos.pending, (state) => { state.loading = true; state.error = null; })
-      .addCase(fetchProductos.fulfilled, (state, action) => { state.loading = false; state.items = action.payload; })
-      .addCase(fetchProductos.rejected, (state, action) => { state.loading = false; state.error = action.error.message; })
+      .addCase(fetchProductos.pending, (state) => { 
+          state.loading = true; 
+          state.error = null; 
+      })
+      .addCase(fetchProductos.fulfilled, (state, action) => { 
+          state.loading = false; 
+          state.items = action.payload; 
+      })
+      .addCase(fetchProductos.rejected, (state, action) => { 
+          state.loading = false; 
+          state.error = action.error.message; 
+      })
+      .addCase(updateStockProducto.pending, (state) => { //actualizacion de stock
+          state.error = null;
+      })
       .addCase(updateStockProducto.fulfilled, (state, action) => {
-        const index = state.items.findIndex((p) => p.id === action.payload.id);
-        if (index !== -1) { state.items[index] = action.payload; }
+          const index = state.items.findIndex((p) => p.id === action.payload.id);
+          if (index !== -1) { 
+              state.items[index] = action.payload; 
+          }
+      })
+      .addCase(updateStockProducto.rejected, (state, action) => {
+          state.error = action.error.message;
       });
   },
 });
