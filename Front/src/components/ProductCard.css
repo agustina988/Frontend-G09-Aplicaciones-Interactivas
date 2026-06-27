@@ -10,6 +10,12 @@
     transform: translateY(-2px);
 }
 
+/* Agotado: sin hover effect */
+.product-card--agotado:hover {
+    box-shadow: none;
+    transform: none;
+}
+
 .product-card-img-wrap {
     position: relative;
     aspect-ratio: 1;
@@ -21,11 +27,41 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease;
+    transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+/* Imagen en blanco y negro cuando no hay stock */
+.product-card--agotado .product-card-img-wrap img {
+    filter: grayscale(1);
 }
 
 .product-card:hover .product-card-img-wrap img {
     transform: scale(1.04);
+}
+
+.product-card--agotado:hover .product-card-img-wrap img {
+    transform: none;
+}
+
+/* Overlay "NO DISPONIBLE" sobre la imagen */
+.product-card-overlay-agotado {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 16, 12, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.product-card-overlay-agotado span {
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    font-family: sans-serif;
+    font-weight: 500;
+    border: 1px solid rgba(255,255,255,0.6);
+    padding: 6px 14px;
 }
 
 .product-badge {
@@ -107,3 +143,49 @@
 }
 
 .product-card-btn:hover { background: #8b6914; }
+
+/* Botón "NO DISPONIBLE" — estilo exclusividad pero bloqueado */
+.product-card-btn--nodisponible {
+    width: 100%;
+    background: #6b6560;
+    color: #d4cfc8;
+    border: none;
+    padding: 9px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.product-card-btn--nodisponible:hover {
+    background: #6b6560;
+}
+
+/* Badge SIN STOCK en admin */
+.admin-stock-badge-agotado {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    background: #c44;
+    color: #fff;
+    padding: 2px 6px;
+    font-family: sans-serif;
+    vertical-align: middle;
+}
+
+.admin-stock-row.sin-stock {
+    opacity: 0.75;
+    background: #fdf8f8;
+}
+
+/* Placeholder cuando no hay imagen */
+.product-card-sin-imagen {
+    width: 100%;
+    height: 100%;
+    background: #f5f2ec;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

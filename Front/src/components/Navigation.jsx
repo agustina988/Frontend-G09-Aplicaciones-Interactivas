@@ -5,7 +5,7 @@ import { productos } from "../data/productos";
 import "./Navigation.css";
 
 export default function Navigation() {
-    const { usuario, logout, totalCarrito, favoritos } = useApp();
+    const { usuario, logout, totalCarrito, favoritos, esAdmin } = useApp();
     const navigate = useNavigate();
     const [busqueda, setBusqueda] = useState("");
     const [resultados, setResultados] = useState([]);
@@ -30,7 +30,6 @@ export default function Navigation() {
         navigate(`/producto/${id}`);
     };
 
-    // Cerrar al hacer click fuera
     useEffect(() => {
         const handler = (e) => {
             if (dropRef.current && !dropRef.current.contains(e.target)) {
@@ -43,6 +42,16 @@ export default function Navigation() {
 
     return (
         <header className="nav-header">
+            {/* Barra de admin cuando está viendo la tienda */}
+            {esAdmin && (
+                <div className="nav-admin-bar">
+                    <span>Estás viendo la tienda como administrador</span>
+                    <Link to="/admin" className="nav-admin-bar-btn">
+                        ← Volver al panel
+                    </Link>
+                </div>
+            )}
+
             <nav className="nav-inner">
                 <div className="nav-links">
                     <Link to="/joyeria">Joyería</Link>
@@ -54,7 +63,6 @@ export default function Navigation() {
                 <Link to="/" className="nav-logo">AUREA</Link>
 
                 <div className="nav-actions">
-                    {/* BUSCADOR */}
                     <div className="nav-search-wrap" ref={dropRef}>
                         <div className="nav-search">
                             <input
