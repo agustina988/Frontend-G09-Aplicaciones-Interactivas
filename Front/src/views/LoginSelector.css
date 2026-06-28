@@ -1,0 +1,112 @@
+.login-sel-page {
+    min-height: 100vh;
+    background: #0d0b08;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    font-family: 'Cormorant Garamond', serif;
+    color: #faf9f6;
+}
+
+.login-sel-logo {
+    font-size: 2.8rem;
+    font-weight: 600;
+    color: #c9a84c;
+    letter-spacing: 0.2em;
+    margin-bottom: 3rem;
+}
+
+.login-sel-title {
+    font-size: 3rem;
+    font-weight: 400;
+    color: #c9a84c;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.02em;
+}
+
+.login-sel-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 3.5rem;
+}
+
+.login-sel-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    width: 100%;
+    max-width: 820px;
+    margin-bottom: 4rem;
+}
+
+.login-sel-card {
+    background: #1e1c18;
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s, background 0.3s;
+    font-family: 'Cormorant Garamond', serif;
+    color: #faf9f6;
+}
+
+.login-sel-card:hover {
+    border-color: #c9a84c;
+    background: #252118;
+}
+
+.login-sel-icon {
+    width: 64px;
+    height: 64px;
+    border: 1px solid rgba(201,168,76,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: #c9a84c;
+}
+
+.login-sel-card-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+    color: #faf9f6;
+}
+
+.login-sel-card-desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.login-sel-link {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: #c9a84c;
+}
+
+.login-sel-footer {
+    text-align: center;
+}
+
+.login-sel-cert {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.4);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 8px 18px;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+}
+
+.login-sel-copy {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.25);
+}

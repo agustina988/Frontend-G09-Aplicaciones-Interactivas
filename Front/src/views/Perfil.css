@@ -1,0 +1,244 @@
+.perfil-page { font-family: 'Cormorant Garamond', serif; background: #faf9f6; }
+
+.perfil-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+}
+
+/* HEADER */
+.perfil-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 2rem;
+    margin-bottom: 3.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid #e8e4dc;
+}
+
+.perfil-avatar {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #2a2520;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.perfil-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.perfil-avatar span {
+    font-size: 3rem;
+    font-weight: 300;
+    color: #c9a84c;
+}
+
+.perfil-avatar-edit {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    background: rgba(20,16,12,0.75);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #faf9f6;
+}
+
+.perfil-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: #8a8580;
+    margin-bottom: 0.4rem;
+}
+
+.perfil-header-info h1 {
+    font-size: 2.5rem;
+    font-weight: 400;
+    color: #2a2520;
+    margin-bottom: 0.5rem;
+}
+
+.perfil-badges { display: flex; align-items: center; gap: 0.5rem; }
+
+.perfil-badge-member {
+    background: #2a2520;
+    color: #c9a84c;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    padding: 4px 10px;
+}
+
+.perfil-badge-since {
+    font-size: 13px;
+    color: #8a8580;
+    letter-spacing: 0.08em;
+}
+
+/* BODY */
+.perfil-body {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+.perfil-col h2 {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: #8a8580;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid #e8e4dc;
+}
+
+/* DATOS */
+.perfil-data-item { margin-bottom: 1.4rem; }
+
+.perfil-data-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: #aaa9a5;
+    margin-bottom: 4px;
+}
+
+.perfil-data-val {
+    font-size: 16px;
+    color: #2a2520;
+}
+
+.perfil-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: #8a8580;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 2rem;
+    transition: color 0.2s;
+}
+
+.perfil-logout-btn:hover { color: #c44; }
+
+/* PEDIDOS */
+.perfil-pedidos-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid #e8e4dc;
+}
+
+.perfil-pedidos-header h2 { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+
+.perfil-ver-todo {
+    background: none;
+    border: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: #8b6914;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.perfil-pedido {
+    display: flex;
+    gap: 1rem;
+    padding: 1.2rem;
+    border: 1px solid #e8e4dc;
+    background: #fff;
+    margin-bottom: 1rem;
+}
+
+.perfil-pedido-img {
+    width: 60px;
+    height: 60px;
+    background: #f5f2ec;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.perfil-pedido-info { flex: 1; }
+
+.perfil-pedido-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+}
+
+.perfil-pedido-id {
+    font-size: 13px;
+    color: #8a8580;
+    letter-spacing: 0.05em;
+}
+
+.perfil-pedido-fecha-estado {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.perfil-pedido-fecha { color: #8a8580; }
+
+.perfil-pedido-estado.en-camino { color: #2a7a3a; }
+
+.perfil-pedido-nombre {
+    font-size: 18px;
+    font-weight: 500;
+    color: #2a2520;
+    margin-bottom: 8px;
+}
+
+.perfil-pedido-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.perfil-pedido-precio {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2a2520;
+}
+
+.perfil-pedido-detalle {
+    background: none;
+    border: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    color: #8b6914;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+}
+
+.perfil-no-pedidos {
+    text-align: center;
+    padding: 3rem 0;
+    font-size: 17px;
+    color: #aaa;
+}
+
+@media (max-width: 768px) {
+    .perfil-body { grid-template-columns: 1fr; }
+    .perfil-header { flex-direction: column; align-items: flex-start; }
+}

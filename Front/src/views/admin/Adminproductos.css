@@ -1,0 +1,211 @@
+.admin-productos {
+    font-family: 'Cormorant Garamond', serif;
+    background: #faf9f4;
+    min-height: 100vh;
+}
+
+.admin-productos-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+}
+
+.admin-productos-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 860px) {
+    .admin-productos-grid { grid-template-columns: 1fr; }
+}
+
+/* FORMULARIO */
+.admin-productos-form-wrap {
+    background: #fff;
+    border: 1px solid #e0dbd0;
+    padding: 2rem;
+}
+
+.admin-productos-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.admin-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.admin-form-group label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: #8a8580;
+}
+
+.admin-form-group input,
+.admin-form-group textarea {
+    border: 1px solid #e0dbd0;
+    background: #faf9f4;
+    padding: 10px 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    color: #2a2520;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-form-group input:focus,
+.admin-form-group textarea:focus {
+    border-color: #8b6914;
+    background: #fff;
+}
+
+.admin-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.admin-form-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff5f5;
+    border: 1px solid #f5c5c5;
+    color: #c44;
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+.admin-form-exito {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f5fff5;
+    border: 1px solid #b5e5b5;
+    color: #3a8a3a;
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+/* PREVIEW */
+.admin-productos-preview {
+    position: sticky;
+    top: 2rem;
+}
+
+.admin-preview-titulo {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: #8a8580;
+    margin-bottom: 1rem;
+}
+
+.admin-preview-card {
+    background: #fff;
+    border: 1px solid #e0dbd0;
+    overflow: hidden;
+}
+
+.admin-preview-img {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f5f2ec;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c0bbb0;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+}
+
+.admin-preview-info {
+    padding: 1rem 1.2rem 1.4rem;
+}
+
+.admin-preview-nombre {
+    font-size: 17px;
+    font-weight: 500;
+    color: #2a2520;
+    margin-bottom: 2px;
+}
+
+.admin-preview-cat {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: #8a8580;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.admin-preview-precio {
+    font-size: 16px;
+    color: #8b6914;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.admin-preview-stock {
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.admin-preview-desc {
+    font-size: 13px;
+    color: #7a7570;
+    line-height: 1.5;
+}
+
+/* Recientes */
+.admin-preview-reciente-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0ece3;
+    font-size: 14px;
+    color: #2a2520;
+}
+
+.admin-preview-reciente-row:last-child { border-bottom: none; }
+
+.admin-preview-reciente-row img {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    background: #f5f2ec;
+    flex-shrink: 0;
+}
+
+/* URL imagen */
+.admin-form-url-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #e0dbd0;
+    background: #faf9f4;
+    padding: 10px 14px;
+}
+
+.admin-form-url-wrap input {
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    color: #2a2520;
+    outline: none;
+    width: 100%;
+}
+
+.admin-form-url-wrap input:focus {
+    border: none;
+    background: transparent;
+}
