@@ -35,6 +35,7 @@ export function AppProvider({ children }) {
     const [pedidosAdmin, setPedidosAdmin] = useState([]);
     const [usuariosAdmin, setUsuariosAdmin] = useState([]);
     const [productosBackend, setProductosBackend] = useState([]);
+    const [cargandoProductos, setCargandoProductos] = useState(true);
     const [backendOnline, setBackendOnline] = useState(true);
 
     const [categoriasAdmin, setCategoriasAdmin] = useState([
@@ -94,7 +95,8 @@ export function AppProvider({ children }) {
                     imagen: b.imagenes?.[0]?.url || "/src/assets/placeholder.jpg",
                 })));
             })
-            .catch(() => setBackendOnline(false));
+            .catch(() => setBackendOnline(false))
+            .finally(() => setCargandoProductos(false));
     }, []);
 
     // Persistir favoritos en localStorage cada vez que cambian
@@ -295,7 +297,7 @@ export function AppProvider({ children }) {
             usuariosAdmin,
             categoriasAdmin, agregarCategoria, eliminarCategoria, editarCategoria,
             productosStock, setProductosStock, editarStock, eliminarStock,
-            productosBackend, setProductosBackend,
+            productosBackend, setProductosBackend, cargandoProductos,
             backendOnline,
         }}>
             {children}

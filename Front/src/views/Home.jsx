@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 import "./Home.css";
 
 export default function Home() {
-    const { productosBackend } = useApp();
+    const { productosBackend, cargandoProductos } = useApp();
 
     // Destacados: primeros 4 productos del catálogo (todo viene del backend, sin inventar nada acá)
     const destacados = productosBackend.slice(0, 4).map((p) => ({
@@ -91,7 +91,11 @@ export default function Home() {
                     <Link to="/joyeria" className="home-ver-todo">VER TODO</Link>
                 </div>
                 <div className="home-products-grid">
-                    {destacados.map((p) => <ProductCard key={p.id} producto={p} />)}
+                    {cargandoProductos ? (
+                        <p style={{ padding: "2rem 0", color: "#8a8580" }}>Cargando piezas destacadas...</p>
+                    ) : (
+                        destacados.map((p) => <ProductCard key={p.id} producto={p} />)
+                    )}
                 </div>
             </section>
 

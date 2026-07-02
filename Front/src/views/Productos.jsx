@@ -5,36 +5,21 @@ import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import "./Productos.css";
 
-// Metadata de filtros por categoría (título; subcategorías quedan deshabilitadas
-// hasta que el backend las modele — hoy `Categoria` no tiene ese concepto).
-const categorias = {
-    joyeria: {
-        titulo: "Joyería",
-        subcategorias: [],
-        materiales: ["Oro 18k", "Oro Blanco", "Platino", "Plata 925"],
-    },
-    relojes: {
-        titulo: "Relojería",
-        subcategorias: [],
-        materiales: ["Acero", "Oro 18k", "Titanio"],
-    },
-    lingotes: {
-        titulo: "Lingotes",
-        subcategorias: [],
-        materiales: ["Oro 999.9", "Plata 999"],
-    },
-    "edicion-limitada": {
-        titulo: "Edición Limitada",
-        subcategorias: [],
-        materiales: ["Oro 18k", "Platino"],
-    },
+// Solo el título de cada categoría es texto de presentación fijo (no filtra nada).
+// Subcategorías y materiales se calculan dinámicamente a partir de los productos
+// reales que trae el backend — antes eran listas hardcodeadas y quedaban desactualizadas.
+const TITULOS = {
+    joyeria: "Joyería",
+    relojes: "Relojería",
+    lingotes: "Lingotes",
+    "edicion-limitada": "Edición Limitada",
 };
 
 export default function Productos({ categoria }) {
     const location = useLocation();
-    const info = categorias[categoria];
+    const titulo = TITULOS[categoria] || categoria;
     const subcatInicial = location.state?.subcategoria || null;
-    const { productosBackend, productosStock } = useApp();
+    const { productosBackend, productosStock, cargandoProductos } = useApp();
 
     const [subcat, setSubcat] = useState(subcatInicial);
     const [materiales, setMateriales] = useState([]);
@@ -61,12 +46,20 @@ export default function Productos({ categoria }) {
                     ...(p.composicionMaterial ? { material: p.composicionMaterial } : {}),
                     ...(p.peso ? { peso: p.peso } : {}),
                     ...(p.certificacion ? { certificacion: p.certificacion } : {}),
-                    categoria: p.categoriaNombre || info?.titulo || categoria,
+                    categoria: p.categoriaNombre || titulo || categoria,
                 },
                 esencia: p.esencia || "",
                 caracteristicas: p.caracteristicas || [],
             };
         });
+
+    // Subcategorías y materiales reales, derivados de los productos de esta categoría
+    const subcategoriasDisponibles = [...new Set(
+        todosLosProdsCat.map((p) => p.subcategoria).filter(Boolean)
+    )];
+    const materialesDisponibles = [...new Set(
+        todosLosProdsCat.flatMap((p) => p.material !== "—" ? [p.material] : [])
+    )];
 
     const maxPrecioReal = todosLosProdsCat.length > 0
         ? Math.max(...todosLosProdsCat.map((p) => p.precio))
@@ -103,10 +96,10 @@ export default function Productos({ categoria }) {
                 <div className="productos-breadcrumb">
                     <Link to="/">Home</Link>
                     <span> | </span>
-                    <span>{info.titulo}</span>
+                    <span>{titulo}</span>
                 </div>
 
-                <h1 className="productos-title">{info.titulo}</h1>
+                <h1 className="productos-title">{titulo}</h1>
 
                 <div className="productos-layout">
                     <aside className="productos-sidebar">
@@ -118,7 +111,7 @@ export default function Productos({ categoria }) {
                             >
                                 Todas
                             </button>
-                            {info.subcategorias.map((s) => (
+                            {subcategoriasDisponibles.map((s) => (
                                 <button
                                     key={s}
                                     className={`sidebar-cat-btn${subcat === s ? " active" : ""}`}
@@ -131,7 +124,7 @@ export default function Productos({ categoria }) {
 
                         <div className="sidebar-section">
                             <p className="sidebar-label">MATERIAL</p>
-                            {info.materiales.map((m) => (
+                            {materialesDisponibles.map((m) => (
                                 <label key={m} className="sidebar-check">
                                     <input
                                         type="checkbox"
@@ -179,7 +172,11 @@ export default function Productos({ categoria }) {
                             </select>
                         </div>
 
-                        {filtrados.length === 0 ? (
+                        {cargandoProductos ? (
+                            <div className="productos-empty">
+                                <p>Cargando productos...</p>
+                            </div>
+                        ) : filtrados.length === 0 ? (
                             <div className="productos-empty">
                                 <p>No hay productos con esos filtros.</p>
                             </div>
