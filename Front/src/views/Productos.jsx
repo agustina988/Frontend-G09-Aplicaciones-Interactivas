@@ -5,10 +5,6 @@ import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import "./Productos.css";
 
-// Nada hardcodeado acá: el nombre de la categoría se toma del propio backend
-// (cada producto ya trae categoriaNombre). El slug de la URL solo se usa como
-// fallback de texto mientras todavía no cargó ningún producto de esa categoría.
-
 export default function Productos({ categoria }) {
     const location = useLocation();
     const subcatInicial = location.state?.subcategoria || null;
@@ -18,7 +14,6 @@ export default function Productos({ categoria }) {
     const [materiales, setMateriales] = useState([]);
     const [orden, setOrden] = useState("relevancia");
 
-    // Productos de esta categoría, filtrando por el slug real que devuelve el backend
     const todosLosProdsCat = productosBackend
         .filter((p) => p.categoriaSlug === categoria)
         .map((p) => {
@@ -46,11 +41,8 @@ export default function Productos({ categoria }) {
             };
         });
 
-    // Título de la categoría: tomado del propio backend (categoriaNombre de
-    // cualquier producto de esta categoría), no hardcodeado en el front.
     const titulo = todosLosProdsCat[0]?.specs?.categoria || categoria;
 
-    // Subcategorías y materiales reales, derivados de los productos de esta categoría
     const subcategoriasDisponibles = [...new Set(
         todosLosProdsCat.map((p) => p.subcategoria).filter(Boolean)
     )];
