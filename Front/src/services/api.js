@@ -64,3 +64,25 @@ export const getUsuariosAPI = () => request("/usuarios");
 export const getPerfilAPI = () => request("/usuarios/perfil");
 export const editarPerfilAPI = (datos) =>
     request("/usuarios/perfil", { method: "PUT", body: JSON.stringify(datos) });
+
+export const crearCategoriaAPI = (datos) =>
+    request("/categories", { method: "POST", body: JSON.stringify(datos) });
+export const editarCategoriaAPI = (id, datos) =>
+    request(`/categories/${id}`, { method: "PUT", body: JSON.stringify(datos) });
+export const eliminarCategoriaAPI = (id) =>
+    request(`/categories/${id}`, { method: "DELETE" });
+
+export const getImagenesPorProductoAPI = (productoId) =>
+    request(`/imagenes/producto/${productoId}`);
+export const crearImagenAPI = (datos) =>
+    request("/imagenes", { method: "POST", body: JSON.stringify(datos) });
+export const eliminarImagenAPI = (id) =>
+    request(`/imagenes/${id}`, { method: "DELETE" });
+
+export const getCuponesAPI = () => request("/cupones");
+export const crearCuponAPI = (datos) =>
+    request("/cupones", { method: "POST", body: JSON.stringify(datos) });
+export const eliminarCuponAPI = (id) =>
+    request(`/cupones/${id}`, { method: "DELETE" });
+export const validarCuponAPI = (codigo) =>
+    request(`/cupones/validar/${encodeURIComponent(codigo)}`);

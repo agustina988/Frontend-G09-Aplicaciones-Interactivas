@@ -1,30 +1,21 @@
 import { useState } from "react";
 import { useApp } from "../../context/AppContext";
-import { crearProductoAPI } from "../../services/api";
+import { crearProductoAPI, crearImagenAPI } from "../../services/api";
 import AdminNav from "./AdminNav";
 import "./AdminProductos.css";
-
-const CATEGORIAS = ["Joyería", "Relojes", "Lingotes", "Edición Limitada"];
-
-const TIPO_MAP = {
-    "Joyería": "joyeria",
-    "Relojes": "relojes",
-    "Lingotes": "lingotes",
-    "Edición Limitada": "edicion-limitada",
-};
 
 const FORM_VACIO = {
     nombre: "",
     descripcion: "",
     precio: "",
     stock: "",
-    categoria: "Joyería",
-    tipo: "joyeria",
+    idCategoria: "",
+    subcategoria: "",
     imagenUrl: "",
 };
 
 export default function AdminProductos() {
-    const { productosStock, setProductosStock, setProductosBackend } = useApp();
+    const { productosStock, setProductosStock, setProductosBackend, categoriasAdmin } = useApp();
     const [form, setForm] = useState(FORM_VACIO);
     const [error, setError] = useState("");
     const [exito, setExito] = useState("");
@@ -39,18 +30,13 @@ export default function AdminProductos() {
         setExito("");
     };
 
-    const handleCategoriaChange = (e) => {
-        const cat = e.target.value;
-        setForm((prev) => ({ ...prev, categoria: cat, tipo: TIPO_MAP[cat] || "joyeria" }));
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setExito("");
 
-        if (!form.nombre || !form.descripcion || !form.precio || !form.stock) {
-            setError("Completá todos los campos obligatorios.");
+        if (!form.nombre || !form.descripcion || !form.precio || !form.stock || !form.idCategoria) {
+            setError("Completá todos los campos obligatorios, incluida la categoría.");
             return;
         }
         if (isNaN(form.precio) || Number(form.precio) <= 0) {
@@ -65,34 +51,57 @@ export default function AdminProductos() {
         setCargando(true);
 
         try {
+            const categoriaElegida = categoriasAdmin.find((c) => String(c.id) === String(form.idCategoria));
+
             const productoCreado = await crearProductoAPI({
                 nombre: form.nombre,
                 descripcion: form.descripcion,
                 precio: Number(form.precio),
                 stock: Number(form.stock),
-                tipo: form.tipo,
-                idCategoria: null,
+                tipo: categoriaElegida?.slug || "",
+                subcategoria: form.subcategoria,
+                idCategoria: Number(form.idCategoria),
                 idVendedor: null,
             });
+
+            // La imagen se persiste en el backend (/imagenes), no solo en memoria del front,
+            // para que no desaparezca al refrescar la página.
+            let imagenUrlGuardada = null;
+            if (form.imagenUrl) {
+                try {
+                    const imagen = await crearImagenAPI({
+                        url: form.imagenUrl,
+                        esPrincipal: true,
+                        producto: { id: productoCreado.id },
+                    });
+                    imagenUrlGuardada = imagen.url;
+                } catch (err) {
+                    console.error("El producto se creó pero la imagen no se pudo guardar:", err);
+                }
+            }
 
             setProductosStock((prev) => [...prev, {
                 id: productoCreado.id,
                 nombre: productoCreado.nombre,
-                categoria: form.categoria,
+                categoria: categoriaElegida?.nombre || "",
+                categoriaSlug: categoriaElegida?.slug || "",
                 precio: productoCreado.precio,
                 stock: productoCreado.stock,
-                imagen: form.imagenUrl || "/src/assets/placeholder.jpg",
+                imagen: imagenUrlGuardada || "/src/assets/placeholder.jpg",
             }]);
 
-            // Agregar a productosBackend con la imagenUrl para que aparezca en Home y Productos
             setProductosBackend((prev) => [...prev, {
                 id: productoCreado.id,
                 nombre: productoCreado.nombre,
                 descripcion: productoCreado.descripcion || form.descripcion,
                 precio: productoCreado.precio,
                 stock: productoCreado.stock,
-                tipo: form.tipo,
-                imagenUrl: form.imagenUrl || null,
+                categoriaId: categoriaElegida?.id ?? null,
+                categoriaNombre: categoriaElegida?.nombre || "",
+                categoriaSlug: categoriaElegida?.slug || "",
+                subcategoria: form.subcategoria,
+                imagenes: imagenUrlGuardada ? [imagenUrlGuardada] : [],
+                imagenUrl: imagenUrlGuardada,
             }]);
 
             setExito(`"${productoCreado.nombre}" creado correctamente en la base de datos.`);
@@ -107,6 +116,7 @@ export default function AdminProductos() {
     };
 
     const imagenPreview = form.imagenUrl && !imgError ? form.imagenUrl : null;
+    const categoriaPreview = categoriasAdmin.find((c) => String(c.id) === String(form.idCategoria))?.nombre;
 
     return (
         <div className="admin-productos">
@@ -173,16 +183,33 @@ export default function AdminProductos() {
                             <div className="admin-form-group">
                                 <label>CATEGORÍA *</label>
                                 <select
-                                    name="categoria"
-                                    value={form.categoria}
-                                    onChange={handleCategoriaChange}
+                                    name="idCategoria"
+                                    value={form.idCategoria}
+                                    onChange={handleChange}
                                     className="admin-stock-select"
                                     style={{ width: "100%", padding: "10px 14px" }}
                                 >
-                                    {CATEGORIAS.map((c) => (
-                                        <option key={c} value={c}>{c}</option>
+                                    <option value="">Seleccionar categoría...</option>
+                                    {categoriasAdmin.map((c) => (
+                                        <option key={c.id} value={c.id}>{c.nombre}</option>
                                     ))}
                                 </select>
+                                {categoriasAdmin.length === 0 && (
+                                    <span style={{ fontSize: "12px", color: "#c44" }}>
+                                        No hay categorías cargadas todavía. Creá una primero en Gestión de Categorías.
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="admin-form-group">
+                                <label>SUBCATEGORÍA (opcional)</label>
+                                <input
+                                    type="text"
+                                    name="subcategoria"
+                                    value={form.subcategoria}
+                                    onChange={handleChange}
+                                    placeholder="Ej: Anillos, Collares..."
+                                />
                             </div>
 
                             <div className="admin-form-group">
@@ -262,7 +289,7 @@ export default function AdminProductos() {
                             </div>
                             <div className="admin-preview-info">
                                 <p className="admin-preview-nombre">{form.nombre || "Nombre del producto"}</p>
-                                <p className="admin-preview-cat">{form.categoria}</p>
+                                <p className="admin-preview-cat">{categoriaPreview || "Sin categoría"}</p>
                                 <p className="admin-preview-precio">
                                     {form.precio ? `$${Number(form.precio).toLocaleString("es-AR")}` : "$0"}
                                 </p>

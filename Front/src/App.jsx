@@ -17,7 +17,6 @@ import Favoritos from "./views/Favoritos";
 import Carrito from "./views/Carrito";
 import Checkout from "./views/Checkout";
 import Confirmacion from "./views/Confirmacion";
-import VenderLingote from "./views/VenderLingote";
 import Informacion from "./views/Informacion";
 
 import LoginAdmin from "./views/admin/LoginAdmin";
@@ -26,7 +25,7 @@ import AdminPedidos from "./views/admin/AdminPedidos";
 import AdminUsuarios from "./views/admin/AdminUsuarios";
 import AdminCategorias from "./views/admin/AdminCategorias";
 import AdminStock from "./views/admin/AdminStock";
-import AdminProductos from "./views/admin/AdminProductos";
+import AdminProductos from "./views/admin/AdminProductos.jsx";
 import AdminCupones from "./views/admin/AdminCupones";
 
 import "./App.css";
@@ -95,7 +94,6 @@ function AppRoutes() {
 
                 <Route path="/" element={<Layout><Home /></Layout>} />
                 <Route path="/producto/:id" element={<Layout><DetalleProducto /></Layout>} />
-                <Route path="/vender-lingote" element={<Layout><VenderLingote /></Layout>} />
                 <Route path="/informacion/:tipo" element={<Layout><Informacion /></Layout>} />
 
                 <Route path="/joyeria" element={<Layout><Productos key="joyeria" categoria="joyeria" /></Layout>} />

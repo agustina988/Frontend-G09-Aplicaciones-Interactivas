@@ -56,9 +56,10 @@ export default function Checkout() {
     const descuentoMetodo = metodoPago === "transferencia" ? Math.round(subtotal * 0.05) : 0;
     const totalFinal = total - descuentoMetodo;
 
-    const handleCupon = () => {
-        if (aplicarCupon(codigoCupon)) setErrorCupon("");
-        else setErrorCupon("Cupón inválido. Probá con AUREA10, AUREA20 o VIP30");
+    const handleCupon = async () => {
+        const ok = await aplicarCupon(codigoCupon);
+        if (ok) setErrorCupon("");
+        else setErrorCupon("Cupón inválido o vencido.");
     };
 
     const validar = () => {

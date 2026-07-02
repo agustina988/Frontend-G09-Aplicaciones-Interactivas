@@ -4,10 +4,11 @@ import { editarStockProductoAPI, eliminarProductoAPI } from "../../services/api"
 import AdminNav from "./AdminNav";
 import "./AdminStock.css";
 
-const CATEGORIAS_FILTRO = ["Todas las Categorías", "Joyería", "Relojes", "Lingotes", "Edición Limitada"];
+const TODAS = "Todas las Categorías";
 
 export default function AdminStock() {
-    const { productosStock, editarStock, eliminarStock } = useApp();
+    const { productosStock, editarStock, eliminarStock, categoriasAdmin } = useApp();
+    const CATEGORIAS_FILTRO = [TODAS, ...categoriasAdmin.map((c) => c.nombre)];
     const [tab, setTab] = useState("stock");
     const [busqueda, setBusqueda] = useState("");
     const [categoriaFiltro, setCategoriaFiltro] = useState("Todas las Categorías");
@@ -15,7 +16,7 @@ export default function AdminStock() {
 
     const filtrados = productosStock.filter((p) => {
         const coincideBusq = p.nombre.toLowerCase().includes(busqueda.toLowerCase());
-        const coincideCat = categoriaFiltro === "Todas las Categorías" || p.categoria === categoriaFiltro;
+        const coincideCat = categoriaFiltro === TODAS || p.categoria === categoriaFiltro;
         return coincideBusq && coincideCat;
     });
 

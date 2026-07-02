@@ -2,12 +2,16 @@ import { createContext, useContext, useState, useCallback, useEffect } from "rea
 import {
     getProductosAPI,
     getCategoriasAPI,
+    crearCategoriaAPI,
+    editarCategoriaAPI,
+    eliminarCategoriaAPI,
     getCarritoAPI,
     agregarAlCarritoAPI,
     vaciarCarritoAPI,
     confirmarCarritoAPI,
     getPedidosAPI,
     crearPedidoAPI,
+    validarCuponAPI,
 } from '../services/api';
 
 const AppContext = createContext();
@@ -38,12 +42,8 @@ export function AppProvider({ children }) {
     const [cargandoProductos, setCargandoProductos] = useState(true);
     const [backendOnline, setBackendOnline] = useState(true);
 
-    const [categoriasAdmin, setCategoriasAdmin] = useState([
-        { id: 1, nombre: "Alta Joyería", slug: "joyeria", desc: "Piezas únicas engastadas con gemas de procedencia ética.", badge: "GIA CERTIFIED", productos: 142, valor: "$12.4M", publicado: true },
-        { id: 2, nombre: "Relojería", slug: "relojes", desc: "Cronógrafos de manufactura suiza y complicaciones mecánicas.", badge: null, stock: 89, publicado: true },
-        { id: 3, nombre: "Colecciones Especiales", slug: "especiales", desc: "Colaboraciones exclusivas y cápsulas estacionales.", badge: null, series: 12, publicado: false },
-        { id: 4, nombre: "Piezas de Autor", slug: "autor", desc: "Diseños conceptuales firmados por maestros artesanos.", badge: "ARTISAN SELECT", productos: 34, publicado: true },
-    ]);
+    // Categorías: vienen 100% del backend (/categories). No hay datos inventados acá.
+    const [categoriasAdmin, setCategoriasAdmin] = useState([]);
 
     const [productosStock, setProductosStock] = useState([]);
 
@@ -97,6 +97,17 @@ export function AppProvider({ children }) {
             })
             .catch(() => setBackendOnline(false))
             .finally(() => setCargandoProductos(false));
+
+        // Categorías reales del backend (para el panel de admin)
+        getCategoriasAPI()
+            .then((data) => setCategoriasAdmin(data.map((c) => ({
+                id: c.id,
+                nombre: c.nombre,
+                slug: c.slug || "",
+                desc: c.descripcion || "",
+                publicado: c.publicado,
+            }))))
+            .catch(() => {});
     }, []);
 
     // Persistir favoritos en localStorage cada vez que cambian
@@ -202,11 +213,16 @@ export function AppProvider({ children }) {
     };
     const esFavorito = (id) => favoritos.some((p) => p.id === id);
 
-    const CUPONES = { "AUREA10": 10, "AUREA20": 20, "VIP30": 30 };
-    const aplicarCupon = (codigo) => {
-        const descuento = CUPONES[codigo.toUpperCase()];
-        if (descuento) { setCupon({ codigo: codigo.toUpperCase(), descuento }); return true; }
-        return false;
+    // El cupón se valida contra el backend (/cupones/validar/:codigo) — no hay
+    // códigos inventados en el front. Si el código no existe, el backend responde 404.
+    const aplicarCupon = async (codigo) => {
+        try {
+            const data = await validarCuponAPI(codigo.toUpperCase());
+            setCupon({ codigo: data.codigo, descuento: data.descuento });
+            return true;
+        } catch {
+            return false;
+        }
     };
     const quitarCupon = () => setCupon(null);
 
@@ -271,9 +287,39 @@ export function AppProvider({ children }) {
         return pedido;
     };
 
-    const agregarCategoria = (cat) => setCategoriasAdmin((prev) => [...prev, { ...cat, id: Date.now(), publicado: true, productos: 0 }]);
-    const eliminarCategoria = (id) => setCategoriasAdmin((prev) => prev.filter((c) => c.id !== id));
-    const editarCategoria = (id, datos) => setCategoriasAdmin((prev) => prev.map((c) => c.id === id ? { ...c, ...datos } : c));
+    // Categorías: todas las operaciones pegan al backend (/categories) y recién
+    // después actualizan el estado local con lo que el backend confirmó.
+    const agregarCategoria = async (cat) => {
+        const creada = await crearCategoriaAPI({
+            nombre: cat.nombre,
+            slug: cat.slug,
+            descripcion: cat.desc || "",
+            publicado: true,
+        });
+        setCategoriasAdmin((prev) => [...prev, {
+            id: creada.id, nombre: creada.nombre, slug: creada.slug || "",
+            desc: creada.descripcion || "", publicado: creada.publicado,
+        }]);
+    };
+
+    const eliminarCategoria = async (id) => {
+        await eliminarCategoriaAPI(id);
+        setCategoriasAdmin((prev) => prev.filter((c) => c.id !== id));
+    };
+
+    const editarCategoria = async (id, datos) => {
+        const actual = categoriasAdmin.find((c) => c.id === id);
+        const actualizada = await editarCategoriaAPI(id, {
+            nombre: datos.nombre ?? actual?.nombre,
+            slug: datos.slug ?? actual?.slug,
+            descripcion: datos.desc ?? actual?.desc ?? "",
+            publicado: datos.publicado ?? actual?.publicado ?? true,
+        });
+        setCategoriasAdmin((prev) => prev.map((c) => c.id === id ? {
+            id: actualizada.id, nombre: actualizada.nombre, slug: actualizada.slug || "",
+            desc: actualizada.descripcion || "", publicado: actualizada.publicado,
+        } : c));
+    };
 
     const editarStock = (id, cantidad) => setProductosStock((prev) => prev.map((p) => p.id === id ? { ...p, stock: Math.max(0, cantidad) } : p));
     const eliminarStock = (id) => {
