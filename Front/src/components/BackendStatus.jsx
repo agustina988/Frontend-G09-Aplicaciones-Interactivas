@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
+import { checkBackendAPI } from "../services/api";
 
 export default function BackendStatus() {
     const [online, setOnline] = useState(true);
     const [cargando, setCargando] = useState(true);
 
     useEffect(() => {
-        fetch("http://localhost:4002/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: "test", password: "test" }),
-        })
+        checkBackendAPI()
             .then(() => setOnline(true))
             .catch(() => setOnline(false))
             .finally(() => setCargando(false));

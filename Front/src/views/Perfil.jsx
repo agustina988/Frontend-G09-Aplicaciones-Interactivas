@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
+import { getMisPedidosAPI, getPerfilAPI } from "../services/api";
 import Footer from "../components/Footer";
 import "./Perfil.css";
 
@@ -17,13 +18,9 @@ export default function Perfil() {
 
     // Cargar pedidos reales del backend
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) { setCargandoPedidos(false); return; }
+        if (!localStorage.getItem("token")) { setCargandoPedidos(false); return; }
 
-        fetch("http://localhost:4002/pedidos/mis-pedidos", {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then((res) => { if (!res.ok) throw new Error(); return res.json(); })
+        getMisPedidosAPI()
             .then((data) => {
                 setErrorPedidos(false);
                 setPedidos(data.map((p) => ({
@@ -40,13 +37,9 @@ export default function Perfil() {
 
     // Cargar perfil actualizado del backend
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) return;
+        if (!localStorage.getItem("token")) return;
 
-        fetch("http://localhost:4002/usuarios/perfil", {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then((res) => { if (!res.ok) throw new Error(); return res.json(); })
+        getPerfilAPI()
             .then((data) => {
                 setUsuario((prev) => ({
                     ...prev,

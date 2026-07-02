@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useApp } from "../context/AppContext";
+import { loginAPI } from "../services/api";
 import "./Login.css";
 
 export default function Login() {
@@ -19,22 +20,9 @@ export default function Login() {
         setError("");
 
         try {
-            const res = await fetch("http://localhost:4002/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (!res.ok) {
-                const msg = await res.text();
-                setError(msg || "Email o contraseña incorrectos.");
-                return;
-            }
-
-            const data = await res.json();
+            const data = await loginAPI(email, password);
             localStorage.setItem("token", data.token);
 
-            // Usar datos reales del backend
             login({
                 id: data.id,
                 nombre: data.nombre,
@@ -51,7 +39,7 @@ export default function Login() {
             navigate(data.rol === "ROLE_ADMIN" ? "/admin" : "/perfil");
 
         } catch (err) {
-            setError("Error de conexión con el servidor.");
+            setError(err.message || "Email o contraseña incorrectos.");
         } finally {
             setCargando(false);
         }

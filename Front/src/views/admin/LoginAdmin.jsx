@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
+import { loginAPI } from "../../services/api";
 import "./LoginAdmin.css";
 
 export default function LoginAdmin() {
@@ -19,15 +20,7 @@ export default function LoginAdmin() {
         setError("");
 
         try {
-            const res = await fetch("http://localhost:4002/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (!res.ok) { setError("Credenciales incorrectas."); return; }
-
-            const data = await res.json();
+            const data = await loginAPI(email, password);
 
             if (data.rol !== "ROLE_ADMIN") {
                 setError("Acceso restringido. Esta cuenta no tiene permisos de administrador.");
@@ -52,7 +45,7 @@ export default function LoginAdmin() {
             navigate("/admin");
 
         } catch (err) {
-            setError("Error de conexión con el servidor.");
+            setError("Credenciales incorrectas.");
         } finally {
             setCargando(false);
         }

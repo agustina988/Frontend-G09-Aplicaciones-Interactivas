@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useApp } from "../../context/AppContext";
+import { editarStockProductoAPI, eliminarProductoAPI } from "../../services/api";
 import AdminNav from "./AdminNav";
 import "./AdminStock.css";
 
@@ -22,21 +23,10 @@ export default function AdminStock() {
         const stockFinal = Math.max(0, nuevoStock);
         editarStock(id, stockFinal);
 
-        const token = localStorage.getItem("token");
-        if (!token) return;
+        if (!localStorage.getItem("token")) return;
 
         try {
-            const res = await fetch(`http://localhost:4002/productos/${id}/stock`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ stock: stockFinal }),
-            });
-            if (!res.ok) {
-                console.error("Error del backend al actualizar stock:", res.status, await res.text());
-            }
+            await editarStockProductoAPI(id, stockFinal);
         } catch (err) {
             console.error("Error actualizando stock:", err);
         }
@@ -45,13 +35,9 @@ export default function AdminStock() {
     const handleEliminarStock = async (id) => {
         eliminarStock(id);
         setModalEliminar(null);
-        const token = localStorage.getItem("token");
-        if (!token) return;
+        if (!localStorage.getItem("token")) return;
         try {
-            await fetch(`http://localhost:4002/productos/${id}`, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            await eliminarProductoAPI(id);
         } catch (err) {
             console.error("Error eliminando producto en backend:", err);
         }

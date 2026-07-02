@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
-//import { productos } from "../data/productos";
 import {
     getProductosAPI,
     getCategoriasAPI,
@@ -13,11 +12,20 @@ import {
 
 const AppContext = createContext();
 
+const cargarFavoritosGuardados = () => {
+    try {
+        const raw = localStorage.getItem("favoritos");
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        return [];
+    }
+};
+
 export function AppProvider({ children }) {
-    const [token, setToken] = useState(null);
+    const [token, setToken] = useState(() => localStorage.getItem("token"));
     const [usuario, setUsuario] = useState(null);
     const [carrito, setCarrito] = useState([]);
-    const [favoritos, setFavoritos] = useState([]);
+    const [favoritos, setFavoritos] = useState(cargarFavoritosGuardados);
     const [toasts, setToasts] = useState([]);
     const [cupon, setCupon] = useState(null);
     const [pedidosAdmin, setPedidosAdmin] = useState([]);
@@ -41,7 +49,6 @@ export function AppProvider({ children }) {
         setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3400);
     }, []);
 
-    // Sincronizar productos y estado del backend al montar (catálogo público, no requiere login)
     useEffect(() => {
         getProductosAPI()
             .then((data) => {
@@ -70,30 +77,37 @@ export function AppProvider({ children }) {
                 })));
             })
             .catch(() => setBackendOnline(false));
-    }, [usuario]);
+    }, []);
 
-    // Cargar carrito del backend
     useEffect(() => {
-        const tokenGuardado = localStorage.getItem("token");
-        if (!tokenGuardado || !usuario || usuario.rol === "ROLE_ADMIN") return;
+        localStorage.setItem("favoritos", JSON.stringify(favoritos));
+    }, [favoritos]);
+
+    useEffect(() => {
+        if (!token || usuario?.rol === "ROLE_ADMIN") return;
         getCarritoAPI()
             .then((data) => {
                 if (data.productos && data.productos.length > 0) {
                     setCarrito(data.productos.map((p) => {
-                        const prodLocal = productos.find((pl) => pl.id === p.idProducto);
-                        return { id: p.idProducto, nombre: p.nombre, precio: p.precio, cantidad: p.cantidad, imagenes: prodLocal?.imagenes || [], subcategoria: prodLocal?.subcategoria || "" };
+                        const prodBackend = productosBackend.find((pl) => pl.id === p.idProducto);
+                        return {
+                            id: p.idProducto,
+                            nombre: p.nombre,
+                            precio: p.precio,
+                            cantidad: p.cantidad,
+                            imagenes: prodBackend?.imagenUrl ? [prodBackend.imagenUrl] : [],
+                            subcategoria: prodBackend?.subcategoria || "",
+                        };
                     }));
                 } else {
                     setCarrito([]);
                 }
             })
             .catch(() => {});
-    }, [usuario]);
+    }, [token]);
 
-    // Cargar pedidos del admin
     useEffect(() => {
-        const tokenGuardado = localStorage.getItem("token");
-        if (!tokenGuardado || !usuario || usuario.rol !== "ROLE_ADMIN") return;
+        if (!token || usuario?.rol !== "ROLE_ADMIN") return;
         getPedidosAPI()
             .then((data) => {
                 setPedidosAdmin(data.map((p) => ({
@@ -109,10 +123,10 @@ export function AppProvider({ children }) {
                 })));
             })
             .catch(() => {});
-    }, [usuario]);
+    }, [token, usuario?.rol]);
 
     const login = (datos) => {
-        // datos viene del backend ya completo
+        setToken(localStorage.getItem("token"));
         setUsuario(datos);
         return { ok: true };
     };
@@ -134,8 +148,7 @@ export function AppProvider({ children }) {
             return [...prev, { ...producto, cantidad: 1 }];
         });
         addToast(`${producto.nombre} agregado al carrito`, "carrito");
-        const tokenGuardado = localStorage.getItem("token");
-        if (tokenGuardado && !esAdmin) {
+        if (token && !esAdmin) {
             try {
                 await agregarAlCarritoAPI(producto.id, 1);
             } catch (err) { console.error("Error sincronizando carrito:", err); }
@@ -150,8 +163,7 @@ export function AppProvider({ children }) {
 
     const vaciarCarrito = () => {
         setCarrito([]);
-        const tokenGuardado = localStorage.getItem("token");
-        if (tokenGuardado && !esAdmin) {
+        if (token && !esAdmin) {
             vaciarCarritoAPI().catch(() => {});
         }
     };
@@ -177,18 +189,15 @@ export function AppProvider({ children }) {
     const confirmarCompra = async (datosEnvio) => {
         const carritoSnapshot = [...carrito];
         const totalSnapshot = total;
-        const tokenGuardado = localStorage.getItem("token");
 
-        // 1. Confirmar compra en backend (descuenta stock y vacía carrito)
-        if (tokenGuardado && !esAdmin) {
+        if (token && !esAdmin) {
             try {
                 await confirmarCarritoAPI();
             } catch (err) { console.error("Error confirmando compra:", err); }
         }
 
-        // 2. Guardar pedido en backend
         let pedidoBackend = null;
-        if (tokenGuardado) {
+        if (token) {
             try {
                 pedidoBackend = await crearPedidoAPI({
                     total: totalSnapshot,
@@ -215,13 +224,11 @@ export function AppProvider({ children }) {
             direccion: datosEnvio?.direccion || usuario?.direccion || "",
         };
 
-        // 3. Restar stock local
         setProductosStock((prev) => prev.map((p) => {
             const comprado = carritoSnapshot.find((c) => c.id === p.id);
             return comprado ? { ...p, stock: Math.max(0, p.stock - comprado.cantidad) } : p;
         }));
 
-        // 4. Actualizar pedidos del usuario en estado local
         if (usuario) {
             setUsuario((prev) => ({
                 ...prev,

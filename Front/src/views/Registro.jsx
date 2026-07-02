@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useApp } from "../context/AppContext";
+import { registroAPI } from "../services/api";
 import "./Registro.css";
 
 export default function Registro() {
@@ -32,18 +33,9 @@ export default function Registro() {
 
         setCargando(true);
         try {
-            const res = await fetch("http://localhost:4002/auth/registro", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: form.email, password: form.password, nombre: form.nombre, telefono: form.telefono }),
-            });
-
-            if (!res.ok) { const msg = await res.text(); setErrors({ email: msg }); return; }
-
-            const data = await res.json();
+            const data = await registroAPI({ email: form.email, password: form.password, nombre: form.nombre, telefono: form.telefono });
             localStorage.setItem("token", data.token);
 
-            // Usar datos reales del backend
             login({
                 id: data.id,
                 nombre: data.nombre,
@@ -60,7 +52,7 @@ export default function Registro() {
             navigate("/perfil");
 
         } catch (err) {
-            setErrors({ email: "Error de conexión con el servidor." });
+            setErrors({ email: err.message || "Error de conexión con el servidor." });
         } finally {
             setCargando(false);
         }

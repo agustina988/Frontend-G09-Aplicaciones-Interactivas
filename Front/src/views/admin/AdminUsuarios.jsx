@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
+import { getUsuariosAPI } from "../../services/api";
 import AdminNav from "./AdminNav";
 import "./AdminUsuarios.css";
 
@@ -14,13 +15,9 @@ export default function AdminUsuarios() {
 
     // Traer usuarios reales del backend
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) { setCargando(false); return; }
+        if (!localStorage.getItem("token")) { setCargando(false); return; }
 
-        fetch("http://localhost:4002/usuarios", {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then((res) => { if (!res.ok) throw new Error(); return res.json(); })
+        getUsuariosAPI()
             .then((data) => {
                 setUsuariosBackend(data);
                 setErrorConexion(false);

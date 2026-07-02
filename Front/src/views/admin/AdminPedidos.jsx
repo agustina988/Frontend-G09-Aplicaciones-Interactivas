@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
+import { getPedidosAPI, cambiarEstadoPedidoAPI } from "../../services/api";
 import AdminNav from "./AdminNav";
 import "./AdminPedidos.css";
 
@@ -14,13 +15,9 @@ export default function AdminPedidos() {
 
     // Cargar pedidos del backend
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) { setCargando(false); return; }
+        if (!localStorage.getItem("token")) { setCargando(false); return; }
 
-        fetch("http://localhost:4002/pedidos", {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then((res) => { if (!res.ok) throw new Error(); return res.json(); })
+        getPedidosAPI()
             .then((data) => {
                 setErrorConexion(false);
                 setPedidosAdmin(data.map((p) => ({
@@ -43,16 +40,9 @@ export default function AdminPedidos() {
         const nuevoEstado = estadosSig[estadoActual];
         if (nuevoEstado === estadoActual) return;
 
-        const token = localStorage.getItem("token");
         try {
-            const res = await fetch(`http://localhost:4002/pedidos/${idReal}/estado`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ estado: nuevoEstado }),
-            });
-            if (res.ok) {
-                setPedidosAdmin((prev) => prev.map((p) => p.idReal === idReal ? { ...p, estado: nuevoEstado } : p));
-            }
+            await cambiarEstadoPedidoAPI(idReal, nuevoEstado);
+            setPedidosAdmin((prev) => prev.map((p) => p.idReal === idReal ? { ...p, estado: nuevoEstado } : p));
         } catch (err) {
             console.error("Error actualizando estado:", err);
         }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useApp } from "../../context/AppContext";
+import { crearProductoAPI } from "../../services/api";
 import AdminNav from "./AdminNav";
 import "./AdminProductos.css";
 
@@ -62,33 +63,17 @@ export default function AdminProductos() {
         }
 
         setCargando(true);
-        const token = localStorage.getItem("token");
 
         try {
-            const res = await fetch("http://localhost:4002/productos", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    nombre: form.nombre,
-                    descripcion: form.descripcion,
-                    precio: Number(form.precio),
-                    stock: Number(form.stock),
-                    tipo: form.tipo,
-                    idCategoria: null,
-                    idVendedor: null,
-                }),
+            const productoCreado = await crearProductoAPI({
+                nombre: form.nombre,
+                descripcion: form.descripcion,
+                precio: Number(form.precio),
+                stock: Number(form.stock),
+                tipo: form.tipo,
+                idCategoria: null,
+                idVendedor: null,
             });
-
-            if (!res.ok) {
-                const msg = await res.text();
-                setError(msg || `Error ${res.status} al crear el producto.`);
-                return;
-            }
-
-            const productoCreado = await res.json();
 
             setProductosStock((prev) => [...prev, {
                 id: productoCreado.id,
@@ -115,7 +100,7 @@ export default function AdminProductos() {
             setImgError(false);
 
         } catch (err) {
-            setError("No se pudo conectar con el servidor. Verificá que el backend esté corriendo.");
+            setError(err.message || "No se pudo conectar con el servidor. Verificá que el backend esté corriendo.");
         } finally {
             setCargando(false);
         }
