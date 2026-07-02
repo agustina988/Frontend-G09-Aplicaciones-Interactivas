@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useSelector } from "react-redux";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import "./Home.css";
 
 export default function Home() {
-    const { productosBackend, cargandoProductos } = useApp();
+    const productos = useSelector((state) => state.productos.items);
+    const cargando = useSelector((state) => state.productos.loading);
 
-    // Destacados: primeros 4 productos del catálogo (todo viene del backend, sin inventar nada acá)
-    const destacados = productosBackend.slice(0, 4).map((p) => ({
+    const destacados = productos.slice(0, 4).map((p) => ({
         id: p.id,
         nombre: p.nombre,
         precio: p.precio,
@@ -33,7 +33,6 @@ export default function Home() {
 
     return (
         <div className="home">
-            {/* HERO */}
             <section className="home-hero">
                 <div className="home-hero-overlay" />
                 <div className="home-hero-content">
@@ -46,7 +45,6 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* CATEGORÍAS */}
             <section className="home-cats">
                 <h2>Explorá nuestras categorías</h2>
                 <div className="home-cats-grid">
@@ -81,7 +79,6 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* DESTACADOS */}
             <section className="home-featured">
                 <div className="home-featured-header">
                     <div>
@@ -91,7 +88,7 @@ export default function Home() {
                     <Link to="/joyeria" className="home-ver-todo">VER TODO</Link>
                 </div>
                 <div className="home-products-grid">
-                    {cargandoProductos ? (
+                    {cargando ? (
                         <p style={{ padding: "2rem 0", color: "#8a8580" }}>Cargando piezas destacadas...</p>
                     ) : (
                         destacados.map((p) => <ProductCard key={p.id} producto={p} />)
@@ -99,7 +96,6 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* GARANTÍAS */}
             <section className="home-guarantees">
                 <div className="home-guarantee">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="1.5">

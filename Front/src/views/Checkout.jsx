@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useSelector, useDispatch } from "react-redux";
+import { validarCupon, quitarCuponAplicado } from "../features/cupones/cuponesSlice";
 import Footer from "../components/Footer";
 import "./Checkout.css";
 
-// Detectar tipo de tarjeta
 function detectarTarjeta(numero) {
     const n = numero.replace(/\s/g, "");
     if (/^4/.test(n)) return "Visa";
@@ -36,7 +36,13 @@ function validarVencimiento(val) {
 }
 
 export default function Checkout() {
-    const { carrito, subtotal, total, cupon, descuentoCupon, aplicarCupon, quitarCupon, usuario } = useApp();
+    const dispatch = useDispatch();
+    const carrito = useSelector((state) => state.carrito.items);
+    const usuario = useSelector((state) => state.auth.usuario);
+    const cupon = useSelector((state) => state.cupones.cuponAplicado);
+    const subtotal = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
+    const descuentoCupon = cupon ? Math.round(subtotal * cupon.descuento / 100) : 0;
+    const total = subtotal - descuentoCupon;
     const navigate = useNavigate();
 
     const [form, setForm] = useState({
@@ -57,9 +63,9 @@ export default function Checkout() {
     const totalFinal = total - descuentoMetodo;
 
     const handleCupon = async () => {
-        const ok = await aplicarCupon(codigoCupon);
-        if (ok) setErrorCupon("");
-        else setErrorCupon("Cupón inválido o vencido.");
+        const resultado = await dispatch(validarCupon(codigoCupon));
+        if (validarCupon.fulfilled.match(resultado)) setErrorCupon("");
+        else setErrorCupon(resultado.payload || "Cupón inválido o vencido.");
     };
 
     const validar = () => {
@@ -208,7 +214,7 @@ export default function Checkout() {
                                 {cupon ? (
                                     <div className="checkout-cupon-aplicado">
                                         <span>✓ Cupón <strong>{cupon.codigo}</strong> aplicado — {cupon.descuento}% off</span>
-                                        <button onClick={quitarCupon}>✕</button>
+                                        <button onClick={() => dispatch(quitarCuponAplicado())}>✕</button>
                                     </div>
                                 ) : (
                                     <>

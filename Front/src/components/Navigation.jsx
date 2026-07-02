@@ -1,10 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useSelector } from "react-redux";
 import "./Navigation.css";
 
 export default function Navigation() {
-    const { usuario, logout, totalCarrito, favoritos, esAdmin, productosStock } = useApp();
+    const usuario = useSelector((state) => state.auth.usuario);
+    const totalCarrito = useSelector((state) => state.carrito.items.reduce((acc, p) => acc + p.cantidad, 0));
+    const favoritos = useSelector((state) => state.favoritos.items);
+    const productos = useSelector((state) => state.productos.items);
+    const esAdmin = usuario?.rol === "ROLE_ADMIN";
     const navigate = useNavigate();
     const [busqueda, setBusqueda] = useState("");
     const [resultados, setResultados] = useState([]);
@@ -15,9 +19,9 @@ export default function Navigation() {
     const handleBusqueda = (val) => {
         setBusqueda(val);
         if (val.trim().length < 2) { setResultados([]); return; }
-        const found = productosStock.filter((p) =>
+        const found = productos.filter((p) =>
             p.nombre.toLowerCase().includes(val.toLowerCase()) ||
-            p.categoria?.toLowerCase().includes(val.toLowerCase())
+            p.categoriaNombre?.toLowerCase().includes(val.toLowerCase())
         ).slice(0, 6);
         setResultados(found);
     };
@@ -41,7 +45,6 @@ export default function Navigation() {
 
     return (
         <header className="nav-header">
-            {/* Barra de admin cuando está viendo la tienda */}
             {esAdmin && (
                 <div className="nav-admin-bar">
                     <span>Estás viendo la tienda como administrador</span>
@@ -82,10 +85,10 @@ export default function Navigation() {
                             <div className="nav-search-dropdown">
                                 {resultados.map((p) => (
                                     <button key={p.id} className="nav-search-item" onClick={() => irAProducto(p.id)}>
-                                        <img src={p.imagen} alt={p.nombre} />
+                                        <img src={p.imagenUrl} alt={p.nombre} />
                                         <div>
                                             <p className="nav-search-nombre">{p.nombre}</p>
-                                            <p className="nav-search-cat">{p.categoria}</p>
+                                            <p className="nav-search-cat">{p.categoriaNombre}</p>
                                         </div>
                                         <p className="nav-search-precio">${p.precio.toLocaleString("es-AR")}</p>
                                     </button>

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useApp } from "../context/AppContext";
-import { registroAPI } from "../services/api";
+import { useDispatch } from "react-redux";
+import { registrarUsuario } from "../features/auth/authSlice";
 import "./Registro.css";
 
 export default function Registro() {
-    const { login } = useApp();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [form, setForm] = useState({ nombre: "", email: "", password: "", confirmar: "", telefono: "", newsletter: false });
     const [errors, setErrors] = useState({});
@@ -32,30 +32,16 @@ export default function Registro() {
         if (Object.keys(e2).length) { setErrors(e2); return; }
 
         setCargando(true);
-        try {
-            const data = await registroAPI({ email: form.email, password: form.password, nombre: form.nombre, telefono: form.telefono });
-            localStorage.setItem("token", data.token);
+        const resultado = await dispatch(registrarUsuario({
+            email: form.email, password: form.password, nombre: form.nombre, telefono: form.telefono,
+        }));
 
-            login({
-                id: data.id,
-                nombre: data.nombre,
-                email: data.email,
-                telefono: data.telefono || form.telefono,
-                direccion: data.direccion || "",
-                rol: data.rol || "ROLE_USER",
-                miembro: "MEMBER",
-                desde: new Date().getFullYear().toString(),
-                avatar: null,
-                pedidos: [],
-            });
-
+        if (registrarUsuario.fulfilled.match(resultado)) {
             navigate("/perfil");
-
-        } catch (err) {
-            setErrors({ email: err.message || "Error de conexión con el servidor." });
-        } finally {
-            setCargando(false);
+        } else {
+            setErrors({ email: resultado.payload || "Error de conexión con el servidor." });
         }
+        setCargando(false);
     };
 
     return (

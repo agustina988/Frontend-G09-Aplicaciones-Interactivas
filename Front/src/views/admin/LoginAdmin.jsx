@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useApp } from "../../context/AppContext";
-import { loginAPI } from "../../services/api";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../../features/auth/authSlice";
 import "./LoginAdmin.css";
 
 export default function LoginAdmin() {
-    const { login } = useApp();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -19,36 +19,18 @@ export default function LoginAdmin() {
         setCargando(true);
         setError("");
 
-        try {
-            const data = await loginAPI(email, password);
+        const resultado = await dispatch(loginUser({ email, password }));
 
-            if (data.rol !== "ROLE_ADMIN") {
+        if (loginUser.fulfilled.match(resultado)) {
+            if (resultado.payload.rol !== "ROLE_ADMIN") {
                 setError("Acceso restringido. Esta cuenta no tiene permisos de administrador.");
-                return;
+            } else {
+                navigate("/admin");
             }
-
-            localStorage.setItem("token", data.token);
-
-            login({
-                id: data.id,
-                nombre: data.nombre || "Admin AUREA",
-                email: data.email,
-                telefono: data.telefono || "",
-                direccion: data.direccion || "",
-                rol: data.rol,
-                miembro: "ADMINISTRADOR",
-                desde: "2024",
-                avatar: null,
-                pedidos: [],
-            });
-
-            navigate("/admin");
-
-        } catch (err) {
+        } else {
             setError("Credenciales incorrectas.");
-        } finally {
-            setCargando(false);
         }
+        setCargando(false);
     };
 
     return (

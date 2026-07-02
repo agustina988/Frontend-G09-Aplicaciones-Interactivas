@@ -1,40 +1,32 @@
 import { useState, useEffect } from "react";
-import { getCuponesAPI, crearCuponAPI, eliminarCuponAPI } from "../../services/api";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchCupones, crearCupon, eliminarCupon } from "../../features/cupones/cuponesSlice";
 import AdminNav from "./AdminNav";
 import "./AdminPanel.css";
 
 export default function AdminCupones() {
-    const [cupones, setCupones] = useState([]);
+    const dispatch = useDispatch();
+    const cupones = useSelector((state) => state.cupones.items);
+    const error = useSelector((state) => state.cupones.error);
     const [codigo, setCodigo] = useState("");
     const [descuento, setDescuento] = useState("");
-    const [error, setError] = useState("");
 
     useEffect(() => {
-        getCuponesAPI()
-            .then((data) => setCupones(data))
-            .catch((err) => console.error("Error al cargar cupones:", err));
-    }, []);
+        dispatch(fetchCupones());
+    }, [dispatch]);
 
-    const handleCrearCupon = async (e) => {
+    const handleCrearCupon = (e) => {
         e.preventDefault();
-        setError("");
-        try {
-            const data = await crearCuponAPI({ codigo: codigo.toUpperCase(), descuento: Number(descuento) });
-            setCupones([...cupones, data]);
-            setCodigo("");
-            setDescuento("");
-        } catch (err) {
-            setError(err.message || "No se pudo crear el cupón.");
-        }
+        dispatch(crearCupon({ codigo: codigo.toUpperCase(), descuento: Number(descuento) })).then((resultado) => {
+            if (crearCupon.fulfilled.match(resultado)) {
+                setCodigo("");
+                setDescuento("");
+            }
+        });
     };
 
-    const handleEliminar = async (id) => {
-        try {
-            await eliminarCuponAPI(id);
-            setCupones(cupones.filter((c) => c.id !== id));
-        } catch (err) {
-            console.error("Error al eliminar cupón:", err);
-        }
+    const handleEliminar = (id) => {
+        dispatch(eliminarCupon(id));
     };
 
     return (
@@ -43,7 +35,6 @@ export default function AdminCupones() {
             <div className="admin-panel-inner">
                 <h1 className="admin-section-title">Gestión de Cupones</h1>
 
-                {/* Formulario de Alta */}
                 <form onSubmit={handleCrearCupon} style={{ marginBottom: "30px", display: "flex", gap: "15px" }}>
                     <input
                         type="text"
@@ -69,7 +60,6 @@ export default function AdminCupones() {
 
                 {error && <p style={{ color: "#c44", marginBottom: "1rem" }}>{error}</p>}
 
-                {/* Tabla de Cupones */}
                 <table style={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}>
                     <thead>
                     <tr style={{ borderBottom: "1px solid #ddd" }}>

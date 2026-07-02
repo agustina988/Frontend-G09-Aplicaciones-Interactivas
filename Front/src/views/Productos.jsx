@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useSelector } from "react-redux";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import "./Productos.css";
@@ -8,7 +8,8 @@ import "./Productos.css";
 export default function Productos({ categoria }) {
     const location = useLocation();
     const subcatInicial = location.state?.subcategoria || null;
-    const { productosBackend, productosStock, cargandoProductos } = useApp();
+    const productosBackend = useSelector((state) => state.productos.items);
+    const cargandoProductos = useSelector((state) => state.productos.loading);
 
     const [subcat, setSubcat] = useState(subcatInicial);
     const [materiales, setMateriales] = useState([]);
@@ -16,30 +17,27 @@ export default function Productos({ categoria }) {
 
     const todosLosProdsCat = productosBackend
         .filter((p) => p.categoriaSlug === categoria)
-        .map((p) => {
-            const enStock = productosStock.find((s) => s.id === p.id);
-            return {
-                id: p.id,
-                nombre: p.nombre,
-                precio: enStock?.precio ?? p.precio,
-                categoria,
-                subcategoria: p.subcategoria || "",
-                material: p.materiales?.[0] || "—",
-                imagenes: p.imagenes?.length ? p.imagenes : (p.imagenUrl ? [p.imagenUrl] : []),
-                imagen: p.imagenUrl || null,
-                badge: p.badge || null,
-                exclusivo: !!p.badge,
-                descripcion: p.descripcion || "",
-                specs: {
-                    ...(p.composicionMaterial ? { material: p.composicionMaterial } : {}),
-                    ...(p.peso ? { peso: p.peso } : {}),
-                    ...(p.certificacion ? { certificacion: p.certificacion } : {}),
-                    categoria: p.categoriaNombre || categoria,
-                },
-                esencia: p.esencia || "",
-                caracteristicas: p.caracteristicas || [],
-            };
-        });
+        .map((p) => ({
+            id: p.id,
+            nombre: p.nombre,
+            precio: p.precio,
+            categoria,
+            subcategoria: p.subcategoria || "",
+            material: p.materiales?.[0] || "—",
+            imagenes: p.imagenes?.length ? p.imagenes : (p.imagenUrl ? [p.imagenUrl] : []),
+            imagen: p.imagenUrl || null,
+            badge: p.badge || null,
+            exclusivo: !!p.badge,
+            descripcion: p.descripcion || "",
+            specs: {
+                ...(p.composicionMaterial ? { material: p.composicionMaterial } : {}),
+                ...(p.peso ? { peso: p.peso } : {}),
+                ...(p.certificacion ? { certificacion: p.certificacion } : {}),
+                categoria: p.categoriaNombre || categoria,
+            },
+            esencia: p.esencia || "",
+            caracteristicas: p.caracteristicas || [],
+        }));
 
     const titulo = todosLosProdsCat[0]?.specs?.categoria || categoria;
 

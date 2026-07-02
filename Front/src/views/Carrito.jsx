@@ -1,10 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useSelector, useDispatch } from "react-redux";
+import { quitarDelCarrito, cambiarCantidad } from "../features/carrito/carritoSlice";
 import Footer from "../components/Footer";
 import "./Carrito.css";
 
 export default function Carrito() {
-    const { carrito, quitarDelCarrito, cambiarCantidad, subtotal } = useApp();
+    const dispatch = useDispatch();
+    const carrito = useSelector((state) => state.carrito.items);
+    const subtotal = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
     const navigate = useNavigate();
 
     return (
@@ -32,15 +35,15 @@ export default function Carrito() {
                                         <p className="carrito-item-cat">{p.subcategoria?.toUpperCase()}</p>
                                         <p className="carrito-item-nombre">{p.nombre}</p>
                                         <div className="carrito-item-qty">
-                                            <button onClick={() => cambiarCantidad(p.id, p.cantidad - 1)}>-</button>
+                                            <button onClick={() => dispatch(cambiarCantidad({ id: p.id, cantidad: p.cantidad - 1 }))}>-</button>
                                             <span>{p.cantidad}</span>
-                                            <button onClick={() => cambiarCantidad(p.id, p.cantidad + 1)}>+</button>
+                                            <button onClick={() => dispatch(cambiarCantidad({ id: p.id, cantidad: p.cantidad + 1 }))}>+</button>
                                         </div>
                                     </div>
                                     <div className="carrito-item-right">
                                         <p className="carrito-item-label">PRECIO UNITARIO</p>
                                         <p className="carrito-item-precio">$ {p.precio.toLocaleString("es-AR")}</p>
-                                        <button className="carrito-item-del" onClick={() => quitarDelCarrito(p.id)} aria-label="Eliminar">
+                                        <button className="carrito-item-del" onClick={() => dispatch(quitarDelCarrito(p.id))} aria-label="Eliminar">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
                                             </svg>

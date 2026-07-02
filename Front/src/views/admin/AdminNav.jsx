@@ -1,9 +1,10 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useApp } from "../../context/AppContext";
+import { useDispatch } from "react-redux";
+import { logout } from "../../features/auth/authSlice";
 import "./AdminNav.css";
 
 export default function AdminNav() {
-    const { logout } = useApp();
+    const dispatch = useDispatch();
     const { pathname } = useLocation();
     const navigate = useNavigate();
 
@@ -29,7 +30,7 @@ export default function AdminNav() {
             </nav>
             <div className="admin-nav-right">
                 <Link to="/" className="admin-nav-tienda">← Ver tienda</Link>
-                <button className="admin-nav-logout" onClick={() => { logout(); navigate("/login"); }}>
+                <button className="admin-nav-logout" onClick={() => { dispatch(logout()); navigate("/login"); }}>
                     Cerrar sesión
                 </button>
             </div>

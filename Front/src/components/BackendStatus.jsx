@@ -1,18 +1,14 @@
-import { useState, useEffect } from "react";
-import { checkBackendAPI } from "../services/api";
+import { useSelector } from "react-redux";
 
 export default function BackendStatus() {
-    const [online, setOnline] = useState(true);
-    const [cargando, setCargando] = useState(true);
+    const cargando = useSelector((state) => state.productos.loading);
+    const error = useSelector((state) => state.productos.error);
+    const cargado = useSelector((state) => state.productos.cargado);
 
-    useEffect(() => {
-        checkBackendAPI()
-            .then(() => setOnline(true))
-            .catch(() => setOnline(false))
-            .finally(() => setCargando(false));
-    }, []);
-
-    if (cargando || online) return null;
+    // El estado de conexión se deriva directamente del fetchProductos que ya
+    // dispara App.jsx al montar — no hace falta un segundo pedido al backend
+    // solo para chequear si está online.
+    if (cargando || !cargado || !error) return null;
 
     return (
         <div style={{

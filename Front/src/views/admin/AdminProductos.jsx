@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useApp } from "../../context/AppContext";
-import { crearProductoAPI, crearImagenAPI } from "../../services/api";
+import { useSelector, useDispatch } from "react-redux";
+import { crearProducto, crearImagenProducto } from "../../features/productos/productosSlice";
 import AdminNav from "./AdminNav";
 import "./AdminProductos.css";
 
@@ -15,7 +15,13 @@ const FORM_VACIO = {
 };
 
 export default function AdminProductos() {
-    const { productosStock, setProductosStock, setProductosBackend, categoriasAdmin } = useApp();
+    const dispatch = useDispatch();
+    const productos = useSelector((state) => state.productos.items);
+    const categoriasAdmin = useSelector((state) => state.categorias.items);
+    const productosStock = productos.map((p) => ({
+        id: p.id, nombre: p.nombre, precio: p.precio, stock: p.stock,
+        imagen: p.imagenUrl || "/src/assets/placeholder.jpg",
+    }));
     const [form, setForm] = useState(FORM_VACIO);
     const [error, setError] = useState("");
     const [exito, setExito] = useState("");
@@ -50,69 +56,35 @@ export default function AdminProductos() {
 
         setCargando(true);
 
-        try {
-            const categoriaElegida = categoriasAdmin.find((c) => String(c.id) === String(form.idCategoria));
+        const categoriaElegida = categoriasAdmin.find((c) => String(c.id) === String(form.idCategoria));
 
-            const productoCreado = await crearProductoAPI({
-                nombre: form.nombre,
-                descripcion: form.descripcion,
-                precio: Number(form.precio),
-                stock: Number(form.stock),
-                tipo: categoriaElegida?.slug || "",
-                subcategoria: form.subcategoria,
-                idCategoria: Number(form.idCategoria),
-                idVendedor: null,
-            });
+        const resultado = await dispatch(crearProducto({
+            nombre: form.nombre,
+            descripcion: form.descripcion,
+            precio: Number(form.precio),
+            stock: Number(form.stock),
+            tipo: categoriaElegida?.slug || "",
+            subcategoria: form.subcategoria,
+            idCategoria: Number(form.idCategoria),
+            idVendedor: null,
+        }));
 
-            // La imagen se persiste en el backend (/imagenes), no solo en memoria del front,
-            // para que no desaparezca al refrescar la página.
-            let imagenUrlGuardada = null;
-            if (form.imagenUrl) {
-                try {
-                    const imagen = await crearImagenAPI({
-                        url: form.imagenUrl,
-                        esPrincipal: true,
-                        producto: { id: productoCreado.id },
-                    });
-                    imagenUrlGuardada = imagen.url;
-                } catch (err) {
-                    console.error("El producto se creó pero la imagen no se pudo guardar:", err);
-                }
-            }
-
-            setProductosStock((prev) => [...prev, {
-                id: productoCreado.id,
-                nombre: productoCreado.nombre,
-                categoria: categoriaElegida?.nombre || "",
-                categoriaSlug: categoriaElegida?.slug || "",
-                precio: productoCreado.precio,
-                stock: productoCreado.stock,
-                imagen: imagenUrlGuardada || "/src/assets/placeholder.jpg",
-            }]);
-
-            setProductosBackend((prev) => [...prev, {
-                id: productoCreado.id,
-                nombre: productoCreado.nombre,
-                descripcion: productoCreado.descripcion || form.descripcion,
-                precio: productoCreado.precio,
-                stock: productoCreado.stock,
-                categoriaId: categoriaElegida?.id ?? null,
-                categoriaNombre: categoriaElegida?.nombre || "",
-                categoriaSlug: categoriaElegida?.slug || "",
-                subcategoria: form.subcategoria,
-                imagenes: imagenUrlGuardada ? [imagenUrlGuardada] : [],
-                imagenUrl: imagenUrlGuardada,
-            }]);
-
-            setExito(`"${productoCreado.nombre}" creado correctamente en la base de datos.`);
-            setForm(FORM_VACIO);
-            setImgError(false);
-
-        } catch (err) {
-            setError(err.message || "No se pudo conectar con el servidor. Verificá que el backend esté corriendo.");
-        } finally {
+        if (!crearProducto.fulfilled.match(resultado)) {
+            setError(resultado.payload || "No se pudo conectar con el servidor. Verificá que el backend esté corriendo.");
             setCargando(false);
+            return;
         }
+
+        const productoCreado = resultado.payload;
+
+        if (form.imagenUrl) {
+            await dispatch(crearImagenProducto({ productoId: productoCreado.id, url: form.imagenUrl }));
+        }
+
+        setExito(`"${productoCreado.nombre}" creado correctamente en la base de datos.`);
+        setForm(FORM_VACIO);
+        setImgError(false);
+        setCargando(false);
     };
 
     const imagenPreview = form.imagenUrl && !imgError ? form.imagenUrl : null;

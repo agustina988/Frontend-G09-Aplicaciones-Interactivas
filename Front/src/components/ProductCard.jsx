@@ -1,19 +1,22 @@
 import { useNavigate } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useSelector, useDispatch } from "react-redux";
 import Swal from "sweetalert2";
+import { agregarAlCarrito } from "../features/carrito/carritoSlice";
+import { toggleFavorito } from "../features/favoritos/favoritosSlice";
 import "./ProductCard.css";
 
 export default function ProductCard({ producto }) {
-    const { agregarAlCarrito, toggleFavorito, esFavorito, usuario, productosStock } = useApp();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const fav = esFavorito(producto.id);
+    const usuario = useSelector((state) => state.auth.usuario);
+    const favoritos = useSelector((state) => state.favoritos.items);
+    const productos = useSelector((state) => state.productos.items);
+    const fav = favoritos.some((p) => p.id === producto.id);
 
-    // Imagen: para productos nuevos del backend usar imagenUrl, para los estáticos usar imagenes[]
     const imagen = producto.imagenes?.[0] || producto.imagenUrl || producto.imagen || null;
 
-    // Stock real del contexto
-    const productoEnStock = productosStock.find((p) => p.id === producto.id);
-    const stockActual = productoEnStock ? productoEnStock.stock : (producto.stock ?? 1);
+    const productoEnCatalogo = productos.find((p) => p.id === producto.id);
+    const stockActual = productoEnCatalogo ? productoEnCatalogo.stock : (producto.stock ?? 1);
     const sinStock = stockActual === 0;
 
     const handleFavoritoClick = (e) => {
@@ -33,7 +36,7 @@ export default function ProductCard({ producto }) {
                 if (result.isConfirmed) navigate("/login");
             });
         } else {
-            toggleFavorito(producto);
+            dispatch(toggleFavorito(producto));
         }
     };
 
@@ -79,7 +82,7 @@ export default function ProductCard({ producto }) {
                         NO DISPONIBLE
                     </button>
                 ) : (
-                    <button className="product-card-btn" onClick={() => agregarAlCarrito(producto)}>
+                    <button className="product-card-btn" onClick={() => dispatch(agregarAlCarrito(producto))}>
                         Agregar al carrito
                     </button>
                 )}

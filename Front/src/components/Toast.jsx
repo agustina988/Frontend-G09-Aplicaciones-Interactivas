@@ -1,8 +1,8 @@
-import { useApp } from "../context/AppContext";
+import { useSelector } from "react-redux";
 import "./Toast.css";
 
 export default function Toast() {
-    const { toasts } = useApp();
+    const toasts = useSelector((state) => state.ui.toasts);
 
     return (
         <div className="toast-container">

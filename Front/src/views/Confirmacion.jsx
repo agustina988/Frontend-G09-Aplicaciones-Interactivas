@@ -1,20 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useSelector, useDispatch } from "react-redux";
+import { confirmarCompra } from "../features/pedidos/pedidosSlice";
 import Footer from "../components/Footer";
 import "./Confirmacion.css";
 
 export default function Confirmacion() {
-    const { carrito, subtotal, total, usuario, confirmarCompra } = useApp();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const carrito = useSelector((state) => state.carrito.items);
+    const usuario = useSelector((state) => state.auth.usuario);
+    const pedido = useSelector((state) => state.pedidos.ultimoPedido);
     const confirmado = useRef(false);
-    const [pedido, setPedido] = useState(null);
 
     useEffect(() => {
         if (!confirmado.current && carrito.length > 0) {
             confirmado.current = true;
-            const p = confirmarCompra({});
-            setPedido(p);
+            dispatch(confirmarCompra({}));
         }
     }, []);
 

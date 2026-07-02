@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useSelector } from "react-redux";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import "./Favoritos.css";
 
 export default function Favoritos() {
-    const { favoritos } = useApp();
+    const favoritos = useSelector((state) => state.favoritos.items);
 
     return (
         <div className="favoritos-page">

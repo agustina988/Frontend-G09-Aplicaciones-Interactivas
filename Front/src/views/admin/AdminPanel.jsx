@@ -1,12 +1,9 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUsuarios } from "../../features/usuarios/usuariosSlice";
 import AdminNav from "./AdminNav";
 import "./AdminPanel.css";
-
-const stats = [
-    { label: "VENTAS TOTALES (MES)", valor: "$ 1.200.000", sub: "+12.5% del mes anterior" },
-    { label: "USUARIOS ACTIVOS", valor: "4.800", sub: "+3.2% crecimiento" },
-    { label: "PEDIDOS PENDIENTES", valor: "24", sub: "PRIORIDAD ALTA", alerta: true },
-];
 
 const gestion = [
     { titulo: "Gestión de Productos", desc: "Administre el catálogo de alta joyería, cargue imágenes de alta resolución y especificaciones de gemas preciosas.", link: "/admin/stock", cta: "ACCEDER AL INVENTARIO", icon: "💎" },
@@ -18,7 +15,24 @@ const gestion = [
 ];
 
 export default function AdminPanel() {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const pedidos = useSelector((state) => state.pedidos.adminList);
+    const totalUsuarios = useSelector((state) => state.usuarios.items.length);
+
+    useEffect(() => {
+        dispatch(fetchUsuarios());
+    }, [dispatch]);
+
+    const ventasDelMes = pedidos.reduce((acc, p) => acc + (p.total || 0), 0);
+    const pedidosPendientes = pedidos.filter((p) => p.estado === "PENDIENTE").length;
+
+    const stats = [
+        { label: "VENTAS TOTALES (PEDIDOS)", valor: `$ ${ventasDelMes.toLocaleString("es-AR")}`, sub: `${pedidos.length} pedidos registrados` },
+        { label: "USUARIOS REGISTRADOS", valor: String(totalUsuarios), sub: "Total en la base de datos" },
+        { label: "PEDIDOS PENDIENTES", valor: String(pedidosPendientes), sub: "PRIORIDAD ALTA", alerta: pedidosPendientes > 0 },
+    ];
+
     return (
         <div className="admin-panel">
             <AdminNav />

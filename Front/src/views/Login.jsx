@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useApp } from "../context/AppContext";
-import { loginAPI } from "../services/api";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../features/auth/authSlice";
 import "./Login.css";
 
 export default function Login() {
-    const { login } = useApp();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -19,30 +19,14 @@ export default function Login() {
         setCargando(true);
         setError("");
 
-        try {
-            const data = await loginAPI(email, password);
-            localStorage.setItem("token", data.token);
+        const resultado = await dispatch(loginUser({ email, password }));
 
-            login({
-                id: data.id,
-                nombre: data.nombre,
-                email: data.email,
-                telefono: data.telefono || "",
-                direccion: data.direccion || "",
-                rol: data.rol,
-                miembro: data.rol === "ROLE_ADMIN" ? "ADMINISTRADOR" : "MEMBER",
-                desde: new Date().getFullYear().toString(),
-                avatar: null,
-                pedidos: [],
-            });
-
-            navigate(data.rol === "ROLE_ADMIN" ? "/admin" : "/perfil");
-
-        } catch (err) {
-            setError(err.message || "Email o contraseña incorrectos.");
-        } finally {
-            setCargando(false);
+        if (loginUser.fulfilled.match(resultado)) {
+            navigate(resultado.payload.rol === "ROLE_ADMIN" ? "/admin" : "/perfil");
+        } else {
+            setError(resultado.payload || "Email o contraseña incorrectos.");
         }
+        setCargando(false);
     };
 
     return (

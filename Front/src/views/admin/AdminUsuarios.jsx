@@ -1,42 +1,30 @@
 import { useState, useEffect } from "react";
-import { useApp } from "../../context/AppContext";
-import { getUsuariosAPI } from "../../services/api";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUsuarios } from "../../features/usuarios/usuariosSlice";
 import AdminNav from "./AdminNav";
 import "./AdminUsuarios.css";
 
 export default function AdminUsuarios() {
-    const { usuariosAdmin } = useApp();
+    const dispatch = useDispatch();
+    const token = useSelector((state) => state.auth.token);
+    const usuariosBackend = useSelector((state) => state.usuarios.items);
+    const cargando = useSelector((state) => state.usuarios.loading);
+    const errorConexion = useSelector((state) => state.usuarios.error);
     const [busqueda, setBusqueda] = useState("");
-    const [usuariosBackend, setUsuariosBackend] = useState([]);
-    const [cargando, setCargando] = useState(true);
-    const [errorConexion, setErrorConexion] = useState(false);
     const [modalUsuario, setModalUsuario] = useState(null);
     const [modalTipo, setModalTipo] = useState(null);
 
-    // Traer usuarios reales del backend
     useEffect(() => {
-        if (!localStorage.getItem("token")) { setCargando(false); return; }
+        if (token) dispatch(fetchUsuarios());
+    }, [token, dispatch]);
 
-        getUsuariosAPI()
-            .then((data) => {
-                setUsuariosBackend(data);
-                setErrorConexion(false);
-            })
-            .catch(() => setErrorConexion(true))
-            .finally(() => setCargando(false));
-    }, []);
-
-    // Combinar usuarios del backend con los del context (registrados en esta sesión)
-    const lista = [
-        ...usuariosBackend.map((u) => ({
-            nombre: u.email.split("@")[0],
-            email: u.email,
-            miembro: u.roles?.some(r => r.nombre === "ROLE_ADMIN") ? "ADMINISTRADOR" : "MEMBER",
-            acceso: "Registrado",
-            pedidos: [],
-        })),
-        ...usuariosAdmin.filter(u => !usuariosBackend.find(ub => ub.email === u.email)),
-    ];
+    const lista = usuariosBackend.map((u) => ({
+        nombre: u.email.split("@")[0],
+        email: u.email,
+        miembro: u.roles?.some(r => r.nombre === "ROLE_ADMIN") ? "ADMINISTRADOR" : "MEMBER",
+        acceso: "Registrado",
+        pedidos: [],
+    }));
 
     const filtrados = lista.filter(
         (u) => u.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -61,14 +49,13 @@ export default function AdminUsuarios() {
                     </div>
                 </div>
 
-                {/* Mensaje de error de conexión */}
                 {errorConexion && (
                     <div style={{
                         background: "#fde8e8", border: "1px solid #f5c6c6",
                         padding: "1rem 1.5rem", marginBottom: "1.5rem",
                         fontFamily: "'Cormorant Garamond', serif", fontSize: "15px", color: "#c44"
                     }}>
-                        ⚠ No se pudo conectar con el servidor. Mostrando datos locales.
+                        ⚠ No se pudo conectar con el servidor.
                     </div>
                 )}
 
@@ -90,7 +77,6 @@ export default function AdminUsuarios() {
                     </div>
                 </div>
 
-                {/* Renderizado condicional mientras carga */}
                 {cargando ? (
                     <div className="admin-empty">
                         <p>Cargando usuarios...</p>
@@ -142,7 +128,6 @@ export default function AdminUsuarios() {
                 )}
             </div>
 
-            {/* MODAL */}
             {modalUsuario && (
                 <div className="admin-modal-overlay" onClick={cerrarModal}>
                     <div className="admin-modal" onClick={(e) => e.stopPropagation()}>

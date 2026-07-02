@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { useApp } from "../../context/AppContext";
+import { useSelector, useDispatch } from "react-redux";
+import { crearCategoria, eliminarCategoria, editarCategoria } from "../../features/categorias/categoriasSlice";
 import AdminNav from "./AdminNav";
 import "./AdminCategorias.css";
 
 export default function AdminCategorias() {
-    const { categoriasAdmin, agregarCategoria, eliminarCategoria, editarCategoria, productosBackend } = useApp();
+    const dispatch = useDispatch();
+    const categoriasAdmin = useSelector((state) => state.categorias.items);
+    const productosBackend = useSelector((state) => state.productos.items);
     const [modal, setModal] = useState(null); // null | 'nueva' | { cat, tipo: 'editar' | 'eliminar' }
     const [form, setForm] = useState({ nombre: "", slug: "", desc: "" });
     const [error, setError] = useState("");
@@ -17,8 +20,6 @@ export default function AdminCategorias() {
         set("slug", v.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""));
     };
 
-    // Cantidad real de productos por categoría — se calcula sobre el catálogo
-    // que ya vino del backend, no es un número inventado.
     const cantidadProductos = (categoriaId) =>
         productosBackend.filter((p) => p.categoriaId === categoriaId).length;
 
@@ -27,14 +28,13 @@ export default function AdminCategorias() {
         if (!form.nombre) return;
         setError("");
         setGuardando(true);
-        try {
-            await agregarCategoria({ nombre: form.nombre, slug: form.slug, desc: form.desc });
+        const resultado = await dispatch(crearCategoria({ nombre: form.nombre, slug: form.slug, desc: form.desc }));
+        setGuardando(false);
+        if (crearCategoria.fulfilled.match(resultado)) {
             setForm({ nombre: "", slug: "", desc: "" });
             setModal(null);
-        } catch (err) {
-            setError(err.message || "No se pudo crear la categoría.");
-        } finally {
-            setGuardando(false);
+        } else {
+            setError(resultado.payload || "No se pudo crear la categoría.");
         }
     };
 
@@ -42,13 +42,15 @@ export default function AdminCategorias() {
         e.preventDefault();
         setError("");
         setGuardando(true);
-        try {
-            await editarCategoria(modal.cat.id, { nombre: form.nombre, slug: form.slug, desc: form.desc, publicado: modal.cat.publicado });
+        const resultado = await dispatch(editarCategoria({
+            id: modal.cat.id,
+            datos: { nombre: form.nombre, slug: form.slug, desc: form.desc, publicado: modal.cat.publicado },
+        }));
+        setGuardando(false);
+        if (editarCategoria.fulfilled.match(resultado)) {
             setModal(null);
-        } catch (err) {
-            setError(err.message || "No se pudo editar la categoría.");
-        } finally {
-            setGuardando(false);
+        } else {
+            setError(resultado.payload || "No se pudo editar la categoría.");
         }
     };
 
@@ -62,11 +64,11 @@ export default function AdminCategorias() {
 
     const handleEliminar = async () => {
         setError("");
-        try {
-            await eliminarCategoria(modal.cat.id);
+        const resultado = await dispatch(eliminarCategoria(modal.cat.id));
+        if (eliminarCategoria.fulfilled.match(resultado)) {
             setModal(null);
-        } catch (err) {
-            setError(err.message || "No se pudo eliminar la categoría.");
+        } else {
+            setError(resultado.payload || "No se pudo eliminar la categoría.");
         }
     };
 
@@ -111,7 +113,6 @@ export default function AdminCategorias() {
                 </div>
             </div>
 
-            {/* MODAL NUEVA / EDITAR */}
             {(modal === "nueva" || modal?.tipo === "editar") && (
                 <div className="admin-modal-overlay" onClick={() => setModal(null)}>
                     <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
@@ -143,7 +144,6 @@ export default function AdminCategorias() {
                 </div>
             )}
 
-            {/* MODAL ELIMINAR */}
             {modal?.tipo === "eliminar" && (
                 <div className="admin-modal-overlay" onClick={() => setModal(null)}>
                     <div className="admin-modal" onClick={(e) => e.stopPropagation()}>

@@ -1,51 +1,35 @@
-import { useState, useEffect } from "react";
-import { useApp } from "../../context/AppContext";
-import { getPedidosAPI, cambiarEstadoPedidoAPI } from "../../services/api";
+import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { cambiarEstadoPedido } from "../../features/pedidos/pedidosSlice";
 import AdminNav from "./AdminNav";
 import "./AdminPedidos.css";
 
 const estadosSig = { PENDIENTE: "ENVIADO", ENVIADO: "ENTREGADO", ENTREGADO: "ENTREGADO" };
 
 export default function AdminPedidos() {
-    const { pedidosAdmin, setPedidosAdmin } = useApp();
+    const dispatch = useDispatch();
+    const pedidosRaw = useSelector((state) => state.pedidos.adminList);
+    const cargando = useSelector((state) => state.pedidos.loading);
+    const errorConexion = useSelector((state) => state.pedidos.error);
     const [busqueda, setBusqueda] = useState("");
     const [pedidoDetalle, setPedidoDetalle] = useState(null);
-    const [cargando, setCargando] = useState(true);
-    const [errorConexion, setErrorConexion] = useState(false);
 
-    // Cargar pedidos del backend
-    useEffect(() => {
-        if (!localStorage.getItem("token")) { setCargando(false); return; }
+    const pedidosAdmin = pedidosRaw.map((p) => ({
+        id: `#${p.id}`,
+        idReal: p.id,
+        cliente: p.emailUsuario,
+        email: p.emailUsuario,
+        fecha: p.fechaPedido,
+        total: p.total,
+        estado: p.estado,
+        direccion: p.direccionEnvio,
+        productos: p.detalles?.map((d) => ({ id: d.idProducto, nombre: d.nombreProducto, precio: d.precioUnitario, cantidad: d.cantidad })) || [],
+    }));
 
-        getPedidosAPI()
-            .then((data) => {
-                setErrorConexion(false);
-                setPedidosAdmin(data.map((p) => ({
-                    id: `#${p.id}`,
-                    idReal: p.id,
-                    cliente: p.emailUsuario,
-                    email: p.emailUsuario,
-                    fecha: p.fechaPedido,
-                    total: p.total,
-                    estado: p.estado,
-                    direccion: p.direccionEnvio,
-                    productos: p.detalles?.map((d) => ({ id: d.idProducto, nombre: d.nombreProducto, precio: d.precioUnitario, cantidad: d.cantidad })) || [],
-                })));
-            })
-            .catch(() => setErrorConexion(true))
-            .finally(() => setCargando(false));
-    }, []);
-
-    const cambiarEstado = async (idReal, estadoActual) => {
+    const cambiarEstado = (idReal, estadoActual) => {
         const nuevoEstado = estadosSig[estadoActual];
         if (nuevoEstado === estadoActual) return;
-
-        try {
-            await cambiarEstadoPedidoAPI(idReal, nuevoEstado);
-            setPedidosAdmin((prev) => prev.map((p) => p.idReal === idReal ? { ...p, estado: nuevoEstado } : p));
-        } catch (err) {
-            console.error("Error actualizando estado:", err);
-        }
+        dispatch(cambiarEstadoPedido({ id: idReal, estado: nuevoEstado }));
     };
 
     const filtrados = pedidosAdmin.filter(

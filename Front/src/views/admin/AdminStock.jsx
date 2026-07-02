@@ -1,18 +1,29 @@
 import { useState } from "react";
-import { useApp } from "../../context/AppContext";
-import { editarStockProductoAPI, eliminarProductoAPI } from "../../services/api";
+import { useSelector, useDispatch } from "react-redux";
+import { editarStockProducto, eliminarProducto } from "../../features/productos/productosSlice";
 import AdminNav from "./AdminNav";
 import "./AdminStock.css";
 
 const TODAS = "Todas las Categorías";
 
 export default function AdminStock() {
-    const { productosStock, editarStock, eliminarStock, categoriasAdmin } = useApp();
+    const dispatch = useDispatch();
+    const productos = useSelector((state) => state.productos.items);
+    const categoriasAdmin = useSelector((state) => state.categorias.items);
     const CATEGORIAS_FILTRO = [TODAS, ...categoriasAdmin.map((c) => c.nombre)];
     const [tab, setTab] = useState("stock");
     const [busqueda, setBusqueda] = useState("");
-    const [categoriaFiltro, setCategoriaFiltro] = useState("Todas las Categorías");
+    const [categoriaFiltro, setCategoriaFiltro] = useState(TODAS);
     const [modalEliminar, setModalEliminar] = useState(null);
+
+    const productosStock = productos.map((p) => ({
+        id: p.id,
+        nombre: p.nombre,
+        categoria: p.categoriaNombre,
+        precio: p.precio,
+        stock: p.stock,
+        imagen: p.imagenUrl || "/src/assets/placeholder.jpg",
+    }));
 
     const filtrados = productosStock.filter((p) => {
         const coincideBusq = p.nombre.toLowerCase().includes(busqueda.toLowerCase());
@@ -20,28 +31,13 @@ export default function AdminStock() {
         return coincideBusq && coincideCat;
     });
 
-    const handleEditarStock = async (id, nuevoStock) => {
-        const stockFinal = Math.max(0, nuevoStock);
-        editarStock(id, stockFinal);
-
-        if (!localStorage.getItem("token")) return;
-
-        try {
-            await editarStockProductoAPI(id, stockFinal);
-        } catch (err) {
-            console.error("Error actualizando stock:", err);
-        }
+    const handleEditarStock = (id, nuevoStock) => {
+        dispatch(editarStockProducto({ id, stock: Math.max(0, nuevoStock) }));
     };
 
-    const handleEliminarStock = async (id) => {
-        eliminarStock(id);
+    const handleEliminarStock = (id) => {
+        dispatch(eliminarProducto(id));
         setModalEliminar(null);
-        if (!localStorage.getItem("token")) return;
-        try {
-            await eliminarProductoAPI(id);
-        } catch (err) {
-            console.error("Error eliminando producto en backend:", err);
-        }
     };
 
     return (

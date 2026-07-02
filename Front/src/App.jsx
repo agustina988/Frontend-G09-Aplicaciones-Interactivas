@@ -1,11 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { AppProvider, useApp } from "./context/AppContext";
+import { useSelector, useDispatch } from "react-redux";
 import ScrollToTop from "./components/ScrollToTop";
 import Navigation from "./components/Navigation";
 import Toast from "./components/Toast";
 import BackendStatus from "./components/BackendStatus";
 import Swal from "sweetalert2";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+
+import { fetchProductos } from "./features/productos/productosSlice";
+import { fetchCategorias } from "./features/categorias/categoriasSlice";
+import { fetchCarrito } from "./features/carrito/carritoSlice";
+import { fetchPedidos } from "./features/pedidos/pedidosSlice";
 
 import Home from "./views/Home";
 import Productos from "./views/Productos";
@@ -25,7 +30,7 @@ import AdminPedidos from "./views/admin/AdminPedidos";
 import AdminUsuarios from "./views/admin/AdminUsuarios";
 import AdminCategorias from "./views/admin/AdminCategorias";
 import AdminStock from "./views/admin/AdminStock";
-import AdminProductos from "./views/admin/AdminProductos.jsx";
+import AdminProductos from "./views/admin/AdminProductos";
 import AdminCupones from "./views/admin/AdminCupones";
 
 import "./App.css";
@@ -40,14 +45,15 @@ function Layout({ children }) {
 }
 
 function AdminRoute({ children }) {
-    const { esAdmin, usuario } = useApp();
+    const usuario = useSelector((state) => state.auth.usuario);
+    const esAdmin = usuario?.rol === "ROLE_ADMIN";
     if (!usuario) return <Navigate to="/login" />;
     if (!esAdmin) return <Navigate to="/" />;
     return children;
 }
 
 function PrivateRoute({ children }) {
-    const { usuario } = useApp();
+    const usuario = useSelector((state) => state.auth.usuario);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -112,13 +118,31 @@ function AppRoutes() {
 }
 
 export default function App() {
+    const dispatch = useDispatch();
+    const cargado = useSelector((state) => state.productos.cargado);
+    const token = useSelector((state) => state.auth.token);
+    const rol = useSelector((state) => state.auth.usuario?.rol);
+
+    useEffect(() => {
+        if (!cargado) {
+            dispatch(fetchProductos());
+            dispatch(fetchCategorias());
+        }
+    }, [cargado, dispatch]);
+
+    useEffect(() => {
+        if (token && rol !== "ROLE_ADMIN") dispatch(fetchCarrito());
+    }, [token]);
+
+    useEffect(() => {
+        if (token && rol === "ROLE_ADMIN") dispatch(fetchPedidos());
+    }, [token, rol]);
+
     return (
         <BrowserRouter>
-            <AppProvider>
-                <AppRoutes />
-                <Toast />
-                <BackendStatus />
-            </AppProvider>
+            <AppRoutes />
+            <Toast />
+            <BackendStatus />
         </BrowserRouter>
     );
 }

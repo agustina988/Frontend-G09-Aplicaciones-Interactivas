@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useSelector, useDispatch } from "react-redux";
 import Footer from "../components/Footer";
 import "./DetalleProducto.css";
 import Swal from "sweetalert2";
+import { agregarAlCarrito } from "../features/carrito/carritoSlice";
+import { toggleFavorito } from "../features/favoritos/favoritosSlice";
 
 export default function DetalleProducto() {
     const { id } = useParams();
-    const { agregarAlCarrito, toggleFavorito, esFavorito, usuario, productosStock, productosBackend } = useApp();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const usuario = useSelector((state) => state.auth.usuario);
+    const favoritos = useSelector((state) => state.favoritos.items);
+    const productosBackend = useSelector((state) => state.productos.items);
     const [imgActiva, setImgActiva] = useState(0);
 
-    // Buscar el producto en el catálogo (ahora todo viene del backend)
     const productoBackend = productosBackend.find((p) => p.id === Number(id));
 
     const producto = productoBackend ? {
@@ -43,8 +47,7 @@ export default function DetalleProducto() {
         );
     }
 
-    const productoEnStock = productosStock.find((p) => p.id === producto.id);
-    const stockActual = productoEnStock ? productoEnStock.stock : 0;
+    const stockActual = productoBackend?.stock ?? 0;
     const sinStock = stockActual === 0;
 
     let textoStock = "● Disponible";
@@ -57,7 +60,7 @@ export default function DetalleProducto() {
         claseStock = "detalle-disponible ultimas";
     }
 
-    const fav = esFavorito(producto.id);
+    const fav = favoritos.some((p) => p.id === producto.id);
     const categoriaPath = producto.categoria;
     const categoriaLabel = {
         joyeria: "Joyería",
@@ -83,18 +86,16 @@ export default function DetalleProducto() {
                 if (result.isConfirmed) navigate("/login");
             });
         } else {
-            toggleFavorito(producto);
+            dispatch(toggleFavorito(producto));
         }
     };
 
-    // Imágenes — para productos del backend puede ser URL o vacío
     const imagenes = producto.imagenes?.length > 0 ? producto.imagenes : [];
     const imagenPrincipal = imagenes[imgActiva] || producto.imagenUrl || null;
 
     return (
         <div className="detalle-page">
             <div className="detalle-inner">
-                {/* BREADCRUMB */}
                 <div className="detalle-breadcrumb">
                     <Link to="/">Home</Link>
                     <span> | </span>
@@ -103,9 +104,7 @@ export default function DetalleProducto() {
                     <span>{producto.nombre}</span>
                 </div>
 
-                {/* MAIN */}
                 <div className="detalle-main">
-                    {/* GALERÍA */}
                     <div className="detalle-galeria">
                         <div className={`detalle-img-principal${sinStock ? " detalle-img-agotado" : ""}`}>
                             {imagenPrincipal ? (
@@ -160,7 +159,6 @@ export default function DetalleProducto() {
                         )}
                     </div>
 
-                    {/* INFO */}
                     <div className="detalle-info">
                         {producto.badge && <span className="detalle-badge">{producto.badge}</span>}
                         <div className={claseStock}>{textoStock}</div>
@@ -171,7 +169,6 @@ export default function DetalleProducto() {
 
                         <p className="detalle-desc">{producto.descripcion}</p>
 
-                        {/* SPECS */}
                         {producto.specs && Object.keys(producto.specs).length > 0 && (
                             <div className="detalle-specs">
                                 {Object.entries(producto.specs).map(([k, v]) => (
@@ -188,7 +185,6 @@ export default function DetalleProducto() {
                             </div>
                         )}
 
-                        {/* BOTONES */}
                         <div className="detalle-btns">
                             {sinStock ? (
                                 <button className="detalle-btn-carrito detalle-btn-nodisponible" disabled>
@@ -197,7 +193,7 @@ export default function DetalleProducto() {
                             ) : (
                                 <button
                                     className="detalle-btn-carrito"
-                                    onClick={() => agregarAlCarrito(producto)}
+                                    onClick={() => dispatch(agregarAlCarrito(producto))}
                                 >
                                     AÑADIR AL CARRITO
                                 </button>
@@ -230,7 +226,6 @@ export default function DetalleProducto() {
                     </div>
                 </div>
 
-                {/* CARACTERÍSTICAS */}
                 {(producto.esencia || producto.caracteristicas?.length > 0) && (
                     <div className="detalle-features">
                         <div className="detalle-features-left">

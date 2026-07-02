@@ -1,55 +1,37 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useApp } from "../context/AppContext";
-import { getMisPedidosAPI, getPerfilAPI } from "../services/api";
+import { useSelector, useDispatch } from "react-redux";
+import { logout, fetchPerfil } from "../features/auth/authSlice";
+import { fetchMisPedidos } from "../features/pedidos/pedidosSlice";
 import Footer from "../components/Footer";
 import "./Perfil.css";
 
 export default function Perfil() {
-    const { usuario, logout, setUsuario } = useApp();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [pedidos, setPedidos] = useState([]);
-    const [cargandoPedidos, setCargandoPedidos] = useState(true);
-    const [errorPedidos, setErrorPedidos] = useState(false);
+    const usuario = useSelector((state) => state.auth.usuario);
+    const token = useSelector((state) => state.auth.token);
+    const pedidosRaw = useSelector((state) => state.pedidos.misPedidos);
+    const cargandoPedidos = useSelector((state) => state.pedidos.loading);
+    const errorPedidos = useSelector((state) => state.pedidos.error);
+
+    const pedidos = pedidosRaw.map((p) => ({
+        id: `#${p.id}`,
+        fecha: p.fechaPedido,
+        estado: p.estado,
+        precio: p.total,
+        productos: p.detalles?.map((d) => ({ nombre: d.nombreProducto, cantidad: d.cantidad, precio: d.precioUnitario })) || [],
+    }));
+
+    useEffect(() => {
+        if (!token) return;
+        dispatch(fetchMisPedidos());
+        dispatch(fetchPerfil());
+    }, [token, dispatch]);
 
     if (!usuario) { navigate("/login"); return null; }
 
-    const handleLogout = () => { logout(); navigate("/login"); };
-
-    // Cargar pedidos reales del backend
-    useEffect(() => {
-        if (!localStorage.getItem("token")) { setCargandoPedidos(false); return; }
-
-        getMisPedidosAPI()
-            .then((data) => {
-                setErrorPedidos(false);
-                setPedidos(data.map((p) => ({
-                    id: `#${p.id}`,
-                    fecha: p.fechaPedido,
-                    estado: p.estado,
-                    precio: p.total,
-                    productos: p.detalles?.map((d) => ({ nombre: d.nombreProducto, cantidad: d.cantidad, precio: d.precioUnitario })) || [],
-                })));
-            })
-            .catch(() => setErrorPedidos(true))
-            .finally(() => setCargandoPedidos(false));
-    }, []);
-
-    // Cargar perfil actualizado del backend
-    useEffect(() => {
-        if (!localStorage.getItem("token")) return;
-
-        getPerfilAPI()
-            .then((data) => {
-                setUsuario((prev) => ({
-                    ...prev,
-                    nombre: data.nombre || prev.nombre,
-                    telefono: data.telefono || prev.telefono,
-                    direccion: data.direccion || prev.direccion,
-                }));
-            })
-            .catch(() => {});
-    }, []);
+    const handleLogout = () => { dispatch(logout()); navigate("/login"); };
 
     return (
         <div className="perfil-page">
@@ -72,7 +54,6 @@ export default function Perfil() {
                 </div>
 
                 <div className="perfil-body">
-                    {/* DATOS PERSONALES */}
                     <div className="perfil-col">
                         <h2>Detalles Personales</h2>
                         <div className="perfil-data-list">
@@ -103,7 +84,6 @@ export default function Perfil() {
                         </button>
                     </div>
 
-                    {/* PEDIDOS */}
                     <div className="perfil-col">
                         <div className="perfil-pedidos-header">
                             <h2>Historial de Pedidos</h2>
