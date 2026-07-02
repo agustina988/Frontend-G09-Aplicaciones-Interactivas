@@ -5,19 +5,12 @@ import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import "./Productos.css";
 
-// Solo el título de cada categoría es texto de presentación fijo (no filtra nada).
-// Subcategorías y materiales se calculan dinámicamente a partir de los productos
-// reales que trae el backend — antes eran listas hardcodeadas y quedaban desactualizadas.
-const TITULOS = {
-    joyeria: "Joyería",
-    relojes: "Relojería",
-    lingotes: "Lingotes",
-    "edicion-limitada": "Edición Limitada",
-};
+// Nada hardcodeado acá: el nombre de la categoría se toma del propio backend
+// (cada producto ya trae categoriaNombre). El slug de la URL solo se usa como
+// fallback de texto mientras todavía no cargó ningún producto de esa categoría.
 
 export default function Productos({ categoria }) {
     const location = useLocation();
-    const titulo = TITULOS[categoria] || categoria;
     const subcatInicial = location.state?.subcategoria || null;
     const { productosBackend, productosStock, cargandoProductos } = useApp();
 
@@ -46,12 +39,16 @@ export default function Productos({ categoria }) {
                     ...(p.composicionMaterial ? { material: p.composicionMaterial } : {}),
                     ...(p.peso ? { peso: p.peso } : {}),
                     ...(p.certificacion ? { certificacion: p.certificacion } : {}),
-                    categoria: p.categoriaNombre || titulo || categoria,
+                    categoria: p.categoriaNombre || categoria,
                 },
                 esencia: p.esencia || "",
                 caracteristicas: p.caracteristicas || [],
             };
         });
+
+    // Título de la categoría: tomado del propio backend (categoriaNombre de
+    // cualquier producto de esta categoría), no hardcodeado en el front.
+    const titulo = todosLosProdsCat[0]?.specs?.categoria || categoria;
 
     // Subcategorías y materiales reales, derivados de los productos de esta categoría
     const subcategoriasDisponibles = [...new Set(
