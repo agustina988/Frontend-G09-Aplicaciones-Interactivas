@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { productos } from "../data/productos";
 import { useApp } from "../context/AppContext";
 import Footer from "../components/Footer";
 import "./DetalleProducto.css";
@@ -12,28 +11,23 @@ export default function DetalleProducto() {
     const navigate = useNavigate();
     const [imgActiva, setImgActiva] = useState(0);
 
-    // Buscar en productos estáticos primero, luego en los del backend
-    const productoEstatico = productos.find((p) => p.id === Number(id));
+    // Buscar el producto en el catálogo (ahora todo viene del backend)
     const productoBackend = productosBackend.find((p) => p.id === Number(id));
 
-    // Construir objeto unificado si es del backend
-    const productoDelBackend = productoBackend ? {
+    const producto = productoBackend ? {
         id: productoBackend.id,
         nombre: productoBackend.nombre,
         precio: productoBackend.precio,
-        categoria: productoBackend.tipo || "joyeria",
-        subcategoria: "Nuevo",
+        categoria: productoBackend.categoriaSlug || "joyeria",
+        subcategoria: "",
         imagenes: productoBackend.imagenUrl ? [productoBackend.imagenUrl] : [],
         imagenUrl: productoBackend.imagenUrl || null,
-        badge: "NUEVO",
-        descripcion: productoBackend.descripcion || "Nuevo producto agregado al catálogo de AUREA.",
-        specs: { categoria: "Nuevo" },
-        esencia: "Una nueva pieza exclusiva incorporada a nuestra colección.",
+        badge: null,
+        descripcion: productoBackend.descripcion || "",
+        specs: { categoria: productoBackend.categoriaNombre || "" },
+        esencia: "",
         caracteristicas: [],
-        esNuevo: true,
     } : null;
-
-    const producto = productoEstatico || productoDelBackend;
 
     if (!producto) {
         return (

@@ -13,14 +13,14 @@ const request = async (endpoint, options = {}) => {
     return res.json();
 };
 
-// AUTH
+// Autenticacion
 export const loginAPI = (email, password) =>
     request("/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
     });
 
-// PRODUCTOS
+
 export const getProductosAPI = () => request("/productos");
 export const getProductoByIdAPI = (id) => request(`/productos/${id}`);
 export const crearProductoAPI = (datos) =>
@@ -30,7 +30,6 @@ export const editarProductoAPI = (id, datos) =>
 export const eliminarProductoAPI = (id) =>
     request(`/productos/${id}`, { method: "DELETE" });
 
-// CARRITO
 export const getCarritoAPI = () => request("/carrito");
 export const agregarAlCarritoAPI = (productoId, cantidad) =>
     request("/carrito/agregar", {
@@ -39,9 +38,15 @@ export const agregarAlCarritoAPI = (productoId, cantidad) =>
     });
 export const vaciarCarritoAPI = () =>
     request("/carrito/vaciar", { method: "DELETE" });
+export const confirmarCarritoAPI = () =>
+    request("/carrito/confirmar", { method: "POST" });
 
-// CATEGORÍAS
+export const getPedidosAPI = () => request("/pedidos");
+export const crearPedidoAPI = (datos) =>
+    request("/pedidos", { method: "POST", body: JSON.stringify(datos) });
+
+
 export const getCategoriasAPI = () => request("/categorias");
 
-// MATERIALES
+
 export const getMaterialesAPI = () => request("/materiales");

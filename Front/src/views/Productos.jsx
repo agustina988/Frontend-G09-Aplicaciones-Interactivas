@@ -1,35 +1,52 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { productos as todosProd, categorias } from "../data/productos";
 import { useApp } from "../context/AppContext";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import "./Productos.css";
 
-// Mapeo de categoria URL → tipo backend
-const TIPO_MAP = {
-    "joyeria": "joyeria",
-    "relojes": "relojes",
-    "lingotes": "lingotes",
-    "edicion-limitada": "edicion-limitada",
+// Metadata de filtros por categoría (título; subcategorías quedan deshabilitadas
+// hasta que el backend las modele — hoy `Categoria` no tiene ese concepto).
+const categorias = {
+    joyeria: {
+        titulo: "Joyería",
+        subcategorias: [],
+        materiales: ["Oro 18k", "Oro Blanco", "Platino", "Plata 925"],
+    },
+    relojes: {
+        titulo: "Relojería",
+        subcategorias: [],
+        materiales: ["Acero", "Oro 18k", "Titanio"],
+    },
+    lingotes: {
+        titulo: "Lingotes",
+        subcategorias: [],
+        materiales: ["Oro 999.9", "Plata 999"],
+    },
+    "edicion-limitada": {
+        titulo: "Edición Limitada",
+        subcategorias: [],
+        materiales: ["Oro 18k", "Platino"],
+    },
 };
 
 export default function Productos({ categoria }) {
+    console.log(categoria)
     const location = useLocation();
     const info = categorias[categoria];
     const subcatInicial = location.state?.subcategoria || null;
     const { productosBackend, productosStock } = useApp();
+console.log(info)
+    console.log(productosBackend, 'mati')
+    console.log(productosStock, 'guada')
 
     const [subcat, setSubcat] = useState(subcatInicial);
     const [materiales, setMateriales] = useState([]);
     const [orden, setOrden] = useState("relevancia");
 
-    // Productos estáticos de esta categoría
-    const prodsCat = todosProd.filter((p) => p.categoria === categoria);
-
-    // Productos nuevos del backend que pertenecen a esta categoría
-    const prodsCatBackend = productosBackend
-        .filter((p) => p.tipo === TIPO_MAP[categoria])
+    // Productos de esta categoría, filtrando por el slug real que devuelve el backend
+    const todosLosProdsCat = productosBackend
+        .filter((p) => p.categoriaSlug === categoria)
         .map((p) => {
             const enStock = productosStock.find((s) => s.id === p.id);
             return {
@@ -37,21 +54,21 @@ export default function Productos({ categoria }) {
                 nombre: p.nombre,
                 precio: enStock?.precio ?? p.precio,
                 categoria,
-                subcategoria: "Nuevo",
-                material: "—",
+                subcategoria: p.subcategoria || "",
+                material: p.materiales?.[0] || "—",
                 imagenes: p.imagenUrl ? [p.imagenUrl] : [],
                 imagen: p.imagenUrl || null,
                 badge: null,
                 exclusivo: false,
                 descripcion: p.descripcion || "",
-                specs: { categoria: info?.titulo || categoria },
+                specs: { categoria: p.categoriaNombre || info?.titulo || categoria },
                 esencia: "",
                 caracteristicas: [],
-                esNuevo: true, // flag para saber que viene del backend
             };
         });
 
-    const todosLosProdsCat = [...prodsCat, ...prodsCatBackend];
+        console.log('todos', todosLosProdsCat)
+
     const maxPrecioReal = todosLosProdsCat.length > 0
         ? Math.max(...todosLosProdsCat.map((p) => p.precio))
         : 0;
@@ -67,13 +84,13 @@ export default function Productos({ categoria }) {
 
     const filtrados = useMemo(() => {
         let lista = todosLosProdsCat;
-        if (subcat && subcat !== "Nuevo") lista = lista.filter((p) => p.subcategoria === subcat);
+        if (subcat) lista = lista.filter((p) => p.subcategoria === subcat);
         if (materiales.length) lista = lista.filter((p) => materiales.includes(p.material));
         lista = lista.filter((p) => p.precio <= precioMax);
         if (orden === "precio-asc") lista = [...lista].sort((a, b) => a.precio - b.precio);
         if (orden === "precio-desc") lista = [...lista].sort((a, b) => b.precio - a.precio);
         return lista;
-    }, [subcat, materiales, precioMax, orden, categoria, prodsCatBackend.length]);
+    }, [subcat, materiales, precioMax, orden, categoria, todosLosProdsCat.length]);
 
     const toggleMaterial = (mat) => {
         setMateriales((prev) =>
@@ -111,14 +128,6 @@ export default function Productos({ categoria }) {
                                     {s}
                                 </button>
                             ))}
-                            {prodsCatBackend.length > 0 && (
-                                <button
-                                    className={`sidebar-cat-btn${subcat === "Nuevo" ? " active" : ""}`}
-                                    onClick={() => setSubcat("Nuevo")}
-                                >
-                                    Nuevos ✦
-                                </button>
-                            )}
                         </div>
 
                         <div className="sidebar-section">

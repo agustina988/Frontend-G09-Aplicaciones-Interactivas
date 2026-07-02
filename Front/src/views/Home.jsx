@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { productos } from "../data/productos";
 import { useApp } from "../context/AppContext";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
@@ -8,29 +7,24 @@ import "./Home.css";
 export default function Home() {
     const { productosBackend } = useApp();
 
-    // Productos estáticos destacados (primeros 4)
-    const destacadosEstaticos = productos.slice(0, 4);
-
-    // Productos nuevos del backend — mostrarlos al final de los destacados
-    const destacadosBackend = productosBackend.map((p) => ({
+    // Destacados: primeros 4 productos del catálogo (todo viene del backend)
+    const destacados = productosBackend.slice(0, 4).map((p) => ({
         id: p.id,
         nombre: p.nombre,
         precio: p.precio,
-        categoria: p.tipo || "joyeria",
-        subcategoria: "Nuevo",
-        material: "—",
+        categoria: p.categoriaSlug || "joyeria",
+        subcategoria: "",
+        material: p.materiales?.[0] || "—",
         imagenes: p.imagenUrl ? [p.imagenUrl] : [],
         imagenUrl: p.imagenUrl || null,
-        badge: "NUEVO",
+        badge: null,
         exclusivo: false,
         descripcion: p.descripcion || "",
-        specs: { categoria: "Nuevo" },
+        specs: { categoria: p.categoriaNombre || "" },
         esencia: "",
         caracteristicas: [],
-        esNuevo: true,
+        esNuevo: false,
     }));
-
-    const destacados = [...destacadosEstaticos, ...destacadosBackend];
 
     return (
         <div className="home">
