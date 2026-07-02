@@ -14,6 +14,7 @@ const gestion = [
     { titulo: "Gestión de Usuarios", desc: "Administre perfiles de clientes VIP y el historial de adquisiciones.", link: "/admin/usuarios", cta: "VER CLIENTES", icon: "👤" },
     { titulo: "Gestión de Stock", desc: "Control riguroso de metales preciosos y disponibilidad de colecciones limitadas.", link: "/admin/stock", cta: "● Actualizado hace 15 min", icon: "📦" },
     { titulo: "Categorías", desc: "Organice el universo AUREA en familias: Anillos, Relojes, Lingotes y Edición limitada.", link: "/admin/categorias", cta: "GESTIONAR", icon: "⚙" },
+    { titulo: "Gestión de Cupones", desc: "Cree y administre promociones exclusivas para clientes.", link: "/admin/cupones", cta: "GESTIONAR CUPONES", icon: "🏷" },
 ];
 
 export default function AdminPanel() {

@@ -27,6 +27,7 @@ import AdminUsuarios from "./views/admin/AdminUsuarios";
 import AdminCategorias from "./views/admin/AdminCategorias";
 import AdminStock from "./views/admin/AdminStock";
 import AdminProductos from "./views/admin/AdminProductos";
+import AdminCupones from "./views/admin/AdminCupones";
 
 import "./App.css";
 
@@ -90,6 +91,7 @@ function AppRoutes() {
                 <Route path="/admin/categorias" element={<AdminRoute><AdminCategorias /></AdminRoute>} />
                 <Route path="/admin/stock" element={<AdminRoute><AdminStock /></AdminRoute>} />
                 <Route path="/admin/productos" element={<AdminRoute><AdminProductos /></AdminRoute>} />
+                <Route path="/admin/cupones" element={<AdminRoute><AdminCupones /></AdminRoute>} />
 
                 <Route path="/" element={<Layout><Home /></Layout>} />
                 <Route path="/producto/:id" element={<Layout><DetalleProducto /></Layout>} />

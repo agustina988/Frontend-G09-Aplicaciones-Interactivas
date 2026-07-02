@@ -14,6 +14,7 @@ export default function AdminNav() {
         { to: "/admin/categorias", label: "CATEGORÍAS" },
         { to: "/admin/stock", label: "STOCK" },
         { to: "/admin/productos", label: "NUEVO PRODUCTO" },
+        { to: "/admin/cupones", label: "CUPONES" },
     ];
 
     return (
