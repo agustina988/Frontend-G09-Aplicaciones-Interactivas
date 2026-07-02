@@ -19,14 +19,19 @@ export default function DetalleProducto() {
         nombre: productoBackend.nombre,
         precio: productoBackend.precio,
         categoria: productoBackend.categoriaSlug || "joyeria",
-        subcategoria: "",
-        imagenes: productoBackend.imagenUrl ? [productoBackend.imagenUrl] : [],
+        subcategoria: productoBackend.subcategoria || "",
+        imagenes: productoBackend.imagenes?.length ? productoBackend.imagenes : (productoBackend.imagenUrl ? [productoBackend.imagenUrl] : []),
         imagenUrl: productoBackend.imagenUrl || null,
-        badge: null,
+        badge: productoBackend.badge || null,
         descripcion: productoBackend.descripcion || "",
-        specs: { categoria: productoBackend.categoriaNombre || "" },
-        esencia: "",
-        caracteristicas: [],
+        specs: {
+            ...(productoBackend.composicionMaterial ? { material: productoBackend.composicionMaterial } : {}),
+            ...(productoBackend.peso ? { peso: productoBackend.peso } : {}),
+            ...(productoBackend.certificacion ? { certificacion: productoBackend.certificacion } : {}),
+            categoria: productoBackend.categoriaNombre || "",
+        },
+        esencia: productoBackend.esencia || "",
+        caracteristicas: productoBackend.caracteristicas || [],
     } : null;
 
     if (!producto) {

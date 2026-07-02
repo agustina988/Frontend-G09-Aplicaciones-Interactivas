@@ -7,22 +7,27 @@ import "./Home.css";
 export default function Home() {
     const { productosBackend } = useApp();
 
-    // Destacados: primeros 4 productos del catálogo (todo viene del backend)
+    // Destacados: primeros 4 productos del catálogo (todo viene del backend, sin inventar nada acá)
     const destacados = productosBackend.slice(0, 4).map((p) => ({
         id: p.id,
         nombre: p.nombre,
         precio: p.precio,
         categoria: p.categoriaSlug || "joyeria",
-        subcategoria: "",
+        subcategoria: p.subcategoria || "",
         material: p.materiales?.[0] || "—",
-        imagenes: p.imagenUrl ? [p.imagenUrl] : [],
+        imagenes: p.imagenes?.length ? p.imagenes : (p.imagenUrl ? [p.imagenUrl] : []),
         imagenUrl: p.imagenUrl || null,
-        badge: null,
-        exclusivo: false,
+        badge: p.badge || null,
+        exclusivo: !!p.badge,
         descripcion: p.descripcion || "",
-        specs: { categoria: p.categoriaNombre || "" },
-        esencia: "",
-        caracteristicas: [],
+        specs: {
+            ...(p.composicionMaterial ? { material: p.composicionMaterial } : {}),
+            ...(p.peso ? { peso: p.peso } : {}),
+            ...(p.certificacion ? { certificacion: p.certificacion } : {}),
+            categoria: p.categoriaNombre || "",
+        },
+        esencia: p.esencia || "",
+        caracteristicas: p.caracteristicas || [],
         esNuevo: false,
     }));
 

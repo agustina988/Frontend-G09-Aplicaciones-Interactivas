@@ -31,14 +31,10 @@ const categorias = {
 };
 
 export default function Productos({ categoria }) {
-    console.log(categoria)
     const location = useLocation();
     const info = categorias[categoria];
     const subcatInicial = location.state?.subcategoria || null;
     const { productosBackend, productosStock } = useApp();
-console.log(info)
-    console.log(productosBackend, 'mati')
-    console.log(productosStock, 'guada')
 
     const [subcat, setSubcat] = useState(subcatInicial);
     const [materiales, setMateriales] = useState([]);
@@ -56,18 +52,21 @@ console.log(info)
                 categoria,
                 subcategoria: p.subcategoria || "",
                 material: p.materiales?.[0] || "—",
-                imagenes: p.imagenUrl ? [p.imagenUrl] : [],
+                imagenes: p.imagenes?.length ? p.imagenes : (p.imagenUrl ? [p.imagenUrl] : []),
                 imagen: p.imagenUrl || null,
-                badge: null,
-                exclusivo: false,
+                badge: p.badge || null,
+                exclusivo: !!p.badge,
                 descripcion: p.descripcion || "",
-                specs: { categoria: p.categoriaNombre || info?.titulo || categoria },
-                esencia: "",
-                caracteristicas: [],
+                specs: {
+                    ...(p.composicionMaterial ? { material: p.composicionMaterial } : {}),
+                    ...(p.peso ? { peso: p.peso } : {}),
+                    ...(p.certificacion ? { certificacion: p.certificacion } : {}),
+                    categoria: p.categoriaNombre || info?.titulo || categoria,
+                },
+                esencia: p.esencia || "",
+                caracteristicas: p.caracteristicas || [],
             };
         });
-
-        console.log('todos', todosLosProdsCat)
 
     const maxPrecioReal = todosLosProdsCat.length > 0
         ? Math.max(...todosLosProdsCat.map((p) => p.precio))

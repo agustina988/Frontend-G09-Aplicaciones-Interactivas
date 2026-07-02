@@ -12,6 +12,7 @@ import {
 
 const AppContext = createContext();
 
+// Favoritos: por ahora se persisten en localStorage (a futuro pasan a Redux).
 const cargarFavoritosGuardados = () => {
     try {
         const raw = localStorage.getItem("favoritos");
@@ -22,6 +23,9 @@ const cargarFavoritosGuardados = () => {
 };
 
 export function AppProvider({ children }) {
+    // El token es la fuente de verdad estable: se inicializa leyendo localStorage
+    // una sola vez, y todo lo que dependa de "¿hay sesión?" debe mirar esto,
+    // no el objeto `usuario` (que cambia de referencia en cada actualización).
     const [token, setToken] = useState(() => localStorage.getItem("token"));
     const [usuario, setUsuario] = useState(null);
     const [carrito, setCarrito] = useState([]);
@@ -49,6 +53,9 @@ export function AppProvider({ children }) {
         setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3400);
     }, []);
 
+    // Sincronizar productos y estado del backend al montar (catálogo público).
+    // Corre UNA sola vez: nunca debe volver a pedir todos los productos por
+    // filtrar, agregar a favoritos, o loguearse. Solo un F5 real dispara esto de nuevo.
     useEffect(() => {
         getProductosAPI()
             .then((data) => {
@@ -64,7 +71,18 @@ export function AppProvider({ children }) {
                     categoriaSlug: b.categoria?.slug || "",
                     subcategoria: b.subcategoria || "",
                     materiales: b.materiales?.map((m) => m.nombre) || [],
+                    // Todas las imágenes (portada primero), no solo la primera
+                    imagenes: (b.imagenes || [])
+                        .slice()
+                        .sort((x, y) => (y.esPrincipal ? 1 : 0) - (x.esPrincipal ? 1 : 0))
+                        .map((img) => img.url),
                     imagenUrl: b.imagenes?.[0]?.url || null,
+                    badge: b.badge || null,
+                    peso: b.peso || "",
+                    certificacion: b.certificacion || "",
+                    composicionMaterial: b.composicionMaterial || "",
+                    esencia: b.esencia || "",
+                    caracteristicas: (b.caracteristicas || []).map((c) => ({ titulo: c.titulo, texto: c.texto })),
                 })));
                 setProductosStock(data.map((b) => ({
                     id: b.id,
@@ -79,10 +97,12 @@ export function AppProvider({ children }) {
             .catch(() => setBackendOnline(false));
     }, []);
 
+    // Persistir favoritos en localStorage cada vez que cambian
     useEffect(() => {
         localStorage.setItem("favoritos", JSON.stringify(favoritos));
     }, [favoritos]);
 
+    // Cargar carrito del backend — depende del token (estable), no de `usuario`
     useEffect(() => {
         if (!token || usuario?.rol === "ROLE_ADMIN") return;
         getCarritoAPI()
@@ -106,6 +126,7 @@ export function AppProvider({ children }) {
             .catch(() => {});
     }, [token]);
 
+    // Cargar pedidos del admin — depende del token, no de `usuario`
     useEffect(() => {
         if (!token || usuario?.rol !== "ROLE_ADMIN") return;
         getPedidosAPI()
@@ -126,6 +147,7 @@ export function AppProvider({ children }) {
     }, [token, usuario?.rol]);
 
     const login = (datos) => {
+        // datos viene del backend ya completo
         setToken(localStorage.getItem("token"));
         setUsuario(datos);
         return { ok: true };
@@ -190,12 +212,14 @@ export function AppProvider({ children }) {
         const carritoSnapshot = [...carrito];
         const totalSnapshot = total;
 
+        // 1. Confirmar compra en backend (descuenta stock y vacía carrito)
         if (token && !esAdmin) {
             try {
                 await confirmarCarritoAPI();
             } catch (err) { console.error("Error confirmando compra:", err); }
         }
 
+        // 2. Guardar pedido en backend
         let pedidoBackend = null;
         if (token) {
             try {
@@ -224,11 +248,13 @@ export function AppProvider({ children }) {
             direccion: datosEnvio?.direccion || usuario?.direccion || "",
         };
 
+        // 3. Restar stock local
         setProductosStock((prev) => prev.map((p) => {
             const comprado = carritoSnapshot.find((c) => c.id === p.id);
             return comprado ? { ...p, stock: Math.max(0, p.stock - comprado.cantidad) } : p;
         }));
 
+        // 4. Actualizar pedidos del usuario en estado local
         if (usuario) {
             setUsuario((prev) => ({
                 ...prev,
