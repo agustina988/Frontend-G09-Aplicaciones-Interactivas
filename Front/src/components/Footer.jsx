@@ -67,23 +67,23 @@ export default function Footer() {
                 </div>
                 <div className="footer-col">
                     <p className="footer-col-title">COLECCIONES</p>
-                    <Link to="/joyeria">Anillos</Link>
-                    <Link to="/joyeria">Collares</Link>
+                    <Link to="/joyeria">Joyería</Link>
+                    <Link to="/relojes">Relojes</Link>
                     <Link to="/lingotes">Lingotes de Oro</Link>
                 </div>
                 <div className="footer-col">
                     <p className="footer-col-title">INVERSIÓN</p>
-                    <a href="#">Precios en Vivo</a>
-                    <a href="#">Bóveda Segura</a>
-                    <a href="#">Abastecimiento Ético</a>
-                    <a href="#">Análisis de Mercado</a>
+                    <Link to="/informacion/precios">Precios en Vivo</Link>
+                    <Link to="/informacion/boveda">Bóveda Segura</Link>
+                    <Link to="/informacion/abastecimiento">Abastecimiento Ético</Link>
+                    <Link to="/informacion/mercado">Análisis de Mercado</Link>
                 </div>
                 <div className="footer-col">
                     <p className="footer-col-title">SOPORTE</p>
-                    <a href="#">Política de Privacidad</a>
-                    <a href="#">Términos de Servicio</a>
-                    <a href="#">Contáctenos</a>
-                    <a href="#">Envíos y Devoluciones</a>
+                    <Link to="/informacion/privacidad">Política de Privacidad</Link>
+                    <Link to="/informacion/terminos">Términos de Servicio</Link>
+                    <Link to="/informacion/contacto">Contáctenos</Link>
+                    <Link to="/informacion/envios">Envíos y Devoluciones</Link>
                 </div>
             </div>
 

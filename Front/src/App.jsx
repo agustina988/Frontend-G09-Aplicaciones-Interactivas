@@ -18,6 +18,7 @@ import Carrito from "./views/Carrito";
 import Checkout from "./views/Checkout";
 import Confirmacion from "./views/Confirmacion";
 import VenderLingote from "./views/VenderLingote";
+import Informacion from "./views/Informacion";
 
 import LoginAdmin from "./views/admin/LoginAdmin";
 import AdminPanel from "./views/admin/AdminPanel";
@@ -93,6 +94,7 @@ function AppRoutes() {
                 <Route path="/" element={<Layout><Home /></Layout>} />
                 <Route path="/producto/:id" element={<Layout><DetalleProducto /></Layout>} />
                 <Route path="/vender-lingote" element={<Layout><VenderLingote /></Layout>} />
+                <Route path="/informacion/:tipo" element={<Layout><Informacion /></Layout>} />
 
                 <Route path="/joyeria" element={<Layout><Productos key="joyeria" categoria="joyeria" /></Layout>} />
                 <Route path="/relojes" element={<Layout><Productos key="relojes" categoria="relojes" /></Layout>} />
