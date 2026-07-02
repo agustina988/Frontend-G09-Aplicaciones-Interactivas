@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUsuarios } from "../../features/usuarios/usuariosSlice";
-import { fetchPedidos } from "../../features/pedidos/pedidosSlice";
 import AdminNav from "./AdminNav";
 import "./AdminUsuarios.css";
 
@@ -11,17 +10,12 @@ export default function AdminUsuarios() {
     const usuariosBackend = useSelector((state) => state.usuarios.items);
     const cargando = useSelector((state) => state.usuarios.loading);
     const errorConexion = useSelector((state) => state.usuarios.error);
-    const pedidosBackend = useSelector((state) => state.pedidos.adminList);
     const [busqueda, setBusqueda] = useState("");
     const [modalUsuario, setModalUsuario] = useState(null);
     const [modalTipo, setModalTipo] = useState(null);
-    const tablaRef = useRef(null);
 
     useEffect(() => {
-        if (token) {
-            dispatch(fetchUsuarios());
-            dispatch(fetchPedidos());
-        }
+        if (token) dispatch(fetchUsuarios());
     }, [token, dispatch]);
 
     const lista = usuariosBackend.map((u) => ({
@@ -29,14 +23,7 @@ export default function AdminUsuarios() {
         email: u.email,
         miembro: u.roles?.some(r => r.nombre === "ROLE_ADMIN") ? "ADMINISTRADOR" : "MEMBER",
         acceso: "Registrado",
-        pedidos: pedidosBackend
-            .filter((p) => p.emailUsuario === u.email)
-            .map((p) => ({
-                id: `#${p.id}`,
-                producto: p.detalles?.map((d) => d.nombreProducto).join(", ") || `Pedido #${p.id}`,
-                fecha: p.fechaPedido,
-                precio: p.total,
-            })),
+        pedidos: [],
     }));
 
     const filtrados = lista.filter(
@@ -83,15 +70,6 @@ export default function AdminUsuarios() {
                         <p className="admin-usuarios-stat-val">{lista.filter(u => u.miembro === "ELITE MEMBER").length}</p>
                         <p className="admin-usuarios-stat-sub">ACTIVOS AHORA</p>
                     </div>
-                    <div className="admin-usuarios-stat">
-                        <p className="admin-usuarios-stat-label">SOLICITUDES PENDIENTES</p>
-                        <p className="admin-usuarios-stat-val rojo">{lista.length}</p>
-                        <button
-                            className="admin-btn-primary"
-                            style={{ marginTop: "0.5rem", padding: "6px 16px", fontSize: "12px" }}
-                            onClick={() => tablaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                        >REVISAR</button>
-                    </div>
                 </div>
 
                 {cargando ? (
@@ -103,7 +81,7 @@ export default function AdminUsuarios() {
                         <p>No hay usuarios registrados todavía.</p>
                     </div>
                 ) : (
-                    <div className="admin-tabla" ref={tablaRef}>
+                    <div className="admin-tabla">
                         <div className="admin-tabla-header" style={{ gridTemplateColumns: "1fr 140px 200px 150px" }}>
                             <span>USUARIO</span><span>ROL</span><span>ÚLTIMO ACCESO</span><span>ACCIONES</span>
                         </div>
