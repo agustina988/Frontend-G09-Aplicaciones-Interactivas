@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUsuarios } from "../../features/usuarios/usuariosSlice";
+import { fetchPedidos } from "../../features/pedidos/pedidosSlice";
 import AdminNav from "./AdminNav";
 import "./AdminUsuarios.css";
 
@@ -10,12 +11,16 @@ export default function AdminUsuarios() {
     const usuariosBackend = useSelector((state) => state.usuarios.items);
     const cargando = useSelector((state) => state.usuarios.loading);
     const errorConexion = useSelector((state) => state.usuarios.error);
+    const pedidosBackend = useSelector((state) => state.pedidos.adminList);
     const [busqueda, setBusqueda] = useState("");
     const [modalUsuario, setModalUsuario] = useState(null);
     const [modalTipo, setModalTipo] = useState(null);
 
     useEffect(() => {
-        if (token) dispatch(fetchUsuarios());
+        if (token) {
+            dispatch(fetchUsuarios());
+            dispatch(fetchPedidos());
+        }
     }, [token, dispatch]);
 
     const lista = usuariosBackend.map((u) => ({
@@ -23,7 +28,14 @@ export default function AdminUsuarios() {
         email: u.email,
         miembro: u.roles?.some(r => r.nombre === "ROLE_ADMIN") ? "ADMINISTRADOR" : "MEMBER",
         acceso: "Registrado",
-        pedidos: [],
+        pedidos: pedidosBackend
+            .filter((p) => p.emailUsuario === u.email)
+            .map((p) => ({
+                id: `#${p.id}`,
+                producto: `Pedido #${p.id} · ${p.estado}`,
+                fecha: p.fechaPedido,
+                precio: p.total,
+            })),
     }));
 
     const filtrados = lista.filter(
