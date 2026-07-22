@@ -11,6 +11,7 @@ export default function ProductCard({ producto }) {
     const usuario = useSelector((state) => state.auth.usuario);
     const favoritos = useSelector((state) => state.favoritos.items);
     const productos = useSelector((state) => state.productos.items);
+    const esAdmin = usuario?.rol === "ROLE_ADMIN";
     const fav = favoritos.some((p) => p.id === producto.id);
 
     const imagen = producto.imagenes?.[0] || producto.imagenUrl || producto.imagen || null;
@@ -77,7 +78,11 @@ export default function ProductCard({ producto }) {
             <div className="product-card-info">
                 <p className="product-card-name">{producto.nombre}</p>
                 <p className="product-card-price">$ {producto.precio.toLocaleString("es-AR")}</p>
-                {sinStock ? (
+                {esAdmin ? (
+                    <button className="product-card-btn product-card-btn--nodisponible" disabled>
+                        No disponible para admins
+                    </button>
+                ) : sinStock ? (
                     <button className="product-card-btn product-card-btn--nodisponible" disabled>
                         NO DISPONIBLE
                     </button>

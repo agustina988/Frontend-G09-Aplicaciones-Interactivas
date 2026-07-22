@@ -39,6 +39,7 @@ export default function Checkout() {
     const dispatch = useDispatch();
     const carrito = useSelector((state) => state.carrito.items);
     const usuario = useSelector((state) => state.auth.usuario);
+    const esAdmin = usuario?.rol === "ROLE_ADMIN";
     const cupon = useSelector((state) => state.cupones.cuponAplicado);
     const subtotal = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
     const descuentoCupon = cupon ? Math.round(subtotal * cupon.descuento / 100) : 0;
@@ -93,6 +94,8 @@ export default function Checkout() {
     };
 
     if (carrito.length === 0) { navigate("/carrito"); return null; }
+
+    if (esAdmin) { navigate("/carrito"); return null; }
 
     return (
         <div className="checkout-page">

@@ -109,13 +109,22 @@ export default function Navigation() {
                         {favoritos.length > 0 && <span className="nav-badge">{favoritos.length}</span>}
                     </Link>
 
-                    <Link to="/carrito" className="nav-icon-btn" aria-label="Carrito">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                        </svg>
-                        {totalCarrito > 0 && <span className="nav-badge">{totalCarrito}</span>}
-                    </Link>
+                    {esAdmin ? (
+                        <span className="nav-icon-btn nav-icon-disabled" aria-label="Carrito desabilitado para admins" title="El carrito no está disponible para administradores">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                            </svg>
+                        </span>
+                    ) : (
+                        <Link to="/carrito" className="nav-icon-btn" aria-label="Carrito">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                            </svg>
+                            {totalCarrito > 0 && <span className="nav-badge">{totalCarrito}</span>}
+                        </Link>
+                    )}
 
                     {usuario ? (
                         <Link to="/perfil" className="nav-icon-btn nav-icon-logueado" aria-label="Mi perfil" title={`Hola, ${usuario.nombre}`}>

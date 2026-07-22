@@ -6,9 +6,30 @@ import "./Carrito.css";
 
 export default function Carrito() {
     const dispatch = useDispatch();
+    const usuario = useSelector((state) => state.auth.usuario);
+    const esAdmin = usuario?.rol === "ROLE_ADMIN";
     const carrito = useSelector((state) => state.carrito.items);
     const subtotal = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
     const navigate = useNavigate();
+
+    if (esAdmin) {
+        return (
+            <div className="carrito-page">
+                <div className="carrito-inner">
+                    <h1 className="carrito-title">Tu Selección</h1>
+                    <div className="carrito-empty">
+                        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth="1.2">
+                            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                        <p>Los administradores no pueden usar el carrito de compras.</p>
+                        <Link to="/admin" className="carrito-cta">Ir al panel de administración</Link>
+                    </div>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
 
     return (
         <div className="carrito-page">

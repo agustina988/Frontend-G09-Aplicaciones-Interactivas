@@ -60,6 +60,7 @@ export default function DetalleProducto() {
         claseStock = "detalle-disponible ultimas";
     }
 
+    const esAdmin = usuario?.rol === "ROLE_ADMIN";
     const fav = favoritos.some((p) => p.id === producto.id);
     const categoriaPath = producto.categoria;
     const categoriaLabel = {
@@ -186,7 +187,11 @@ export default function DetalleProducto() {
                         )}
 
                         <div className="detalle-btns">
-                            {sinStock ? (
+                            {esAdmin ? (
+                                <button className="detalle-btn-carrito detalle-btn-nodisponible" disabled>
+                                    No disponible para admins
+                                </button>
+                            ) : sinStock ? (
                                 <button className="detalle-btn-carrito detalle-btn-nodisponible" disabled>
                                     NO DISPONIBLE
                                 </button>
