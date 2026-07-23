@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { cambiarEstadoPedido } from "../../features/pedidos/pedidosSlice";
+import { setAdminPedidosBusqueda } from "../../features/filtros/filtrosSlice";
 import AdminNav from "./AdminNav";
 import "./AdminPedidos.css";
 
@@ -11,7 +12,11 @@ export default function AdminPedidos() {
     const pedidosRaw = useSelector((state) => state.pedidos.adminList);
     const cargando = useSelector((state) => state.pedidos.loading);
     const errorConexion = useSelector((state) => state.pedidos.error);
-    const [busqueda, setBusqueda] = useState("");
+
+    // Antes: useState(""). Ahora vive en la slice `filtros`.
+    const busqueda = useSelector((state) => state.filtros.adminPedidosBusqueda);
+
+    // Esto sí queda local: es solo UI (qué pedido tiene el modal de detalle abierto).
     const [pedidoDetalle, setPedidoDetalle] = useState(null);
 
     const pedidosAdmin = pedidosRaw.map((p) => ({
@@ -47,7 +52,7 @@ export default function AdminPedidos() {
                     </div>
                     <div className="admin-pedidos-search">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                        <input placeholder="Buscar pedidos..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
+                        <input placeholder="Buscar pedidos..." value={busqueda} onChange={(e) => dispatch(setAdminPedidosBusqueda(e.target.value))} />
                     </div>
                 </div>
 

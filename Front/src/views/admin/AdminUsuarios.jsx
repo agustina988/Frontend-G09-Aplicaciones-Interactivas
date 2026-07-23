@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUsuarios } from "../../features/usuarios/usuariosSlice";
+import { setAdminUsuariosBusqueda } from "../../features/filtros/filtrosSlice";
 import AdminNav from "./AdminNav";
 import "./AdminUsuarios.css";
 
@@ -14,7 +15,11 @@ export default function AdminUsuarios() {
     // Los pedidos ya los pide App.jsx una sola vez al loguearse como admin;
     // acá solo se leen del store, no se vuelven a gettear.
     const pedidosBackend = useSelector((state) => state.pedidos.adminList);
-    const [busqueda, setBusqueda] = useState("");
+
+    // Antes: useState(""). Ahora vive en la slice `filtros`.
+    const busqueda = useSelector((state) => state.filtros.adminUsuariosBusqueda);
+
+    // Esto sí queda local: es solo UI (qué modal está abierto y de quién).
     const [modalUsuario, setModalUsuario] = useState(null);
     const [modalTipo, setModalTipo] = useState(null);
 
@@ -60,7 +65,7 @@ export default function AdminUsuarios() {
                     </div>
                     <div className="admin-pedidos-search">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                        <input placeholder="Buscar por nombre o rol..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
+                        <input placeholder="Buscar por nombre o rol..." value={busqueda} onChange={(e) => dispatch(setAdminUsuariosBusqueda(e.target.value))} />
                     </div>
                 </div>
 

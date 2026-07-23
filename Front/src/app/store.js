@@ -1,10 +1,4 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import {
-    persistStore,
-    persistReducer,
-    FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER,
-} from "redux-persist";
-import storage from "redux-persist/lib/storage";
 
 import authReducer from "../features/auth/authSlice";
 import productosReducer from "../features/productos/productosSlice";
@@ -18,6 +12,10 @@ import filtrosReducer from "../features/filtros/filtrosSlice";
 import uiReducer from "../features/ui/toastSlice";
 import { setTokenGetter } from "./axiosInstance";
 
+// Antes: el rootReducer se envolvía con persistReducer (redux-persist),
+// que guardaba "auth" y "favoritos" en localStorage por debajo.
+// Ahora: ni Context, ni localStorage. Todo el estado vive únicamente
+// en memoria, adentro del store de Redux, tal como pidió la profe.
 const rootReducer = combineReducers({
     auth: authReducer,
     productos: productosReducer,
@@ -31,24 +29,8 @@ const rootReducer = combineReducers({
     ui: uiReducer,
 });
 
-const persistConfig = {
-    key: "aurea-root",
-    storage,
-    whitelist: ["auth", "favoritos"],
-};
-
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
 export const store = configureStore({
-    reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: {
-                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-            },
-        }),
+    reducer: rootReducer,
 });
 
 setTokenGetter(() => store.getState().auth.token);
-
-export const persistor = persistStore(store);
