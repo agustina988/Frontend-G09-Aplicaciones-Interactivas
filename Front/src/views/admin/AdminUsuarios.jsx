@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUsuarios } from "../../features/usuarios/usuariosSlice";
-import { fetchPedidos } from "../../features/pedidos/pedidosSlice";
 import AdminNav from "./AdminNav";
 import "./AdminUsuarios.css";
 
@@ -10,18 +9,22 @@ export default function AdminUsuarios() {
     const token = useSelector((state) => state.auth.token);
     const usuariosBackend = useSelector((state) => state.usuarios.items);
     const cargando = useSelector((state) => state.usuarios.loading);
+    const cargadoUsuarios = useSelector((state) => state.usuarios.cargado);
     const errorConexion = useSelector((state) => state.usuarios.error);
+    // Los pedidos ya los pide App.jsx una sola vez al loguearse como admin;
+    // acá solo se leen del store, no se vuelven a gettear.
     const pedidosBackend = useSelector((state) => state.pedidos.adminList);
     const [busqueda, setBusqueda] = useState("");
     const [modalUsuario, setModalUsuario] = useState(null);
     const [modalTipo, setModalTipo] = useState(null);
 
     useEffect(() => {
-        if (token) {
+        // Se pide una única vez: si ya está cargado, entrar y salir de esta
+        // pestaña no vuelve a llamar al backend.
+        if (token && !cargadoUsuarios) {
             dispatch(fetchUsuarios());
-            dispatch(fetchPedidos());
         }
-    }, [token, dispatch]);
+    }, [token, cargadoUsuarios, dispatch]);
 
     const lista = usuariosBackend.map((u) => ({
         nombre: u.email.split("@")[0],

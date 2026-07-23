@@ -11,7 +11,7 @@ const FORM_VACIO = {
     stock: "",
     idCategoria: "",
     subcategoria: "",
-    imagenUrl: "",
+    imagenes: [],
 };
 
 export default function AdminProductos() {
@@ -23,6 +23,7 @@ export default function AdminProductos() {
         imagen: p.imagenUrl || "/src/assets/placeholder.jpg",
     }));
     const [form, setForm] = useState(FORM_VACIO);
+    const [nuevaImagenUrl, setNuevaImagenUrl] = useState("");
     const [error, setError] = useState("");
     const [exito, setExito] = useState("");
     const [cargando, setCargando] = useState(false);
@@ -30,10 +31,22 @@ export default function AdminProductos() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (name === "imagenUrl") setImgError(false);
         setForm((prev) => ({ ...prev, [name]: value }));
         setError("");
         setExito("");
+    };
+
+    const agregarImagen = () => {
+        const url = nuevaImagenUrl.trim();
+        if (!url) return;
+        if (form.imagenes.includes(url)) { setNuevaImagenUrl(""); return; }
+        setForm((prev) => ({ ...prev, imagenes: [...prev.imagenes, url] }));
+        setNuevaImagenUrl("");
+        setImgError(false);
+    };
+
+    const quitarImagen = (url) => {
+        setForm((prev) => ({ ...prev, imagenes: prev.imagenes.filter((i) => i !== url) }));
     };
 
     const handleSubmit = async (e) => {
@@ -77,17 +90,23 @@ export default function AdminProductos() {
 
         const productoCreado = resultado.payload;
 
-        if (form.imagenUrl) {
-            await dispatch(crearImagenProducto({ productoId: productoCreado.id, url: form.imagenUrl }));
+        if (form.imagenes.length > 0) {
+            for (let i = 0; i < form.imagenes.length; i++) {
+                await dispatch(crearImagenProducto({
+                    productoId: productoCreado.id,
+                    url: form.imagenes[i],
+                    esPrincipal: i === 0,
+                }));
+            }
         }
 
         setExito(`"${productoCreado.nombre}" creado correctamente en la base de datos.`);
         setForm(FORM_VACIO);
+        setNuevaImagenUrl("");
         setImgError(false);
         setCargando(false);
     };
 
-    const imagenPreview = form.imagenUrl && !imgError ? form.imagenUrl : null;
     const categoriaPreview = categoriasAdmin.find((c) => String(c.id) === String(form.idCategoria))?.nombre;
 
     return (
@@ -185,7 +204,7 @@ export default function AdminProductos() {
                             </div>
 
                             <div className="admin-form-group">
-                                <label>URL DE IMAGEN (opcional)</label>
+                                <label>IMÁGENES (opcional, podés cargar varias)</label>
                                 <div className="admin-form-url-wrap">
                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a8580" strokeWidth="1.8">
                                         <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
@@ -193,20 +212,52 @@ export default function AdminProductos() {
                                     </svg>
                                     <input
                                         type="url"
-                                        name="imagenUrl"
-                                        value={form.imagenUrl}
-                                        onChange={handleChange}
+                                        value={nuevaImagenUrl}
+                                        onChange={(e) => { setNuevaImagenUrl(e.target.value); setImgError(false); }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") { e.preventDefault(); agregarImagen(); }
+                                        }}
                                         placeholder="https://ejemplo.com/imagen.jpg"
                                     />
+                                    <button
+                                        type="button"
+                                        className="admin-btn-primary"
+                                        style={{ padding: "8px 16px", fontSize: "12px", whiteSpace: "nowrap" }}
+                                        onClick={agregarImagen}
+                                    >
+                                        AGREGAR
+                                    </button>
                                 </div>
-                                {form.imagenUrl && imgError && (
-                                    <span style={{ fontSize: "12px", color: "#c44" }}>
-                                        La URL no es una imagen válida
-                                    </span>
+                                {form.imagenes.length > 0 && (
+                                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "10px" }}>
+                                        {form.imagenes.map((url, i) => (
+                                            <div key={url} style={{ position: "relative", width: "64px", height: "64px" }}>
+                                                <img
+                                                    src={url}
+                                                    alt={`Imagen ${i + 1}`}
+                                                    onError={() => setImgError(true)}
+                                                    style={{ width: "100%", height: "100%", objectFit: "cover", border: i === 0 ? "2px solid #8b6914" : "1px solid #e0dbd0" }}
+                                                />
+                                                {i === 0 && (
+                                                    <span style={{ position: "absolute", bottom: "-8px", left: 0, right: 0, textAlign: "center", fontSize: "9px", color: "#8b6914", background: "#fff" }}>
+                                                        PRINCIPAL
+                                                    </span>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => quitarImagen(url)}
+                                                    aria-label="Quitar imagen"
+                                                    style={{ position: "absolute", top: "-8px", right: "-8px", width: "20px", height: "20px", borderRadius: "50%", background: "#c44", color: "#fff", border: "none", cursor: "pointer", fontSize: "12px", lineHeight: 1 }}
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
-                                {form.imagenUrl && !imgError && (
-                                    <span style={{ fontSize: "12px", color: "#5a8a5a" }}>
-                                        ✓ Imagen cargada en la vista previa
+                                {imgError && (
+                                    <span style={{ fontSize: "12px", color: "#c44" }}>
+                                        Alguna de las URLs no es una imagen válida
                                     </span>
                                 )}
                             </div>
@@ -248,11 +299,10 @@ export default function AdminProductos() {
                         <p className="admin-preview-titulo">VISTA PREVIA</p>
                         <div className="admin-preview-card">
                             <div className="admin-preview-img">
-                                {imagenPreview ? (
+                                {form.imagenes[0] ? (
                                     <img
-                                        src={imagenPreview}
+                                        src={form.imagenes[0]}
                                         alt="preview"
-                                        onError={() => setImgError(true)}
                                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                                     />
                                 ) : (

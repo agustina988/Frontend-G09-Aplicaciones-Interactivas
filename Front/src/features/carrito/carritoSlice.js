@@ -41,6 +41,45 @@ export const agregarAlCarrito = createAsyncThunk(
     }
 );
 
+// Cambia la cantidad de un producto ya agregado. Actualiza el estado local
+// al toque para que se sienta instantáneo, y en paralelo avisa al backend
+// (PUT /carrito/item/:id, igual patrón que el PUT /productos/:id/stock del admin)
+// para que la cantidad quede persistida ahí también.
+export const cambiarCantidad = createAsyncThunk(
+    "carrito/cambiarCantidad",
+    async ({ id, cantidad }, { dispatch, getState, rejectWithValue }) => {
+        if (cantidad < 1) return { id, cantidad };
+        dispatch(carritoSlice.actions.cambiarCantidadLocal({ id, cantidad }));
+
+        const { token, usuario } = getState().auth;
+        if (token && usuario?.rol !== "ROLE_ADMIN") {
+            try {
+                await axiosInstance.put(`/carrito/item/${id}`, { cantidad });
+            } catch (err) {
+                return rejectWithValue(err.response?.data || "No se pudo actualizar la cantidad");
+            }
+        }
+        return { id, cantidad };
+    }
+);
+
+export const quitarDelCarrito = createAsyncThunk(
+    "carrito/quitarDelCarrito",
+    async (id, { dispatch, getState, rejectWithValue }) => {
+        dispatch(carritoSlice.actions.quitarDelCarritoLocal(id));
+
+        const { token, usuario } = getState().auth;
+        if (token && usuario?.rol !== "ROLE_ADMIN") {
+            try {
+                await axiosInstance.delete(`/carrito/item/${id}`);
+            } catch (err) {
+                return rejectWithValue(err.response?.data || "No se pudo eliminar el producto del carrito");
+            }
+        }
+        return id;
+    }
+);
+
 export const vaciarCarrito = createAsyncThunk("carrito/vaciarCarrito", async (_, { dispatch, getState, rejectWithValue }) => {
     dispatch(carritoSlice.actions.vaciarCarritoLocal());
     const { token, usuario } = getState().auth;
@@ -80,10 +119,10 @@ const carritoSlice = createSlice({
             if (existe) existe.cantidad += 1;
             else state.items.push({ ...producto, cantidad: 1 });
         },
-        quitarDelCarrito: (state, action) => {
+        quitarDelCarritoLocal: (state, action) => {
             state.items = state.items.filter((p) => p.id !== action.payload);
         },
-        cambiarCantidad: (state, action) => {
+        cambiarCantidadLocal: (state, action) => {
             const { id, cantidad } = action.payload;
             if (cantidad < 1) return;
             const item = state.items.find((p) => p.id === id);
@@ -110,5 +149,4 @@ const carritoSlice = createSlice({
     },
 });
 
-export const { quitarDelCarrito, cambiarCantidad } = carritoSlice.actions;
 export default carritoSlice.reducer;

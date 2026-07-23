@@ -78,11 +78,7 @@ export default function ProductCard({ producto }) {
             <div className="product-card-info">
                 <p className="product-card-name">{producto.nombre}</p>
                 <p className="product-card-price">$ {producto.precio.toLocaleString("es-AR")}</p>
-                {esAdmin ? (
-                    <button className="product-card-btn product-card-btn--nodisponible" disabled>
-                        No disponible para admins
-                    </button>
-                ) : sinStock ? (
+                {esAdmin ? null : sinStock ? (
                     <button className="product-card-btn product-card-btn--nodisponible" disabled>
                         NO DISPONIBLE
                     </button>

@@ -14,6 +14,7 @@ import favoritosReducer from "../features/favoritos/favoritosSlice";
 import cuponesReducer from "../features/cupones/cuponesSlice";
 import pedidosReducer from "../features/pedidos/pedidosSlice";
 import usuariosReducer from "../features/usuarios/usuariosSlice";
+import filtrosReducer from "../features/filtros/filtrosSlice";
 import uiReducer from "../features/ui/toastSlice";
 import { setTokenGetter } from "./axiosInstance";
 
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
     cupones: cuponesReducer,
     pedidos: pedidosReducer,
     usuarios: usuariosReducer,
+    filtros: filtrosReducer,
     ui: uiReducer,
 });
 

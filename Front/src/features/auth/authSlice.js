@@ -45,11 +45,13 @@ const authSlice = createSlice({
         usuario: null,
         loading: false,
         error: null,
+        perfilCargado: false,
     },
     reducers: {
         logout: (state) => {
             state.token = null;
             state.usuario = null;
+            state.perfilCargado = false;
         },
     },
     extraReducers: (builder) => {
@@ -107,6 +109,10 @@ const authSlice = createSlice({
                     state.usuario.telefono = action.payload.telefono || state.usuario.telefono;
                     state.usuario.direccion = action.payload.direccion || state.usuario.direccion;
                 }
+                state.perfilCargado = true;
+            })
+            .addCase(fetchPerfil.rejected, (state) => {
+                state.perfilCargado = true;
             })
             // PERFIL (PUT)
             .addCase(actualizarPerfil.fulfilled, (state, action) => {

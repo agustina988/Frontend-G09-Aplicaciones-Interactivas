@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Footer from "../components/Footer";
@@ -6,6 +6,7 @@ import "./DetalleProducto.css";
 import Swal from "sweetalert2";
 import { agregarAlCarrito } from "../features/carrito/carritoSlice";
 import { toggleFavorito } from "../features/favoritos/favoritosSlice";
+import { fetchProductoPorId } from "../features/productos/productosSlice";
 
 export default function DetalleProducto() {
     const { id } = useParams();
@@ -13,12 +14,23 @@ export default function DetalleProducto() {
     const navigate = useNavigate();
     const usuario = useSelector((state) => state.auth.usuario);
     const favoritos = useSelector((state) => state.favoritos.items);
-    const productosBackend = useSelector((state) => state.productos.items);
+    const productoBackend = useSelector((state) => state.productos.productoActual);
+    const cargandoActual = useSelector((state) => state.productos.cargandoActual);
     const [imgActiva, setImgActiva] = useState(0);
 
-    const productoBackend = productosBackend.find((p) => p.id === Number(id));
+    // Cada vez que cambia el id de la URL, se vuelve a pedir el producto
+    // al backend por /productos/{id} — nunca se busca en la lista ya cargada,
+    // porque esa lista puede estar desactualizada (stock, precio, etc.).
+    useEffect(() => {
+        setImgActiva(0);
+        dispatch(fetchProductoPorId(id));
+    }, [id, dispatch]);
 
-    const producto = productoBackend ? {
+    if (cargandoActual && !productoBackend) {
+        return <div className="detalle-not-found"><p>Cargando producto...</p></div>;
+    }
+
+    const producto = productoBackend && productoBackend.id === Number(id) ? {
         id: productoBackend.id,
         nombre: productoBackend.nombre,
         precio: productoBackend.precio,
@@ -187,11 +199,7 @@ export default function DetalleProducto() {
                         )}
 
                         <div className="detalle-btns">
-                            {esAdmin ? (
-                                <button className="detalle-btn-carrito detalle-btn-nodisponible" disabled>
-                                    No disponible para admins
-                                </button>
-                            ) : sinStock ? (
+                            {esAdmin ? null : sinStock ? (
                                 <button className="detalle-btn-carrito detalle-btn-nodisponible" disabled>
                                     NO DISPONIBLE
                                 </button>

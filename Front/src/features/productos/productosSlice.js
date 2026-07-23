@@ -35,6 +35,17 @@ export const fetchProductos = createAsyncThunk("productos/fetchProductos", async
     }
 });
 
+// Se llama cada vez que se entra al detalle de un producto: SIEMPRE pega
+// contra /productos/{id} (no busca en la lista ya cargada en memoria).
+export const fetchProductoPorId = createAsyncThunk("productos/fetchProductoPorId", async (id, { rejectWithValue }) => {
+    try {
+        const { data } = await axiosInstance.get(`/productos/${id}`);
+        return mapearProducto(data);
+    } catch (err) {
+        return rejectWithValue(err.response?.data || "No se pudo cargar el producto");
+    }
+});
+
 export const crearProducto = createAsyncThunk("productos/crearProducto", async (datos, { rejectWithValue }) => {
     try {
         const { data } = await axiosInstance.post("/productos", datos);
@@ -44,14 +55,14 @@ export const crearProducto = createAsyncThunk("productos/crearProducto", async (
     }
 });
 
-export const crearImagenProducto = createAsyncThunk("productos/crearImagenProducto", async ({ productoId, url }, { rejectWithValue }) => {
+export const crearImagenProducto = createAsyncThunk("productos/crearImagenProducto", async ({ productoId, url, esPrincipal = false }, { rejectWithValue }) => {
     try {
         const { data } = await axiosInstance.post("/imagenes", {
             url,
-            esPrincipal: true,
+            esPrincipal,
             producto: { id: productoId },
         });
-        return { productoId, url: data.url };
+        return { productoId, url: data.url, esPrincipal };
     } catch (err) {
         return rejectWithValue(err.response?.data || "No se pudo guardar la imagen");
     }
@@ -82,6 +93,10 @@ const productosSlice = createSlice({
         loading: false,
         error: null,
         cargado: false,
+        // Detalle de producto pedido por id (vista DetalleProducto).
+        productoActual: null,
+        cargandoActual: false,
+        errorActual: null,
     },
     reducers: {
         restarStockLocal: (state, action) => {
@@ -107,14 +122,28 @@ const productosSlice = createSlice({
                 state.error = action.payload || action.error.message;
                 state.cargado = true;
             })
+            .addCase(fetchProductoPorId.pending, (state) => {
+                state.cargandoActual = true;
+                state.errorActual = null;
+            })
+            .addCase(fetchProductoPorId.fulfilled, (state, action) => {
+                state.cargandoActual = false;
+                state.productoActual = action.payload;
+            })
+            .addCase(fetchProductoPorId.rejected, (state, action) => {
+                state.cargandoActual = false;
+                state.productoActual = null;
+                state.errorActual = action.payload || action.error.message;
+            })
             .addCase(crearProducto.fulfilled, (state, action) => {
                 state.items.push(action.payload);
             })
             .addCase(crearImagenProducto.fulfilled, (state, action) => {
-                const p = state.items.find((i) => i.id === action.payload.productoId);
+                const { productoId, url, esPrincipal } = action.payload;
+                const p = state.items.find((i) => i.id === productoId);
                 if (p) {
-                    p.imagenUrl = action.payload.url;
-                    p.imagenes = [action.payload.url];
+                    p.imagenes = [...(p.imagenes || []), url];
+                    if (esPrincipal || !p.imagenUrl) p.imagenUrl = url;
                 }
             })
             .addCase(editarStockProducto.fulfilled, (state, action) => {

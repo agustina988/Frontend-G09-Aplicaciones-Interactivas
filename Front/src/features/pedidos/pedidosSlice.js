@@ -96,6 +96,8 @@ const pedidosSlice = createSlice({
         ultimoPedido: null,
         loading: false,
         error: null,
+        cargadoAdmin: false,
+        cargadoMisPedidos: false,
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -107,10 +109,12 @@ const pedidosSlice = createSlice({
             .addCase(fetchPedidos.fulfilled, (state, action) => {
                 state.loading = false;
                 state.adminList = action.payload;
+                state.cargadoAdmin = true;
             })
             .addCase(fetchPedidos.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || action.error.message;
+                state.cargadoAdmin = true;
             })
             .addCase(fetchMisPedidos.pending, (state) => {
                 state.loading = true;
@@ -119,10 +123,12 @@ const pedidosSlice = createSlice({
             .addCase(fetchMisPedidos.fulfilled, (state, action) => {
                 state.loading = false;
                 state.misPedidos = action.payload;
+                state.cargadoMisPedidos = true;
             })
             .addCase(fetchMisPedidos.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || action.error.message;
+                state.cargadoMisPedidos = true;
             })
             .addCase(cambiarEstadoPedido.fulfilled, (state, action) => {
                 const idx = state.adminList.findIndex((p) => p.id === action.payload.id);

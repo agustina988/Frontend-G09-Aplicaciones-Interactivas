@@ -52,6 +52,15 @@ function AdminRoute({ children }) {
     return children;
 }
 
+// El admin no compra: ni siquiera puede entrar a estas rutas navegando
+// directamente por URL. Nada de carrito, nada de checkout, nada de nada.
+function SinAdminRoute({ children }) {
+    const usuario = useSelector((state) => state.auth.usuario);
+    const esAdmin = usuario?.rol === "ROLE_ADMIN";
+    if (esAdmin) return <Navigate to="/admin" />;
+    return children;
+}
+
 function PrivateRoute({ children }) {
     const usuario = useSelector((state) => state.auth.usuario);
     const navigate = useNavigate();
@@ -107,11 +116,11 @@ function AppRoutes() {
                 <Route path="/lingotes" element={<Layout><Productos key="lingotes" categoria="lingotes" /></Layout>} />
                 <Route path="/edicion-limitada" element={<Layout><Productos key="edicion" categoria="edicion-limitada" /></Layout>} />
 
-                <Route path="/carrito" element={<Layout><PrivateRoute><Carrito /></PrivateRoute></Layout>} />
+                <Route path="/carrito" element={<Layout><PrivateRoute><SinAdminRoute><Carrito /></SinAdminRoute></PrivateRoute></Layout>} />
                 <Route path="/perfil" element={<Layout><PrivateRoute><Perfil /></PrivateRoute></Layout>} />
                 <Route path="/favoritos" element={<Layout><PrivateRoute><Favoritos /></PrivateRoute></Layout>} />
-                <Route path="/checkout" element={<Layout><PrivateRoute><Checkout /></PrivateRoute></Layout>} />
-                <Route path="/confirmacion" element={<Layout><PrivateRoute><Confirmacion /></PrivateRoute></Layout>} />
+                <Route path="/checkout" element={<Layout><PrivateRoute><SinAdminRoute><Checkout /></SinAdminRoute></PrivateRoute></Layout>} />
+                <Route path="/confirmacion" element={<Layout><PrivateRoute><SinAdminRoute><Confirmacion /></SinAdminRoute></PrivateRoute></Layout>} />
             </Routes>
         </>
     );
@@ -122,6 +131,7 @@ export default function App() {
     const cargado = useSelector((state) => state.productos.cargado);
     const token = useSelector((state) => state.auth.token);
     const rol = useSelector((state) => state.auth.usuario?.rol);
+    const cargadoAdmin = useSelector((state) => state.pedidos.cargadoAdmin);
 
     useEffect(() => {
         if (!cargado) {
@@ -135,8 +145,10 @@ export default function App() {
     }, [token]);
 
     useEffect(() => {
-        if (token && rol === "ROLE_ADMIN") dispatch(fetchPedidos());
-    }, [token, rol]);
+        // Se pide una sola vez por sesión: si ya está cargado (cargadoAdmin),
+        // no se vuelve a gettear solo porque el componente se vuelva a montar.
+        if (token && rol === "ROLE_ADMIN" && !cargadoAdmin) dispatch(fetchPedidos());
+    }, [token, rol, cargadoAdmin, dispatch]);
 
     return (
         <BrowserRouter>
