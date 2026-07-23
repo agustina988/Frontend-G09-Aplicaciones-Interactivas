@@ -84,7 +84,7 @@ export default function Navigation() {
                             <div className="nav-search-dropdown">
                                 {resultados.map((p) => (
                                     <button key={p.id} className="nav-search-item" onClick={() => irAProducto(p.id)}>
-                                        <img src={p.imagenUrl} alt={p.nombre} />
+                                        <img src={p.imagenUrl} alt={p.nombre} referrerPolicy="no-referrer" />
                                         <div>
                                             <p className="nav-search-nombre">{p.nombre}</p>
                                             <p className="nav-search-cat">{p.categoriaNombre}</p>

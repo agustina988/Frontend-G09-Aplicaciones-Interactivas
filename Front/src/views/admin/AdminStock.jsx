@@ -78,7 +78,6 @@ export default function AdminStock() {
                             >
                                 {CATEGORIAS_FILTRO.map((c) => <option key={c}>{c}</option>)}
                             </select>
-                            <button className="admin-btn-primary">EXPORTAR PDF</button>
                         </div>
 
                         <div className="admin-stock-tabla">
@@ -97,7 +96,7 @@ export default function AdminStock() {
                             ) : filtrados.map((p) => (
                                 <div key={p.id} className={`admin-stock-row${p.stock === 0 ? " sin-stock" : ""}`}>
                                     <span className="admin-stock-prod">
-                                        <img src={p.imagen} alt={p.nombre} style={{ filter: p.stock === 0 ? "grayscale(1)" : "none" }} />
+                                        <img src={p.imagen} alt={p.nombre} referrerPolicy="no-referrer" style={{ filter: p.stock === 0 ? "grayscale(1)" : "none" }} />
                                         <span>
                                             {p.nombre}
                                             {p.stock === 0 && <span className="admin-stock-badge-agotado">SIN STOCK</span>}

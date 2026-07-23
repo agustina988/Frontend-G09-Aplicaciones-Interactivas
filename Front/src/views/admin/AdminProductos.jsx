@@ -235,6 +235,7 @@ export default function AdminProductos() {
                                                 <img
                                                     src={url}
                                                     alt={`Imagen ${i + 1}`}
+                                                    referrerPolicy="no-referrer"
                                                     onError={() => setImgError(true)}
                                                     style={{ width: "100%", height: "100%", objectFit: "cover", border: i === 0 ? "2px solid #8b6914" : "1px solid #e0dbd0" }}
                                                 />
@@ -303,6 +304,7 @@ export default function AdminProductos() {
                                     <img
                                         src={form.imagenes[0]}
                                         alt="preview"
+                                        referrerPolicy="no-referrer"
                                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                                     />
                                 ) : (
@@ -326,7 +328,7 @@ export default function AdminProductos() {
                             <p className="admin-preview-titulo" style={{ marginTop: "2rem" }}>ÚLTIMOS PRODUCTOS</p>
                             {productosStock.slice(-3).reverse().map((p) => (
                                 <div key={p.id} className="admin-preview-reciente-row">
-                                    <img src={p.imagen} alt={p.nombre} onError={(e) => { e.target.style.display = "none"; }} />
+                                    <img src={p.imagen} alt={p.nombre} referrerPolicy="no-referrer" onError={(e) => { e.target.style.display = "none"; }} />
                                     <div>
                                         <p>{p.nombre}</p>
                                         <p style={{ color: "#8b6914", fontSize: "13px" }}>${p.precio?.toLocaleString("es-AR")}</p>

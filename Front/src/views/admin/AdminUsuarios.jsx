@@ -116,14 +116,8 @@ export default function AdminUsuarios() {
                                 </span>
                                 <span style={{ fontSize: "14px", color: "#5a5550" }}>{u.acceso || "Ahora mismo"}</span>
                                 <span style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                                    <button className="admin-accion-btn" title="Editar usuario" onClick={() => abrirModal(u, "editar")}>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                                    </button>
                                     <button className="admin-accion-btn" title="Ver historial de pedidos" onClick={() => abrirModal(u, "historial")}>
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    </button>
-                                    <button className="admin-accion-btn rojo" title="Suspender usuario" onClick={() => abrirModal(u, "suspender")}>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
                                     </button>
                                 </span>
                             </div>
@@ -143,26 +137,11 @@ export default function AdminUsuarios() {
                     <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="admin-modal-header">
                             <h2>
-                                {modalTipo === "editar" && `Editar: ${modalUsuario.nombre}`}
                                 {modalTipo === "historial" && `Historial: ${modalUsuario.nombre}`}
-                                {modalTipo === "suspender" && `Suspender: ${modalUsuario.nombre}`}
                             </h2>
                             <button onClick={cerrarModal}>✕</button>
                         </div>
                         <div className="admin-modal-body">
-                            {modalTipo === "editar" && (
-                                <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
-                                    <div><p className="admin-modal-label">NOMBRE</p><p style={{ fontSize: "16px" }}>{modalUsuario.nombre}</p></div>
-                                    <div><p className="admin-modal-label">EMAIL</p><p style={{ fontSize: "16px" }}>{modalUsuario.email}</p></div>
-                                    <div><p className="admin-modal-label">ROL</p>
-                                        <select style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "15px", border: "1px solid #e0dbd0", padding: "6px 12px", background: "#fff" }} defaultValue={modalUsuario.miembro}>
-                                            <option>MEMBER</option>
-                                            <option>ELITE MEMBER</option>
-                                        </select>
-                                    </div>
-                                    <button className="admin-btn-primary" onClick={cerrarModal}>GUARDAR CAMBIOS</button>
-                                </div>
-                            )}
                             {modalTipo === "historial" && (
                                 <div>
                                     <p style={{ color: "#8a8580", fontSize: "14px", marginBottom: "1rem" }}>Pedidos realizados por este usuario:</p>
@@ -174,15 +153,6 @@ export default function AdminUsuarios() {
                                             </div>
                                         </div>
                                     )) : <p style={{ color: "#aaa" }}>Sin pedidos registrados.</p>}
-                                </div>
-                            )}
-                            {modalTipo === "suspender" && (
-                                <div style={{ textAlign: "center", padding: "1rem 0" }}>
-                                    <p style={{ fontSize: "16px", marginBottom: "1.5rem", color: "#5a5550" }}>¿Estás seguro que querés suspender a <strong>{modalUsuario.nombre}</strong>? Esta acción es reversible.</p>
-                                    <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
-                                        <button className="admin-btn-primary" style={{ background: "#c44" }} onClick={cerrarModal}>SUSPENDER</button>
-                                        <button className="admin-btn-primary" style={{ background: "#888" }} onClick={cerrarModal}>CANCELAR</button>
-                                    </div>
                                 </div>
                             )}
                         </div>

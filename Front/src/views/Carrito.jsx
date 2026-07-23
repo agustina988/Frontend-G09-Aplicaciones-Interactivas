@@ -51,7 +51,7 @@ export default function Carrito() {
                         <div className="carrito-items">
                             {carrito.map((p) => (
                                 <div key={p.id} className="carrito-item">
-                                    <img src={p.imagenes?.[0] || p.imagen} alt={p.nombre} className="carrito-item-img" />
+                                    <img src={p.imagenes?.[0] || p.imagen} alt={p.nombre} className="carrito-item-img" referrerPolicy="no-referrer" />
                                     <div className="carrito-item-info">
                                         <p className="carrito-item-cat">{p.subcategoria?.toUpperCase()}</p>
                                         <p className="carrito-item-nombre">{p.nombre}</p>

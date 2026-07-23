@@ -121,7 +121,7 @@ export default function DetalleProducto() {
                     <div className="detalle-galeria">
                         <div className={`detalle-img-principal${sinStock ? " detalle-img-agotado" : ""}`}>
                             {imagenPrincipal ? (
-                                <img src={imagenPrincipal} alt={producto.nombre} />
+                                <img src={imagenPrincipal} alt={producto.nombre} referrerPolicy="no-referrer" />
                             ) : (
                                 <div style={{ width: "100%", height: "100%", background: "#f5f2ec", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0bbb0" strokeWidth="1.2">
@@ -165,7 +165,7 @@ export default function DetalleProducto() {
                                         className={`detalle-thumb${imgActiva === i ? " active" : ""}`}
                                         onClick={() => setImgActiva(i)}
                                     >
-                                        <img src={img} alt={`Vista ${i + 1}`} />
+                                        <img src={img} alt={`Vista ${i + 1}`} referrerPolicy="no-referrer" />
                                     </button>
                                 ))}
                             </div>
