@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../app/axiosInstance";
+import { act } from "react";
 
 
 const mapearProducto = (b) => ({
@@ -93,6 +94,7 @@ const productosSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            //fetchProductos
             .addCase(fetchProductos.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -107,22 +109,64 @@ const productosSlice = createSlice({
                 state.error = action.payload || action.error.message;
                 state.cargado = true;
             })
-            .addCase(crearProducto.fulfilled, (state, action) => {
+
+            //crearProducto
+            .addCase(crearProducto.pending, (state)=>{
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(crearProducto.fulfilled, (state, action) =>{
+                state.loading = false;
                 state.items.push(action.payload);
             })
+            .addCase(crearProducto.rejected, (state, action) =>{
+                state.loading = false;
+                state.error = action.payload || action.error.message;
+            })
+            //crearImagenProducto
+            .addCase(crearImagenProducto.pending, (state)=>{
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(crearImagenProducto.fulfilled, (state, action) => {
+                state.loading = false;
                 const p = state.items.find((i) => i.id === action.payload.productoId);
                 if (p) {
                     p.imagenUrl = action.payload.url;
                     p.imagenes = [action.payload.url];
                 }
             })
+            .addCase(crearImagenProducto.rejected, (state, action) =>{
+                state.loading = false;
+                state.error = action.payload || action.error.message;
+            })
+
+            //editarStockProducto
+            .addCase(editarStockProducto.pending, (state) =>{
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(editarStockProducto.fulfilled, (state, action) => {
+                state.loading = false;
                 const idx = state.items.findIndex((p) => p.id === action.payload.id);
                 if (idx !== -1) state.items[idx] = { ...state.items[idx], stock: action.payload.stock };
             })
+            .addCase(editarStockProducto.rejected, (state, action)=>{
+                state.loading = false;
+                state.error = action.payload || action.error.message;
+            })
+            //eliminarProducto
+            .addCase(eliminarProducto.pending, (state)=>{
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(eliminarProducto.fulfilled, (state, action) => {
+                state.loading = false;
                 state.items = state.items.filter((p) => p.id !== action.payload);
+            })
+            .addCase(eliminarProducto.rejected, (state,action)=>{
+                state.loading = false;
+                state.error = action.payload || action.error.message;
             });
     },
 });

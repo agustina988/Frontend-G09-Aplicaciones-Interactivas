@@ -65,6 +65,7 @@ const categoriasSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+            //fetchCategorias
             .addCase(fetchCategorias.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -77,15 +78,48 @@ const categoriasSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || action.error.message;
             })
+
+            //crearCategoria
+            .addCase(crearCategoria.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(crearCategoria.fulfilled, (state, action) => {
+                state.loading = false;
                 state.items.push(action.payload);
             })
+            .addCase(crearCategoria.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message;
+            })
+
+            //editarCategoria
+            .addCase(editarCategoria.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(editarCategoria.fulfilled, (state, action) => {
+                state.loading = false;
                 const idx = state.items.findIndex((c) => c.id === action.payload.id);
                 if (idx !== -1) state.items[idx] = action.payload;
             })
+            .addCase(editarCategoria.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message;
+            })
+
+            //eliminarCategoria
+            .addCase(eliminarCategoria.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(eliminarCategoria.fulfilled, (state, action) => {
+                state.loading = false;
                 state.items = state.items.filter((c) => c.id !== action.payload);
+            })
+            .addCase(eliminarCategoria.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message;
             });
     },
 });
