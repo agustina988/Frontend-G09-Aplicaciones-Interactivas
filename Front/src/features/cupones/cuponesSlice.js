@@ -45,6 +45,9 @@ const cuponesSlice = createSlice({
         loading: false,
         error: null,
         errorValidacion: null,
+        // NUEVO: igual que productos/usuarios/pedidos. Si ya se pidió una vez,
+        // entrar y salir de la pantalla de cupones no vuelve a gettear.
+        cargado: false,
     },
     reducers: {
         quitarCuponAplicado: (state) => {
@@ -60,10 +63,12 @@ const cuponesSlice = createSlice({
             .addCase(fetchCupones.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = action.payload;
+                state.cargado = true;
             })
             .addCase(fetchCupones.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || action.error.message;
+                state.cargado = true;
             })
             .addCase(crearCupon.fulfilled, (state, action) => {
                 state.items.push(action.payload);
