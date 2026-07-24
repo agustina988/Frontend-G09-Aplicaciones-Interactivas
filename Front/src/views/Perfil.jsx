@@ -14,6 +14,8 @@ export default function Perfil() {
     const pedidosRaw = useSelector((state) => state.pedidos.misPedidos);
     const cargandoPedidos = useSelector((state) => state.pedidos.loading);
     const errorPedidos = useSelector((state) => state.pedidos.error);
+    const cargadoMisPedidos = useSelector((state) => state.pedidos.cargadoMisPedidos);
+    const perfilCargado = useSelector((state) => state.auth.perfilCargado);
 
     const pedidos = pedidosRaw.map((p) => ({
         id: `#${p.id}`,
@@ -25,9 +27,15 @@ export default function Perfil() {
 
     useEffect(() => {
         if (!token) return;
-        dispatch(fetchMisPedidos());
-        dispatch(fetchPerfil());
-    }, [token, dispatch]);
+        if (!cargadoMisPedidos) dispatch(fetchMisPedidos());
+    }, [token, cargadoMisPedidos, dispatch]);
+
+    // El perfil (nombre/teléfono/dirección) se trae una sola vez al loguearse;
+    // si se edita, se actualiza local + PUT (ver actualizarPerfil), sin volver
+    // a gettear cada vez que se entra a esta pantalla.
+    useEffect(() => {
+        if (token && !perfilCargado) dispatch(fetchPerfil());
+    }, [token, perfilCargado, dispatch]);
 
     if (!usuario) { navigate("/login"); return null; }
 

@@ -16,6 +16,7 @@ const usuariosSlice = createSlice({
         items: [],
         loading: false,
         error: null,
+        cargado: false,
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -27,10 +28,12 @@ const usuariosSlice = createSlice({
             .addCase(fetchUsuarios.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = action.payload;
+                state.cargado = true;
             })
             .addCase(fetchUsuarios.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || action.error.message;
+                state.cargado = true;
             });
     },
 });

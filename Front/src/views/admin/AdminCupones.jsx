@@ -8,12 +8,18 @@ export default function AdminCupones() {
     const dispatch = useDispatch();
     const cupones = useSelector((state) => state.cupones.items);
     const error = useSelector((state) => state.cupones.error);
+    const cargado = useSelector((state) => state.cupones.cargado);
     const [codigo, setCodigo] = useState("");
     const [descuento, setDescuento] = useState("");
 
     useEffect(() => {
-        dispatch(fetchCupones());
-    }, [dispatch]);
+        // Antes: dispatch(fetchCupones()) sin guard -> cada vez que se
+        // entraba a esta pantalla, volvía a pegarle al backend.
+        // Ahora: se pide una única vez por sesión, igual que usuarios/pedidos.
+        if (!cargado) {
+            dispatch(fetchCupones());
+        }
+    }, [cargado, dispatch]);
 
     const handleCrearCupon = (e) => {
         e.preventDefault();

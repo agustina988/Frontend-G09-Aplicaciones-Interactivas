@@ -235,7 +235,7 @@ export default function Checkout() {
                         <p className="checkout-resumen-title">Resumen del Pedido</p>
                         {carrito.map((p) => (
                             <div key={p.id} className="checkout-resumen-item">
-                                <img src={p.imagenes?.[0] || p.imagen} alt={p.nombre} />
+                                <img src={p.imagenes?.[0] || p.imagen} alt={p.nombre} referrerPolicy="no-referrer" />
                                 <div style={{ flex: 1 }}>
                                     <p style={{ fontSize: "11px", color: "#8a8580", letterSpacing: "0.1em" }}>{p.subcategoria?.toUpperCase()}</p>
                                     <p style={{ fontSize: "17px", color: "#2a2520", fontWeight: 500 }}>{p.nombre}</p>

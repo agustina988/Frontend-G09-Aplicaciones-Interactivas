@@ -45,6 +45,13 @@ const cuponesSlice = createSlice({
         loading: false,
         error: null,
         errorValidacion: null,
+        // Flag para no re-pedir la lista cada vez que se entra a la pestaña
+        // de admin (corrección anterior).
+        cargado: false,
+        // NUEVO: loading/error propios de crear/eliminar cupón, separados
+        // de "loading"/"error" que ya usa fetchCupones.
+        guardando: false,
+        errorGuardado: null,
     },
     reducers: {
         quitarCuponAplicado: (state) => {
@@ -60,16 +67,35 @@ const cuponesSlice = createSlice({
             .addCase(fetchCupones.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = action.payload;
+                state.cargado = true;
             })
             .addCase(fetchCupones.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || action.error.message;
+                state.cargado = true;
+            })
+            // NUEVO: pending/rejected de crearCupon (antes solo fulfilled)
+            .addCase(crearCupon.pending, (state) => {
+                state.guardando = true;
+                state.errorGuardado = null;
             })
             .addCase(crearCupon.fulfilled, (state, action) => {
+                state.guardando = false;
                 state.items.push(action.payload);
+            })
+            .addCase(crearCupon.rejected, (state, action) => {
+                state.guardando = false;
+                state.errorGuardado = action.payload || action.error.message;
+            })
+            // NUEVO: pending/rejected de eliminarCupon
+            .addCase(eliminarCupon.pending, (state) => {
+                state.errorGuardado = null;
             })
             .addCase(eliminarCupon.fulfilled, (state, action) => {
                 state.items = state.items.filter((c) => c.id !== action.payload);
+            })
+            .addCase(eliminarCupon.rejected, (state, action) => {
+                state.errorGuardado = action.payload || action.error.message;
             })
             .addCase(validarCupon.pending, (state) => {
                 state.errorValidacion = null;

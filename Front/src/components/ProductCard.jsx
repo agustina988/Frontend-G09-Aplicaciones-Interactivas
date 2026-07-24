@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Swal from "sweetalert2";
@@ -14,7 +15,9 @@ export default function ProductCard({ producto }) {
     const esAdmin = usuario?.rol === "ROLE_ADMIN";
     const fav = favoritos.some((p) => p.id === producto.id);
 
-    const imagen = producto.imagenes?.[0] || producto.imagenUrl || producto.imagen || null;
+    const [imagenRota, setImagenRota] = useState(false);
+    const imagenUrl = producto.imagenes?.[0] || producto.imagenUrl || producto.imagen || null;
+    const imagen = imagenRota ? null : imagenUrl;
 
     const productoEnCatalogo = productos.find((p) => p.id === producto.id);
     const stockActual = productoEnCatalogo ? productoEnCatalogo.stock : (producto.stock ?? 1);
@@ -49,7 +52,7 @@ export default function ProductCard({ producto }) {
                 style={{ cursor: "pointer" }}
             >
                 {imagen ? (
-                    <img src={imagen} alt={producto.nombre} loading="lazy" />
+                    <img src={imagen} alt={producto.nombre} loading="lazy" referrerPolicy="no-referrer" onError={() => setImagenRota(true)} />
                 ) : (
                     <div className="product-card-sin-imagen">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c0bbb0" strokeWidth="1.5">
@@ -78,11 +81,7 @@ export default function ProductCard({ producto }) {
             <div className="product-card-info">
                 <p className="product-card-name">{producto.nombre}</p>
                 <p className="product-card-price">$ {producto.precio.toLocaleString("es-AR")}</p>
-                {esAdmin ? (
-                    <button className="product-card-btn product-card-btn--nodisponible" disabled>
-                        No disponible para admins
-                    </button>
-                ) : sinStock ? (
+                {esAdmin ? null : sinStock ? (
                     <button className="product-card-btn product-card-btn--nodisponible" disabled>
                         NO DISPONIBLE
                     </button>

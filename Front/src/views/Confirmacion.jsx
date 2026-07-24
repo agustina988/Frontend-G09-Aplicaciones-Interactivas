@@ -61,7 +61,7 @@ export default function Confirmacion() {
                     <div className="confirmacion-producto-card">
                         {primerProducto && (
                             <>
-                                <img src={primerProducto.imagenes?.[0] || primerProducto.imagen} alt={primerProducto.nombre} />
+                                <img src={primerProducto.imagenes?.[0] || primerProducto.imagen} alt={primerProducto.nombre} referrerPolicy="no-referrer" />
                                 <div className="confirmacion-prod-info">
                                     {primerProducto.badge && <span className="confirmacion-prod-badge">{primerProducto.badge}</span>}
                                     <h2>{primerProducto.nombre}</h2>

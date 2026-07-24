@@ -1,19 +1,21 @@
-import { useState, useMemo, useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setFiltroCategoria, resetFiltroCategoria } from "../features/filtros/filtrosSlice";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import "./Productos.css";
 
+const FILTRO_VACIO = { subcat: null, materiales: [], orden: "relevancia", precioMax: 0 };
+
 export default function Productos({ categoria }) {
+    const dispatch = useDispatch();
     const location = useLocation();
     const subcatInicial = location.state?.subcategoria || null;
     const productosBackend = useSelector((state) => state.productos.items);
     const cargandoProductos = useSelector((state) => state.productos.loading);
-
-    const [subcat, setSubcat] = useState(subcatInicial);
-    const [materiales, setMateriales] = useState([]);
-    const [orden, setOrden] = useState("relevancia");
+    const filtro = useSelector((state) => state.filtros.porCategoria[categoria] || FILTRO_VACIO);
+    const { subcat, materiales, orden, precioMax } = filtro;
 
     const todosLosProdsCat = productosBackend
         .filter((p) => p.categoriaSlug === categoria)
@@ -52,14 +54,23 @@ export default function Productos({ categoria }) {
         ? Math.max(...todosLosProdsCat.map((p) => p.precio))
         : 0;
 
-    const [precioMax, setPrecioMax] = useState(maxPrecioReal);
+    const cargadoProductos = useSelector((state) => state.productos.cargado);
+    const filtroExistente = useSelector((state) => state.filtros.porCategoria[categoria]);
 
     useEffect(() => {
-        setSubcat(subcatInicial);
-        setMateriales([]);
-        setOrden("relevancia");
-        setPrecioMax(maxPrecioReal);
-    }, [categoria, maxPrecioReal, subcatInicial]);
+        // Importante: hay que esperar a que "productos" ya esté cargado
+        // (state.productos.cargado) antes de fijar el filtro. Si se fija
+        // apenas se monta la página, todavía no hay productos y
+        // maxPrecioReal da 0 — y como después no se vuelve a pisar el
+        // filtro ya inicializado, el rango de precio quedaba en $0 para
+        // siempre y no se veía ningún producto.
+        if (cargadoProductos && !filtroExistente) {
+            dispatch(resetFiltroCategoria({ categoria, precioMax: maxPrecioReal }));
+            if (subcatInicial) {
+                dispatch(setFiltroCategoria({ categoria, filtros: { subcat: subcatInicial } }));
+            }
+        }
+    }, [categoria, subcatInicial, maxPrecioReal, filtroExistente, cargadoProductos, dispatch]);
 
     const filtrados = useMemo(() => {
         let lista = todosLosProdsCat;
@@ -71,10 +82,13 @@ export default function Productos({ categoria }) {
         return lista;
     }, [subcat, materiales, precioMax, orden, categoria, todosLosProdsCat.length]);
 
+    const setSubcat = (val) => dispatch(setFiltroCategoria({ categoria, filtros: { subcat: val } }));
+    const setOrden = (val) => dispatch(setFiltroCategoria({ categoria, filtros: { orden: val } }));
+    const setPrecioMax = (val) => dispatch(setFiltroCategoria({ categoria, filtros: { precioMax: val } }));
+
     const toggleMaterial = (mat) => {
-        setMateriales((prev) =>
-            prev.includes(mat) ? prev.filter((m) => m !== mat) : [...prev, mat]
-        );
+        const actuales = materiales.includes(mat) ? materiales.filter((m) => m !== mat) : [...materiales, mat];
+        dispatch(setFiltroCategoria({ categoria, filtros: { materiales: actuales } }));
     };
 
     return (

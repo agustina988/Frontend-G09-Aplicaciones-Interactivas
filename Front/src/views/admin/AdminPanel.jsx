@@ -19,10 +19,19 @@ export default function AdminPanel() {
     const navigate = useNavigate();
     const pedidos = useSelector((state) => state.pedidos.adminList);
     const totalUsuarios = useSelector((state) => state.usuarios.items.length);
+    const cargadoUsuarios = useSelector((state) => state.usuarios.cargado);
 
     useEffect(() => {
-        dispatch(fetchUsuarios());
-    }, [dispatch]);
+        // Antes: dispatch(fetchUsuarios()) sin guard -> cada vez que se
+        // volvía al dashboard (por ejemplo, después de entrar a "Usuarios"
+        // y volver) se disparaba un GET /usuarios de nuevo.
+        // Ahora: usa el mismo flag "cargado" que ya tiene la slice de
+        // usuarios, así que solo pide una vez por sesión, sin importar
+        // cuántas veces se entre y salga de esta pantalla.
+        if (!cargadoUsuarios) {
+            dispatch(fetchUsuarios());
+        }
+    }, [cargadoUsuarios, dispatch]);
 
     const ventasDelMes = pedidos.reduce((acc, p) => acc + (p.total || 0), 0);
     const pedidosPendientes = pedidos.filter((p) => p.estado === "PENDIENTE").length;

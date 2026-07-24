@@ -1,19 +1,24 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { editarStockProducto, eliminarProducto } from "../../features/productos/productosSlice";
+import { TODAS, setAdminStockBusqueda, setAdminStockCategoria } from "../../features/filtros/filtrosSlice";
 import AdminNav from "./AdminNav";
 import "./AdminStock.css";
-
-const TODAS = "Todas las Categorías";
 
 export default function AdminStock() {
     const dispatch = useDispatch();
     const productos = useSelector((state) => state.productos.items);
     const categoriasAdmin = useSelector((state) => state.categorias.items);
     const CATEGORIAS_FILTRO = [TODAS, ...categoriasAdmin.map((c) => c.nombre)];
+
+    // Antes: useState(""), useState(TODAS). Ahora viven en la slice `filtros`,
+    // igual que el resto de las "tablas" de la app.
+    const busqueda = useSelector((state) => state.filtros.adminStockBusqueda);
+    const categoriaFiltro = useSelector((state) => state.filtros.adminStockCategoria);
+
+    // Esto sí queda local: no es dato de ninguna tabla, es solo UI
+    // (qué pestaña está activa y qué fila tiene el modal de confirmación abierto).
     const [tab, setTab] = useState("stock");
-    const [busqueda, setBusqueda] = useState("");
-    const [categoriaFiltro, setCategoriaFiltro] = useState(TODAS);
     const [modalEliminar, setModalEliminar] = useState(null);
 
     const productosStock = productos.map((p) => ({
@@ -68,17 +73,16 @@ export default function AdminStock() {
                                 <input
                                     placeholder="Buscar producto o SKU..."
                                     value={busqueda}
-                                    onChange={(e) => setBusqueda(e.target.value)}
+                                    onChange={(e) => dispatch(setAdminStockBusqueda(e.target.value))}
                                 />
                             </div>
                             <select
                                 className="admin-stock-select"
                                 value={categoriaFiltro}
-                                onChange={(e) => setCategoriaFiltro(e.target.value)}
+                                onChange={(e) => dispatch(setAdminStockCategoria(e.target.value))}
                             >
                                 {CATEGORIAS_FILTRO.map((c) => <option key={c}>{c}</option>)}
                             </select>
-                            <button className="admin-btn-primary">EXPORTAR PDF</button>
                         </div>
 
                         <div className="admin-stock-tabla">
@@ -97,7 +101,7 @@ export default function AdminStock() {
                             ) : filtrados.map((p) => (
                                 <div key={p.id} className={`admin-stock-row${p.stock === 0 ? " sin-stock" : ""}`}>
                                     <span className="admin-stock-prod">
-                                        <img src={p.imagen} alt={p.nombre} style={{ filter: p.stock === 0 ? "grayscale(1)" : "none" }} />
+                                        <img src={p.imagen} alt={p.nombre} referrerPolicy="no-referrer" style={{ filter: p.stock === 0 ? "grayscale(1)" : "none" }} />
                                         <span>
                                             {p.nombre}
                                             {p.stock === 0 && <span className="admin-stock-badge-agotado">SIN STOCK</span>}

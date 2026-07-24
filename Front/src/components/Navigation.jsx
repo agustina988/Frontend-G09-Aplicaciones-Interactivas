@@ -1,47 +1,47 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setBusqueda, limpiarBusqueda } from "../features/filtros/filtrosSlice";
 import "./Navigation.css";
 
 export default function Navigation() {
+    const dispatch = useDispatch();
     const usuario = useSelector((state) => state.auth.usuario);
     const totalCarrito = useSelector((state) => state.carrito.items.reduce((acc, p) => acc + p.cantidad, 0));
     const favoritos = useSelector((state) => state.favoritos.items);
     const productos = useSelector((state) => state.productos.items);
+    const busqueda = useSelector((state) => state.filtros.busqueda);
     const esAdmin = usuario?.rol === "ROLE_ADMIN";
     const navigate = useNavigate();
-    const [busqueda, setBusqueda] = useState("");
-    const [resultados, setResultados] = useState([]);
-    const [buscadorAbierto, setBuscadorAbierto] = useState(false);
     const inputRef = useRef(null);
     const dropRef = useRef(null);
 
-    const handleBusqueda = (val) => {
-        setBusqueda(val);
-        if (val.trim().length < 2) { setResultados([]); return; }
-        const found = productos.filter((p) =>
-            p.nombre.toLowerCase().includes(val.toLowerCase()) ||
-            p.categoriaNombre?.toLowerCase().includes(val.toLowerCase())
+    const resultados = useMemo(() => {
+        if (busqueda.trim().length < 2) return [];
+        return productos.filter((p) =>
+            p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+            p.categoriaNombre?.toLowerCase().includes(busqueda.toLowerCase())
         ).slice(0, 6);
-        setResultados(found);
+    }, [busqueda, productos]);
+
+    const handleBusqueda = (val) => {
+        dispatch(setBusqueda(val));
     };
 
     const irAProducto = (id) => {
-        setBusqueda("");
-        setResultados([]);
-        setBuscadorAbierto(false);
+        dispatch(limpiarBusqueda());
         navigate(`/producto/${id}`);
     };
 
     useEffect(() => {
         const handler = (e) => {
             if (dropRef.current && !dropRef.current.contains(e.target)) {
-                setResultados([]);
+                dispatch(limpiarBusqueda());
             }
         };
         document.addEventListener("mousedown", handler);
         return () => document.removeEventListener("mousedown", handler);
-    }, []);
+    }, [dispatch]);
 
     return (
         <header className="nav-header">
@@ -73,7 +73,6 @@ export default function Navigation() {
                                 placeholder="Buscar un producto..."
                                 value={busqueda}
                                 onChange={(e) => handleBusqueda(e.target.value)}
-                                onFocus={() => setBuscadorAbierto(true)}
                             />
                             <button aria-label="Buscar">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -85,7 +84,7 @@ export default function Navigation() {
                             <div className="nav-search-dropdown">
                                 {resultados.map((p) => (
                                     <button key={p.id} className="nav-search-item" onClick={() => irAProducto(p.id)}>
-                                        <img src={p.imagenUrl} alt={p.nombre} />
+                                        <img src={p.imagenUrl} alt={p.nombre} referrerPolicy="no-referrer" />
                                         <div>
                                             <p className="nav-search-nombre">{p.nombre}</p>
                                             <p className="nav-search-cat">{p.categoriaNombre}</p>
@@ -109,14 +108,7 @@ export default function Navigation() {
                         {favoritos.length > 0 && <span className="nav-badge">{favoritos.length}</span>}
                     </Link>
 
-                    {esAdmin ? (
-                        <span className="nav-icon-btn nav-icon-disabled" aria-label="Carrito desabilitado para admins" title="El carrito no está disponible para administradores">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                            </svg>
-                        </span>
-                    ) : (
+                    {!esAdmin && (
                         <Link to="/carrito" className="nav-icon-btn" aria-label="Carrito">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                                 <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
