@@ -46,6 +46,11 @@ const authSlice = createSlice({
         loading: false,
         error: null,
         perfilCargado: false,
+        // NUEVO: loading/error propios de actualizarPerfil, separados de
+        // "loading"/"error" (que ya usan login/registro) para no pisarse
+        // entre sí si el usuario edita el perfil en otra pantalla.
+        guardandoPerfil: false,
+        errorPerfil: null,
     },
     reducers: {
         logout: (state) => {
@@ -103,6 +108,12 @@ const authSlice = createSlice({
                 state.error = action.payload || action.error.message;
             })
             // PERFIL (GET)
+            // NUEVO: faltaba el .pending -> antes no había ninguna forma de
+            // saber, mientras se estaba pidiendo el perfil, que la petición
+            // estaba en curso.
+            .addCase(fetchPerfil.pending, (state) => {
+                state.errorPerfil = null;
+            })
             .addCase(fetchPerfil.fulfilled, (state, action) => {
                 if (state.usuario) {
                     state.usuario.nombre = action.payload.nombre || state.usuario.nombre;
@@ -111,16 +122,29 @@ const authSlice = createSlice({
                 }
                 state.perfilCargado = true;
             })
-            .addCase(fetchPerfil.rejected, (state) => {
+            .addCase(fetchPerfil.rejected, (state, action) => {
                 state.perfilCargado = true;
+                state.errorPerfil = action.payload || action.error.message;
             })
             // PERFIL (PUT)
+            // NUEVO: faltaban tanto el .pending como el .rejected -> si
+            // guardar el perfil fallaba en el backend, no se enteraba nadie:
+            // no había spinner, y el error de rejectWithValue se perdía.
+            .addCase(actualizarPerfil.pending, (state) => {
+                state.guardandoPerfil = true;
+                state.errorPerfil = null;
+            })
             .addCase(actualizarPerfil.fulfilled, (state, action) => {
+                state.guardandoPerfil = false;
                 if (state.usuario) {
                     state.usuario.nombre = action.payload.nombre || state.usuario.nombre;
                     state.usuario.telefono = action.payload.telefono || state.usuario.telefono;
                     state.usuario.direccion = action.payload.direccion || state.usuario.direccion;
                 }
+            })
+            .addCase(actualizarPerfil.rejected, (state, action) => {
+                state.guardandoPerfil = false;
+                state.errorPerfil = action.payload || action.error.message;
             });
     },
 });

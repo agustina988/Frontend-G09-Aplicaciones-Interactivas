@@ -98,6 +98,10 @@ const pedidosSlice = createSlice({
         error: null,
         cargadoAdmin: false,
         cargadoMisPedidos: false,
+        // NUEVO: loading/error propios de cambiarEstadoPedido, separados
+        // de "loading"/"error" que ya usan fetchPedidos/fetchMisPedidos.
+        actualizandoEstado: false,
+        errorEstado: null,
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -130,9 +134,19 @@ const pedidosSlice = createSlice({
                 state.error = action.payload || action.error.message;
                 state.cargadoMisPedidos = true;
             })
+            // NUEVO: pending/rejected de cambiarEstadoPedido (antes solo fulfilled)
+            .addCase(cambiarEstadoPedido.pending, (state) => {
+                state.actualizandoEstado = true;
+                state.errorEstado = null;
+            })
             .addCase(cambiarEstadoPedido.fulfilled, (state, action) => {
+                state.actualizandoEstado = false;
                 const idx = state.adminList.findIndex((p) => p.id === action.payload.id);
                 if (idx !== -1) state.adminList[idx] = action.payload;
+            })
+            .addCase(cambiarEstadoPedido.rejected, (state, action) => {
+                state.actualizandoEstado = false;
+                state.errorEstado = action.payload || action.error.message;
             })
             .addCase(confirmarCompra.pending, (state) => {
                 state.loading = true;

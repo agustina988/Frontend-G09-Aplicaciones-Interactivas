@@ -111,6 +111,14 @@ const carritoSlice = createSlice({
         items: [],
         loading: false,
         error: null,
+        // NUEVO: antes ninguna de las acciones de abajo (agregar, cambiar
+        // cantidad, quitar, vaciar, confirmar) tenía un solo .addCase.
+        // Como todas actualizan el estado local al instante (optimistic
+        // update) dentro del propio thunk, "sincronizando" no es un
+        // spinner bloqueante, sino una señal de que hay una sincronización
+        // con el backend en curso, útil por ejemplo para mostrar un
+        // pequeño ícono de "guardando..." en el carrito.
+        sincronizando: false,
     },
     reducers: {
         addItemLocal: (state, action) => {
@@ -144,6 +152,69 @@ const carritoSlice = createSlice({
             })
             .addCase(fetchCarrito.rejected, (state, action) => {
                 state.loading = false;
+                state.error = action.payload || action.error.message;
+            })
+            // NUEVO: agregarAlCarrito no tenía ningún .addCase. El estado
+            // local ya se actualiza de forma optimista con addItemLocal,
+            // pero si falla la sincronización con el backend, ahora queda
+            // registrado el error en vez de perderse en silencio.
+            .addCase(agregarAlCarrito.pending, (state) => {
+                state.sincronizando = true;
+                state.error = null;
+            })
+            .addCase(agregarAlCarrito.fulfilled, (state) => {
+                state.sincronizando = false;
+            })
+            .addCase(agregarAlCarrito.rejected, (state, action) => {
+                state.sincronizando = false;
+                state.error = action.payload || action.error.message;
+            })
+            // NUEVO: cambiarCantidad
+            .addCase(cambiarCantidad.pending, (state) => {
+                state.sincronizando = true;
+                state.error = null;
+            })
+            .addCase(cambiarCantidad.fulfilled, (state) => {
+                state.sincronizando = false;
+            })
+            .addCase(cambiarCantidad.rejected, (state, action) => {
+                state.sincronizando = false;
+                state.error = action.payload || action.error.message;
+            })
+            // NUEVO: quitarDelCarrito
+            .addCase(quitarDelCarrito.pending, (state) => {
+                state.sincronizando = true;
+                state.error = null;
+            })
+            .addCase(quitarDelCarrito.fulfilled, (state) => {
+                state.sincronizando = false;
+            })
+            .addCase(quitarDelCarrito.rejected, (state, action) => {
+                state.sincronizando = false;
+                state.error = action.payload || action.error.message;
+            })
+            // NUEVO: vaciarCarrito
+            .addCase(vaciarCarrito.pending, (state) => {
+                state.sincronizando = true;
+                state.error = null;
+            })
+            .addCase(vaciarCarrito.fulfilled, (state) => {
+                state.sincronizando = false;
+            })
+            .addCase(vaciarCarrito.rejected, (state, action) => {
+                state.sincronizando = false;
+                state.error = action.payload || action.error.message;
+            })
+            // NUEVO: confirmarCarritoBackend
+            .addCase(confirmarCarritoBackend.pending, (state) => {
+                state.sincronizando = true;
+                state.error = null;
+            })
+            .addCase(confirmarCarritoBackend.fulfilled, (state) => {
+                state.sincronizando = false;
+            })
+            .addCase(confirmarCarritoBackend.rejected, (state, action) => {
+                state.sincronizando = false;
                 state.error = action.payload || action.error.message;
             });
     },
