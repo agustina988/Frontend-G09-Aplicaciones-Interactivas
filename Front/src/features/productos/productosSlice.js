@@ -137,6 +137,11 @@ const productosSlice = createSlice({
                 state.productoActual = null;
                 state.errorActual = action.payload || action.error.message;
             })
+            //crearProducto
+            .addCase(crearProducto.pending, (state)=>{
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(crearProducto.fulfilled, (state, action) => {
                 state.items.push(action.payload);
             })
@@ -150,6 +155,7 @@ const productosSlice = createSlice({
                 state.error = null;
             })
             .addCase(crearImagenProducto.fulfilled, (state, action) => {
+                state.loading = false;
                 const { productoId, url, esPrincipal } = action.payload;
                 const p = state.items.find((i) => i.id === productoId);
                 if (p) {
