@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../app/axiosInstance";
-import { confirmarCarritoBackend, vaciarCarrito } from "../carrito/carritoSlice";
-import { restarStockLocal } from "../productos/productosSlice";
+import { vaciarCarrito } from "../carrito/carritoSlice";
+// ELIMINADO: import { restarStockLocal } from "../productos/productosSlice"; 
+// El stock ahora lo maneja exclusivamente el backend para evitar desincronización.
 
 export const fetchPedidos = createAsyncThunk("pedidos/fetchPedidos", async (_, { rejectWithValue }) => {
     try {
@@ -42,49 +43,38 @@ export const cambiarEstadoPedido = createAsyncThunk("pedidos/cambiarEstadoPedido
 export const confirmarCompra = createAsyncThunk(
     "pedidos/confirmarCompra",
     async (datosEnvio, { dispatch, getState, rejectWithValue }) => {
-        const { carrito, auth } = getState();
+        const { carrito, auth, cupones } = getState();
         const carritoSnapshot = [...carrito.items];
-        const subtotal = carritoSnapshot.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
-        const descuento = getState().cupones.cuponAplicado
-            ? Math.round(subtotal * getState().cupones.cuponAplicado.descuento / 100)
-            : 0;
-        const total = subtotal - descuento;
 
-        await dispatch(confirmarCarritoBackend());
-
-        let pedidoBackend = null;
-        if (auth.token) {
-            const resultado = await dispatch(crearPedidoBackend({
-                total,
-                direccionEnvio: datosEnvio?.direccion || auth.usuario?.direccion || "",
-                productos: carritoSnapshot.map((p) => ({
-                    idProducto: p.id,
-                    nombreProducto: p.nombre,
-                    precioUnitario: p.precio,
-                    cantidad: p.cantidad,
-                })),
-            }));
-            if (crearPedidoBackend.fulfilled.match(resultado)) {
-                pedidoBackend = resultado.payload;
-            } else {
-                return rejectWithValue(resultado.payload || "No se pudo guardar el pedido");
-            }
+        if (carritoSnapshot.length === 0) {
+            return rejectWithValue("El carrito está vacío");
         }
 
-        dispatch(restarStockLocal(carritoSnapshot.map((c) => ({ id: c.id, cantidad: c.cantidad }))));
-        dispatch(vaciarCarrito());
-
-        return {
-            id: pedidoBackend ? `#${pedidoBackend.id}` : "#" + Math.floor(1000 + Math.random() * 9000),
-            idReal: pedidoBackend?.id,
-            cliente: auth.usuario?.nombre || auth.usuario?.email || "Cliente",
-            email: auth.usuario?.email || "",
-            fecha: new Date().toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" }),
-            total,
-            estado: "PENDIENTE",
-            productos: carritoSnapshot,
-            direccion: datosEnvio?.direccion || auth.usuario?.direccion || "",
+        // 1. Construcción del Payload. 
+        // Solo enviamos referencias (IDs), cantidades y datos de contacto.
+        // Los precios y cálculos totales se procesan en el servidor.
+        const payloadBackend = {
+            direccionEnvio: datosEnvio?.direccion || auth.usuario?.direccion || "",
+            emailContacto: auth.usuario?.email || datosEnvio?.email || "",
+            cuponAplicado: cupones.cuponAplicado?.codigo || null,
+            productos: carritoSnapshot.map((p) => ({
+                idProducto: p.id,
+                cantidad: p.cantidad
+            }))
         };
+
+        // 2. Ejecutar la llamada real al backend.
+        const resultado = await dispatch(crearPedidoBackend(payloadBackend));
+
+        if (crearPedidoBackend.fulfilled.match(resultado)) {
+            // 3. Limpiar estado local solo si el backend confirmó la transacción con éxito.
+            dispatch(vaciarCarrito());
+            
+            // Retornamos el objeto Pedido real que generó y respondió la base de datos.
+            return resultado.payload; 
+        } else {
+            return rejectWithValue(resultado.payload || "Error al procesar la compra en el servidor");
+        }
     }
 );
 
@@ -98,8 +88,6 @@ const pedidosSlice = createSlice({
         error: null,
         cargadoAdmin: false,
         cargadoMisPedidos: false,
-        // NUEVO: loading/error propios de cambiarEstadoPedido, separados
-        // de "loading"/"error" que ya usan fetchPedidos/fetchMisPedidos.
         actualizandoEstado: false,
         errorEstado: null,
     },
@@ -134,7 +122,6 @@ const pedidosSlice = createSlice({
                 state.error = action.payload || action.error.message;
                 state.cargadoMisPedidos = true;
             })
-            // NUEVO: pending/rejected de cambiarEstadoPedido (antes solo fulfilled)
             .addCase(cambiarEstadoPedido.pending, (state) => {
                 state.actualizandoEstado = true;
                 state.errorEstado = null;
@@ -154,7 +141,9 @@ const pedidosSlice = createSlice({
             })
             .addCase(confirmarCompra.fulfilled, (state, action) => {
                 state.loading = false;
-                state.ultimoPedido = action.payload;
+                // El action.payload ahora contiene el JSON completo que envió el backend
+                // con el total real, el ID real de base de datos y los detalles validados.
+                state.ultimoPedido = action.payload; 
             })
             .addCase(confirmarCompra.rejected, (state, action) => {
                 state.loading = false;
