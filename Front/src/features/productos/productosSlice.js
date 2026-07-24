@@ -143,6 +143,7 @@ const productosSlice = createSlice({
                 state.error = null;
             })
             .addCase(crearProducto.fulfilled, (state, action) => {
+                state.loading = false
                 state.items.push(action.payload);
             })
             .addCase(crearProducto.rejected, (state, action) =>{
